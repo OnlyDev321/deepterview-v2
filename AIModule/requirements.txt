@@ -1,0 +1,30 @@
+# ── 빌드 도구 (최우선 설치) ───────────────────────────
+setuptools>=69.5.1         # pkg_resources 정상 동작 보장
+wheel>=0.43.0
+
+# ── 핵심 의존성 ───────────────────────────────────────
+numpy==1.26.4
+protobuf==4.25.3
+
+# ── ML / 영상 분석 ────────────────────────────────────
+tensorflow==2.15.1
+tf-keras==2.15.0
+opencv-python==4.9.0.80
+mediapipe==0.10.14
+deepface==0.0.93
+
+# ── 음성 분석 ─────────────────────────────────────────
+librosa==0.10.1
+soundfile==0.12.1
+# whisper는 아래 명령어로 별도 설치 (--no-build-isolation 필수)
+# pip install openai-whisper==20231117 --no-build-isolation
+
+# ── API 서버 ──────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+httpx==0.27.0
+
+# ── 외부 서비스 / 유틸 ────────────────────────────────
+openai==1.30.1
+pdfplumber==0.11.0

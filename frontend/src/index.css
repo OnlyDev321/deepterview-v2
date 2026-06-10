@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #05070a;
+  --color-primary: #cebdff;
+  --color-primary-container: #9b7fed;
+  --color-secondary: #7bd0ff;
+  --color-surface: #111417;
+  --color-surface-container-lowest: #0c0e12;
+  --color-surface-container-low: #191c1f;
+  --color-surface-container-high: #282a2e;
+  --color-surface-container-highest: #323539;
+  --color-on-background: #e1e2e7;
+  --color-on-surface-variant: #cbc3d7;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-background antialiased;
+  }
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface-container-lowest) inset;
+  -webkit-text-fill-color: white;
+
+  /* 🔥 QUAN TRỌNG */
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface-container-lowest) inset;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+@layer utilities {
+  .glow-button {
+    box-shadow: 0 0 20px rgba(155, 127, 237, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glow-button:hover {
+    box-shadow: 0 0 30px rgba(155, 127, 237, 0.4);
+    transform: scale(1.01);
+  }
+  .glass-panel {
+    @apply bg-surface-container-lowest/60 backdrop-blur-3xl border border-white/5;
+  }
+}
+
+@keyframes mock-void-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes mock-void-width {
+  0%,
+  100% {
+    width: 30%;
+  }
+  50% {
+    width: 100%;
+  }
+}
+
+@keyframes mock-void-sheen {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(120%);
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+@keyframes mock-emotion-wave {
+  0%,
+  100% {
+    transform: scaleY(0.88);
+  }
+  50% {
+    transform: scaleY(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mock-void-fill,
+  .mock-void-sheen,
+  .mock-emotion-bar {
+    animation: none !important;
+  }
+
+  .mock-void-fill {
+    width: 66% !important;
+  }
+
+  .mock-emotion-bar {
+    transform: scaleY(1) !important;
+  }
+}
