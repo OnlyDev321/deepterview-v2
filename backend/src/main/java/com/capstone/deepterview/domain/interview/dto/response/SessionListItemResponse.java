@@ -1,11 +1,11 @@
 package com.capstone.deepterview.domain.interview.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.capstone.deepterview.domain.interview.domain.InterviewSession;
 import com.capstone.deepterview.domain.interview.domain.SessionStatus;
 import com.capstone.deepterview.domain.interview.domain.SessionType;
 import com.capstone.deepterview.domain.report.domain.Grade;
-
-import java.time.LocalDateTime;
 
 public record SessionListItemResponse(
 		Long sessionId,
@@ -14,8 +14,8 @@ public record SessionListItemResponse(
 		SessionStatus status,
 		Float overallScore,
 		Grade grade,
-		LocalDateTime createdAt
-) {
+		LocalDateTime createdAt,
+		LocalDateTime endedAt) {
 	public static SessionListItemResponse from(InterviewSession session) {
 		Float overallScore = session.getFeedbackReport() == null ? null : session.getFeedbackReport().getOverallScore();
 		Grade grade = session.getFeedbackReport() == null ? null : session.getFeedbackReport().getGrade();
@@ -27,8 +27,7 @@ public record SessionListItemResponse(
 				session.getStatus(),
 				overallScore,
 				grade,
-				session.getCreatedAt()
-		);
+				session.getCreatedAt(),
+				session.getEndedAt());
 	}
 }
-

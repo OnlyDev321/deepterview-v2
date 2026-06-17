@@ -1,6 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Filter, Sparkles, AlertCircle, RefreshCw, FileText } from "lucide-react";
+import {
+  Calendar,
+  Filter,
+  Sparkles,
+  AlertCircle,
+  RefreshCw,
+  FileText,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import SessionList from "../../components/dashboard/history/SessionList";
@@ -10,19 +17,31 @@ import InterviewTimeline from "../../components/dashboard/history/InterviewTimel
 import { sessionService } from "../../services/sessionService";
 import { reportService } from "../../services/reportService";
 import { runSessionAnalysisPipeline } from "../../lib/sessionAnalysisPipeline";
-import type { SessionListItem, SessionDetail, SessionReport } from "../../types";
+import type {
+  SessionListItem,
+  SessionDetail,
+  SessionReport,
+} from "../../types";
 import type { InterviewSession, QAPair } from "../../types/types";
 
 const HistoryLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const focusSessionId = (location.state as { focusSessionId?: number } | null)?.focusSessionId;
-  const reportReadyNotice = (location.state as { reportReady?: boolean } | null)?.reportReady;
+  const focusSessionId = (location.state as { focusSessionId?: number } | null)
+    ?.focusSessionId;
+  const reportReadyNotice = (location.state as { reportReady?: boolean } | null)
+    ?.reportReady;
 
   const [sessions, setSessions] = useState<SessionListItem[]>([]);
-  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
-  const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null);
-  const [sessionReport, setSessionReport] = useState<SessionReport | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(
+    null,
+  );
+  const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(
+    null,
+  );
+  const [sessionReport, setSessionReport] = useState<SessionReport | null>(
+    null,
+  );
   const [isLoadingList, setIsLoadingList] = useState(true);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [isCreatingReport, setIsCreatingReport] = useState(false);
@@ -39,7 +58,7 @@ const HistoryLayout = () => {
       const res = await sessionService.getSessions(0, 50);
       const completedSessions = res.content || [];
       setSessions(completedSessions);
-      
+
       if (shouldAutoSelect && completedSessions.length > 0) {
         setSelectedSessionId(completedSessions[0].sessionId);
       } else if (completedSessions.length === 0) {
@@ -121,7 +140,15 @@ const HistoryLayout = () => {
         month: "long",
         day: "numeric",
       }),
-      duration: s.sessionType === "TECHNICAL" ? "기술" : s.sessionType === "PERSONALITY" ? "인성" : "종합",
+      duration: (() => {
+        if (!s.endedAt || !s.createdAt) return "0분 0초";
+        const diffMs =
+          new Date(s.endedAt).getTime() - new Date(s.createdAt).getTime();
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}분 ${seconds}초`;
+      })(),
       score: s.overallScore ? Math.round(s.overallScore) : 0,
       questionCount: 0,
       qaPairs: [],
@@ -133,7 +160,8 @@ const HistoryLayout = () => {
     return sessionDetail.questions.map((q) => ({
       id: String(q.id),
       question: q.content,
-      answer: q.answerText || "답변 데이터가 존재하지 않거나 녹음이 스킵되었습니다.",
+      answer:
+        q.answerText || "답변 데이터가 존재하지 않거나 녹음이 스킵되었습니다.",
       tags: [q.questionType === "TECHNICAL" ? "기술" : "행동형"],
       answerId: q.answerId,
       aiInsight: q.answerId ? "AI 다차원 피드백 산출 완료" : "피드백 미생성",
@@ -144,7 +172,7 @@ const HistoryLayout = () => {
   const getMappedSelectedSession = (): InterviewSession | null => {
     if (!sessionDetail) return null;
     const mappedPairs = buildMappedQAPairs();
-    
+
     return {
       id: String(sessionDetail.sessionId),
       company: "Deepterview",
@@ -156,13 +184,20 @@ const HistoryLayout = () => {
             day: "numeric",
           })
         : "진행 시간 없음",
-      duration:
-        sessionDetail.sessionType === "TECHNICAL"
-          ? "기술 면접"
-          : sessionDetail.sessionType === "PERSONALITY"
-          ? "인성 면접"
-          : "종합 면접",
-      score: sessionReport?.overallScore ? Math.round(sessionReport.overallScore) : 0,
+      duration: (() => {
+        if (!sessionDetail.startedAt || !sessionDetail.endedAt)
+          return "0분 0초";
+        const diffMs =
+          new Date(sessionDetail.endedAt).getTime() -
+          new Date(sessionDetail.startedAt).getTime();
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}분 ${seconds}초`;
+      })(),
+      score: sessionReport?.overallScore
+        ? Math.round(sessionReport.overallScore)
+        : 0,
       questionCount: sessionDetail.totalQuestions,
       qaPairs: mappedPairs,
     };
@@ -171,7 +206,9 @@ const HistoryLayout = () => {
   // Navigations
   const handleNavigateToAnalysis = (answerId: number) => {
     if (selectedSessionId) {
-      navigate(`/dashboard/history/${selectedSessionId}/analytics?answerId=${answerId}`);
+      navigate(
+        `/dashboard/history/${selectedSessionId}/analytics?answerId=${answerId}`,
+      );
     } else {
       navigate(`/dashboard/analytics?answerId=${answerId}`);
     }
@@ -183,7 +220,9 @@ const HistoryLayout = () => {
         // Find the first question with a valid answerId
         const firstAnswered = sessionDetail.questions.find((q) => q.answerId);
         if (firstAnswered && firstAnswered.answerId) {
-          navigate(`/dashboard/history/${selectedSessionId}/analytics?answerId=${firstAnswered.answerId}`);
+          navigate(
+            `/dashboard/history/${selectedSessionId}/analytics?answerId=${firstAnswered.answerId}`,
+          );
         } else {
           // Navigate anyway so the user can see the questions in the sidebar
           navigate(`/dashboard/history/${selectedSessionId}/analytics`);
@@ -199,14 +238,14 @@ const HistoryLayout = () => {
     if (!selectedSessionId) return;
 
     const confirmDelete = window.confirm(
-      "이 면접 연습 기록을 정말로 삭제하시겠습니까? 삭제된 기록은 복구할 수 없습니다."
+      "이 면접 연습 기록을 정말로 삭제하시겠습니까? 삭제된 기록은 복구할 수 없습니다.",
     );
     if (!confirmDelete) return;
 
     try {
       setIsLoadingDetail(true);
       await sessionService.deleteSession(selectedSessionId);
-      
+
       // Successfully deleted, refresh list and auto-select next
       alert("면접 연습 기록이 성공적으로 삭제되었습니다.");
       await loadSessionsList(true);
@@ -274,7 +313,9 @@ const HistoryLayout = () => {
       {isLoadingList ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <RefreshCw size={36} className="text-[#cebdff] animate-spin" />
-          <p className="text-sm text-[#cbc3d7]/60 font-medium">세션 내역을 불러오고 있습니다...</p>
+          <p className="text-sm text-[#cbc3d7]/60 font-medium">
+            세션 내역을 불러오고 있습니다...
+          </p>
         </div>
       ) : error ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
@@ -284,9 +325,12 @@ const HistoryLayout = () => {
       ) : sessions.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center bg-[#191c1f]/20 rounded-[2.5rem] border border-white/5 p-12 text-center">
           <Sparkles size={48} className="text-[#cebdff]/30 mb-4" />
-          <h3 className="text-xl font-bold text-[#e1e2e7] mb-2">면접 연습 기록이 존재하지 않습니다</h3>
+          <h3 className="text-xl font-bold text-[#e1e2e7] mb-2">
+            면접 연습 기록이 존재하지 않습니다
+          </h3>
           <p className="text-[#cbc3d7]/50 text-sm max-w-sm mx-auto">
-            새로운 면접 연습을 생성하여 AI의 다차원 피드백 보고서를 확인해보세요!
+            새로운 면접 연습을 생성하여 AI의 다차원 피드백 보고서를
+            확인해보세요!
           </p>
           <button
             onClick={() => navigate("/dashboard")}
@@ -310,7 +354,9 @@ const HistoryLayout = () => {
           >
             <SessionList
               sessions={formatSessionsForList()}
-              selectedSessionId={selectedSessionId ? String(selectedSessionId) : ""}
+              selectedSessionId={
+                selectedSessionId ? String(selectedSessionId) : ""
+              }
               onSelectSession={(id) => setSelectedSessionId(Number(id))}
             />
           </motion.div>
@@ -325,7 +371,9 @@ const HistoryLayout = () => {
             {isLoadingDetail || !selectedMappedSession ? (
               <div className="h-full flex flex-col items-center justify-center gap-4">
                 <RefreshCw size={28} className="text-[#cebdff] animate-spin" />
-                <p className="text-xs text-[#cbc3d7]/60 font-mono">AI 보고서를 로딩 중입니다...</p>
+                <p className="text-xs text-[#cbc3d7]/60 font-mono">
+                  AI 보고서를 로딩 중입니다...
+                </p>
               </div>
             ) : (
               <>
@@ -348,7 +396,8 @@ const HistoryLayout = () => {
                           종합 리포트가 아직 없습니다
                         </h4>
                         <p className="text-xs text-[#cbc3d7]/60">
-                          AI 분석이 완료되면 종합 점수와 요약을 생성할 수 있습니다.
+                          AI 분석이 완료되면 종합 점수와 요약을 생성할 수
+                          있습니다.
                         </p>
                       </div>
                       <button
@@ -376,12 +425,22 @@ const HistoryLayout = () => {
                     transition={{ delay: 0.7 }}
                   >
                     <div className="bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border border-white/5">
-                      <h4 className="text-[0.65rem] uppercase tracking-widest text-[#cebdff] font-black mb-3">AI 종합 분석 요약</h4>
-                      <p className="text-xs text-[#cbc3d7]/80 leading-relaxed font-light">{sessionReport.aiSummary || "요약 데이터를 생성하는 중입니다..."}</p>
+                      <h4 className="text-[0.65rem] uppercase tracking-widest text-[#cebdff] font-black mb-3">
+                        AI 종합 분석 요약
+                      </h4>
+                      <p className="text-xs text-[#cbc3d7]/80 leading-relaxed font-light">
+                        {sessionReport.aiSummary ||
+                          "요약 데이터를 생성하는 중입니다..."}
+                      </p>
                     </div>
                     <div className="bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border border-white/5">
-                      <h4 className="text-[0.65rem] uppercase tracking-widest text-emerald-400 font-black mb-3">강점 요약</h4>
-                      <p className="text-xs text-[#cbc3d7]/80 leading-relaxed font-light">{sessionReport.strengthSummary || "강점 데이터를 분석 중입니다..."}</p>
+                      <h4 className="text-[0.65rem] uppercase tracking-widest text-emerald-400 font-black mb-3">
+                        강점 요약
+                      </h4>
+                      <p className="text-xs text-[#cbc3d7]/80 leading-relaxed font-light">
+                        {sessionReport.strengthSummary ||
+                          "강점 데이터를 분석 중입니다..."}
+                      </p>
                     </div>
                   </motion.div>
                 )}

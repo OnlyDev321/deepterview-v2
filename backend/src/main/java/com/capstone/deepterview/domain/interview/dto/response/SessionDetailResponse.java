@@ -1,11 +1,11 @@
 package com.capstone.deepterview.domain.interview.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.capstone.deepterview.domain.interview.domain.InterviewSession;
 import com.capstone.deepterview.domain.interview.domain.SessionStatus;
 import com.capstone.deepterview.domain.interview.domain.SessionType;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 public record SessionDetailResponse(
 		Long sessionId,
@@ -16,8 +16,8 @@ public record SessionDetailResponse(
 		SessionStatus status,
 		int totalQuestions,
 		LocalDateTime startedAt,
-		List<QuestionResponse> questions
-) {
+		LocalDateTime endedAt,
+		List<QuestionResponse> questions) {
 	public static SessionDetailResponse of(InterviewSession session, List<QuestionResponse> questions) {
 		return new SessionDetailResponse(
 				session.getId(),
@@ -28,8 +28,7 @@ public record SessionDetailResponse(
 				session.getStatus(),
 				session.getTotalQuestions(),
 				session.getStartedAt(),
-				questions
-		);
+				session.getEndedAt(),
+				questions);
 	}
 }
-

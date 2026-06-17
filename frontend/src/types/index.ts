@@ -128,6 +128,7 @@ export interface SessionListItem {
   overallScore?: number;
   grade?: "S" | "A" | "B" | "C" | "D";
   createdAt: string;
+  endedAt: string;
 }
 
 export interface SessionListResponse {
@@ -163,7 +164,8 @@ export interface SessionDetail {
   sessionType: "TECHNICAL" | "PERSONALITY" | "COMBINED";
   status: SessionStatus;
   totalQuestions: number;
-  startedAt?: string;
+  startedAt?: string | Date;
+  endedAt?: string | Date;
   questions: QuestionResponse[];
 }
 
