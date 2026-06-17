@@ -79,6 +79,7 @@ export interface LlmFeedbackView {
 
 export interface AnswerAnalysis {
   answerId: number;
+  submittedText?: string;
   transcript: string;
   durationSec: number;
   speechAnalysis?: SpeechAnalysisView;

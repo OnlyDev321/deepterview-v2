@@ -26,14 +26,16 @@ const AnalyticsLayout = () => {
 
   const answerIdParam = searchParams.get("answerId");
   const [activeAnswerId, setActiveAnswerId] = useState<number | null>(
-    answerIdParam ? Number(answerIdParam) : null
+    answerIdParam ? Number(answerIdParam) : null,
   );
 
   const [analysis, setAnalysis] = useState<AnswerAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPendingAnalysis, setIsPendingAnalysis] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [analysisStatusLabel, setAnalysisStatusLabel] = useState<string | null>(null);
+  const [analysisStatusLabel, setAnalysisStatusLabel] = useState<string | null>(
+    null,
+  );
 
   // States to populate the sidebar of questions for the session
   const [sessionQuestions, setSessionQuestions] = useState<any[]>([]);
@@ -49,9 +51,9 @@ const AnalyticsLayout = () => {
   const hasMeaningfulAnalysis = (data: AnswerAnalysis) =>
     Boolean(
       data.speechAnalysis ||
-        data.nonverbalAnalysis ||
-        data.llmFeedback ||
-        data.starAnalysis,
+      data.nonverbalAnalysis ||
+      data.llmFeedback ||
+      data.starAnalysis,
     );
 
   const fetchAnalysis = async (answerId: number) => {
@@ -69,7 +71,9 @@ const AnalyticsLayout = () => {
       console.error("Failed to load answer analysis:", err);
       setAnalysis(null);
       setIsPendingAnalysis(true);
-      setError("답변 분석 데이터를 불러오는데 실패했거나 AI 분석이 아직 진행 중입니다.");
+      setError(
+        "답변 분석 데이터를 불러오는데 실패했거나 AI 분석이 아직 진행 중입니다.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -213,7 +217,10 @@ const AnalyticsLayout = () => {
             onClick={() => navigate("/dashboard/history")}
             className="flex items-center gap-3 w-full px-5 py-3.5 mb-6 bg-[#111417]/80 hover:bg-[#111417] text-[#cbc3d7] hover:text-white rounded-2xl border border-white/5 text-xs font-bold transition-all cursor-pointer group shadow-sm hover:shadow-md"
           >
-            <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowLeft
+              size={14}
+              className="group-hover:-translate-x-0.5 transition-transform"
+            />
             <span>이전 기록으로 돌아가기</span>
           </button>
 
@@ -236,8 +243,8 @@ const AnalyticsLayout = () => {
                   !q.answerId
                     ? "bg-black/20 border-transparent text-[#cbc3d7]/20 cursor-not-allowed"
                     : q.answerId === activeAnswerId
-                    ? "bg-[#cebdff]/10 border-[#cebdff]/30 text-[#e1e2e7] shadow-lg shadow-[#cebdff]/5"
-                    : "bg-[#111417]/40 border-transparent hover:bg-[#191c1f] hover:border-white/5 text-[#cbc3d7]/60 cursor-pointer"
+                      ? "bg-[#cebdff]/10 border-[#cebdff]/30 text-[#e1e2e7] shadow-lg shadow-[#cebdff]/5"
+                      : "bg-[#111417]/40 border-transparent hover:bg-[#191c1f] hover:border-white/5 text-[#cbc3d7]/60 cursor-pointer"
                 }`}
               >
                 <div className="flex items-center justify-between w-full">
@@ -245,14 +252,22 @@ const AnalyticsLayout = () => {
                     질문 0{idx + 1}
                   </span>
                   {!q.answerId ? (
-                    <span className="text-[0.6rem] text-red-400 font-bold bg-red-400/5 px-2 py-0.5 rounded border border-red-400/10">미답변</span>
+                    <span className="text-[0.6rem] text-red-400 font-bold bg-red-400/5 px-2 py-0.5 rounded border border-red-400/10">
+                      미답변
+                    </span>
                   ) : q.answerId === activeAnswerId && isPendingAnalysis ? (
-                    <span className="text-[0.6rem] text-amber-400 font-bold bg-amber-400/5 px-2 py-0.5 rounded border border-amber-400/10">분석 중</span>
+                    <span className="text-[0.6rem] text-amber-400 font-bold bg-amber-400/5 px-2 py-0.5 rounded border border-amber-400/10">
+                      분석 중
+                    </span>
                   ) : (
-                    <span className="text-[0.6rem] text-emerald-400 font-bold bg-emerald-400/5 px-2 py-0.5 rounded border border-emerald-400/10">답변 완료</span>
+                    <span className="text-[0.6rem] text-emerald-400 font-bold bg-emerald-400/5 px-2 py-0.5 rounded border border-emerald-400/10">
+                      답변 완료
+                    </span>
                   )}
                 </div>
-                <p className="font-medium line-clamp-2 leading-relaxed">{q.content}</p>
+                <p className="font-medium line-clamp-2 leading-relaxed">
+                  {q.content}
+                </p>
               </button>
             ))}
           </div>
@@ -271,8 +286,12 @@ const AnalyticsLayout = () => {
         ) : error && !analysis ? (
           <div className="h-[60vh] flex flex-col items-center justify-center bg-[#191c1f]/20 rounded-[2.5rem] border border-white/5 p-12 text-center">
             <AlertCircle size={48} className="text-amber-400 mb-4" />
-            <h3 className="text-xl font-bold text-[#e1e2e7] mb-2">분석을 불러올 수 없습니다</h3>
-            <p className="text-[#cbc3d7]/50 text-sm max-w-sm mx-auto mb-6">{error}</p>
+            <h3 className="text-xl font-bold text-[#e1e2e7] mb-2">
+              분석을 불러올 수 없습니다
+            </h3>
+            <p className="text-[#cbc3d7]/50 text-sm max-w-sm mx-auto mb-6">
+              {error}
+            </p>
             <div className="flex flex-wrap gap-3 justify-center">
               {activeAnswerId && (
                 <button
@@ -288,7 +307,8 @@ const AnalyticsLayout = () => {
                 onClick={() => navigate("/dashboard/history")}
                 className="px-6 py-2.5 bg-[#cebdff]/10 hover:bg-[#cebdff]/20 text-[#cebdff] rounded-full border border-[#cebdff]/30 text-xs font-bold transition-all cursor-pointer"
               >
-                <ArrowLeft size={12} className="inline mr-2" /> 히스토리 목록으로 이동
+                <ArrowLeft size={12} className="inline mr-2" /> 히스토리
+                목록으로 이동
               </button>
             </div>
           </div>
@@ -302,7 +322,8 @@ const AnalyticsLayout = () => {
             {isPendingAnalysis && (
               <div className="flex items-center justify-between gap-4 px-6 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
                 <p className="text-xs text-amber-300/90">
-                  {analysisStatusLabel || "AI 분석이 진행 중입니다. 잠시 후 자동으로 갱신됩니다."}
+                  {analysisStatusLabel ||
+                    "AI 분석이 진행 중입니다. 잠시 후 자동으로 갱신됩니다."}
                 </p>
                 {activeAnswerId && (
                   <button
@@ -327,32 +348,65 @@ const AnalyticsLayout = () => {
                     <MessageSquare size={18} className="text-[#cebdff]" />
                   </div>
                   <h2 className="text-xl font-bold text-[#e1e2e7] tracking-tight leading-relaxed">
-                    "{analysis.starAnalysis?.situationFeedback ? "면접 질문 분석 리포트" : "질문 내용"}"
+                    "
+                    {analysis.starAnalysis?.situationFeedback
+                      ? "면접 질문 분석 리포트"
+                      : "질문 내용"}
+                    "
                   </h2>
                 </div>
                 <p className="text-md text-[#cbc3d7] font-light leading-relaxed mt-4 pl-14 italic">
-                  {sessionQuestions.find((q) => q.answerId === activeAnswerId)?.content || "면접 질문 내용입니다."}
+                  {sessionQuestions.find((q) => q.answerId === activeAnswerId)
+                    ?.content || "면접 질문 내용입니다."}
                 </p>
               </div>
 
               {/* Transcript Block */}
-              <div className="pt-6 border-t border-white/5">
-                <div className="flex items-center gap-3 mb-3">
-                  <User size={16} className="text-[#cbc3d7]/60" />
-                  <span className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/50 font-bold">
-                    사용자 답변 STT 텍스트 변환
-                  </span>
+              <div className="pt-6 border-t border-white/5 space-y-6">
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <User size={16} className="text-[#cbc3d7]/60" />
+                    <span className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/50 font-bold">
+                      제출한 답변 내용
+                    </span>
+                  </div>
+                  <div className="p-6 bg-black/40 rounded-2xl border border-white/5">
+                    <p className="text-sm text-[#e1e2e7] leading-relaxed font-light font-sans">
+                      {analysis.submittedText ||
+                        analysis.transcript ||
+                        "제출된 답변이 없습니다."}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-6 bg-black/40 rounded-2xl border border-white/5">
-                  <p className="text-sm text-[#cbc3d7] leading-relaxed font-light font-sans">
-                    {analysis.transcript || "변환된 텍스트가 없습니다."}
-                  </p>
-                </div>
+
+                {analysis.submittedText &&
+                  analysis.transcript &&
+                  analysis.submittedText !== analysis.transcript && (
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <TrendingUp size={16} className="text-[#cbc3d7]/40" />
+                        <span className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/40 font-bold">
+                          AI 음성인식(STT) 변환 결과
+                        </span>
+                      </div>
+                      <div className="p-6 bg-black/10 rounded-2xl border border-white/5 border-dashed">
+                        <p className="text-sm text-[#cbc3d7]/90 leading-relaxed font-light font-sans">
+                          {analysis.transcript}
+                        </p>
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
 
             {/* Visual Analytics Columns */}
-            <div className={analysis.nonverbalAnalysis ? "grid grid-cols-2 gap-8" : "grid grid-cols-1 gap-8"}>
+            <div
+              className={
+                analysis.nonverbalAnalysis
+                  ? "grid grid-cols-2 gap-8"
+                  : "grid grid-cols-1 gap-8"
+              }
+            >
               {/* verbal / speech analytics */}
               <div className="bg-[#191c1f]/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 space-y-6">
                 <div className="flex items-center gap-3">
@@ -368,17 +422,28 @@ const AnalyticsLayout = () => {
                     {analysis.speechAnalysis.wpm != null && (
                       <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
                         <div>
-                          <h4 className="text-[0.65rem] text-[#cbc3d7]/40 font-bold uppercase tracking-wider">발화 속도 (WPM)</h4>
+                          <h4 className="text-[0.65rem] text-[#cbc3d7]/40 font-bold uppercase tracking-wider">
+                            발화 속도 (WPM)
+                          </h4>
                           <p className="text-2xl font-black text-white mt-1">
-                            {Math.round(analysis.speechAnalysis.wpm)} <span className="text-xs text-[#cbc3d7]/40 font-medium">단어/분</span>
+                            {Math.round(analysis.speechAnalysis.wpm)}{" "}
+                            <span className="text-xs text-[#cbc3d7]/40 font-medium">
+                              단어/분
+                            </span>
                           </p>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-[0.6rem] font-bold ${
-                          analysis.speechAnalysis.wpm >= 110 && analysis.speechAnalysis.wpm <= 150
-                            ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/20"
-                            : "bg-amber-400/10 text-amber-400 border border-amber-400/20"
-                        }`}>
-                          {analysis.speechAnalysis.wpm >= 110 && analysis.speechAnalysis.wpm <= 150 ? "안정적 속도" : "조율 권장"}
+                        <span
+                          className={`px-3 py-1 rounded-full text-[0.6rem] font-bold ${
+                            analysis.speechAnalysis.wpm >= 110 &&
+                            analysis.speechAnalysis.wpm <= 150
+                              ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/20"
+                              : "bg-amber-400/10 text-amber-400 border border-amber-400/20"
+                          }`}
+                        >
+                          {analysis.speechAnalysis.wpm >= 110 &&
+                          analysis.speechAnalysis.wpm <= 150
+                            ? "안정적 속도"
+                            : "조율 권장"}
                         </span>
                       </div>
                     )}
@@ -387,39 +452,59 @@ const AnalyticsLayout = () => {
                     {analysis.speechAnalysis.fillerCount != null && (
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-[0.65rem] text-[#cbc3d7]/60 font-bold uppercase">사용 빈도 높은 습관어</span>
-                          <span className="text-xs text-amber-400 font-bold">{analysis.speechAnalysis.fillerCount}회 발견</span>
+                          <span className="text-[0.65rem] text-[#cbc3d7]/60 font-bold uppercase">
+                            사용 빈도 높은 습관어
+                          </span>
+                          <span className="text-xs text-amber-400 font-bold">
+                            {analysis.speechAnalysis.fillerCount}회 발견
+                          </span>
                         </div>
                         <div className="flex flex-wrap gap-2 p-4 bg-black/20 rounded-2xl border border-white/5 min-h-[50px] items-center">
-                          {analysis.speechAnalysis.fillerWords && Object.keys(analysis.speechAnalysis.fillerWords).length > 0 ? (
-                            Object.entries(analysis.speechAnalysis.fillerWords).map(([word, count]) => (
-                              <span key={word} className="px-3 py-1 bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[0.65rem] font-bold rounded-xl">
+                          {analysis.speechAnalysis.fillerWords &&
+                          Object.keys(analysis.speechAnalysis.fillerWords)
+                            .length > 0 ? (
+                            Object.entries(
+                              analysis.speechAnalysis.fillerWords,
+                            ).map(([word, count]) => (
+                              <span
+                                key={word}
+                                className="px-3 py-1 bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[0.65rem] font-bold rounded-xl"
+                              >
                                 "{word}" : {count}회
                               </span>
                             ))
                           ) : (
-                            <span className="text-xs text-[#cbc3d7]/30">습관어가 검출되지 않아 맑고 정돈된 표현입니다. ✨</span>
+                            <span className="text-xs text-[#cbc3d7]/30">
+                              습관어가 검출되지 않아 맑고 정돈된 표현입니다. ✨
+                            </span>
                           )}
                         </div>
                       </div>
                     )}
 
                     {/* Progress Bars */}
-                    {(analysis.speechAnalysis.clarityScore != null || 
-                      analysis.speechAnalysis.paceScore != null || 
+                    {(analysis.speechAnalysis.clarityScore != null ||
+                      analysis.speechAnalysis.paceScore != null ||
                       analysis.speechAnalysis.silenceRatio != null) && (
                       <div className="space-y-4 pt-2">
                         {analysis.speechAnalysis.paceScore != null && (
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
-                              <span className="text-[#cbc3d7]/60 uppercase">발화 템포 점수 (Pace Score)</span>
-                              <span className="text-[#7bd0ff]">{Math.round(analysis.speechAnalysis.paceScore)}점</span>
+                              <span className="text-[#cbc3d7]/60 uppercase">
+                                발화 템포 점수 (Pace Score)
+                              </span>
+                              <span className="text-[#7bd0ff]">
+                                {Math.round(analysis.speechAnalysis.paceScore)}
+                                점
+                              </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-sky-400 to-blue-500"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${analysis.speechAnalysis.paceScore}%` }}
+                                animate={{
+                                  width: `${analysis.speechAnalysis.paceScore}%`,
+                                }}
                                 transition={{ duration: 1, ease: "easeOut" }}
                               />
                             </div>
@@ -429,14 +514,23 @@ const AnalyticsLayout = () => {
                         {analysis.speechAnalysis.clarityScore != null && (
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
-                              <span className="text-[#cbc3d7]/60 uppercase">문장 전달 선명도 (Clarity Score)</span>
-                              <span className="text-[#7bd0ff]">{Math.round(analysis.speechAnalysis.clarityScore)}점</span>
+                              <span className="text-[#cbc3d7]/60 uppercase">
+                                문장 전달 선명도 (Clarity Score)
+                              </span>
+                              <span className="text-[#7bd0ff]">
+                                {Math.round(
+                                  analysis.speechAnalysis.clarityScore,
+                                )}
+                                점
+                              </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-sky-400 to-blue-500"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${analysis.speechAnalysis.clarityScore}%` }}
+                                animate={{
+                                  width: `${analysis.speechAnalysis.clarityScore}%`,
+                                }}
                                 transition={{ duration: 1, ease: "easeOut" }}
                               />
                             </div>
@@ -446,14 +540,24 @@ const AnalyticsLayout = () => {
                         {analysis.speechAnalysis.silenceRatio != null && (
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
-                              <span className="text-[#cbc3d7]/60 uppercase">발화 공백 안정비 (Silence)</span>
-                              <span className="text-[#7bd0ff]">{Math.round((1 - analysis.speechAnalysis.silenceRatio) * 100)}%</span>
+                              <span className="text-[#cbc3d7]/60 uppercase">
+                                발화 공백 안정비 (Silence)
+                              </span>
+                              <span className="text-[#7bd0ff]">
+                                {Math.round(
+                                  (1 - analysis.speechAnalysis.silenceRatio) *
+                                    100,
+                                )}
+                                %
+                              </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-sky-400 to-blue-500"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${(1 - analysis.speechAnalysis.silenceRatio) * 100}%` }}
+                                animate={{
+                                  width: `${(1 - analysis.speechAnalysis.silenceRatio) * 100}%`,
+                                }}
                                 transition={{ duration: 1, ease: "easeOut" }}
                               />
                             </div>
@@ -469,7 +573,9 @@ const AnalyticsLayout = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-xs text-[#cbc3d7]/40 italic">언어 감정 분석을 대기 중입니다...</p>
+                  <p className="text-xs text-[#cbc3d7]/40 italic">
+                    언어 감정 분석을 대기 중입니다...
+                  </p>
                 )}
               </div>
 
@@ -488,17 +594,27 @@ const AnalyticsLayout = () => {
                     <div className="grid grid-cols-2 gap-4">
                       {analysis.nonverbalAnalysis.eyeContactScore != null && (
                         <div className="p-4 bg-black/20 rounded-2xl border border-white/5 text-center">
-                          <span className="text-[0.55rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider block">아이컨택 비율</span>
+                          <span className="text-[0.55rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider block">
+                            아이컨택 비율
+                          </span>
                           <span className="text-2xl font-black text-white mt-1 block">
-                            {Math.round(analysis.nonverbalAnalysis.eyeContactScore)}%
+                            {Math.round(
+                              analysis.nonverbalAnalysis.eyeContactScore,
+                            )}
+                            %
                           </span>
                         </div>
                       )}
                       {analysis.nonverbalAnalysis.confidenceScore != null && (
                         <div className="p-4 bg-black/20 rounded-2xl border border-white/5 text-center">
-                          <span className="text-[0.55rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider block">표정 자신감</span>
+                          <span className="text-[0.55rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider block">
+                            표정 자신감
+                          </span>
                           <span className="text-2xl font-black text-white mt-1 block">
-                            {Math.round(analysis.nonverbalAnalysis.confidenceScore)}%
+                            {Math.round(
+                              analysis.nonverbalAnalysis.confidenceScore,
+                            )}
+                            %
                           </span>
                         </div>
                       )}
@@ -508,15 +624,20 @@ const AnalyticsLayout = () => {
                     {analysis.nonverbalAnalysis.dominantEmotion && (
                       <div className="flex items-center justify-between p-4 bg-[#cebdff]/5 rounded-2xl border border-[#cebdff]/10">
                         <div>
-                          <span className="text-[0.6rem] text-[#cebdff] font-bold uppercase tracking-wider block">핵심 감정 지표</span>
+                          <span className="text-[0.6rem] text-[#cebdff] font-bold uppercase tracking-wider block">
+                            핵심 감정 지표
+                          </span>
                           <span className="text-lg font-black text-white mt-1 block">
-                            {analysis.nonverbalAnalysis.dominantEmotion === "NEUTRAL"
+                            {analysis.nonverbalAnalysis.dominantEmotion ===
+                            "NEUTRAL"
                               ? "차분하고 담담한 상태 😐"
-                              : analysis.nonverbalAnalysis.dominantEmotion === "HAPPY"
-                              ? "긍정적이며 미소 지음 🙂"
-                              : analysis.nonverbalAnalysis.dominantEmotion === "SURPRISE"
-                              ? "집중하여 몰입함 😲"
-                              : "감정 반응 안정적"}
+                              : analysis.nonverbalAnalysis.dominantEmotion ===
+                                  "HAPPY"
+                                ? "긍정적이며 미소 지음 🙂"
+                                : analysis.nonverbalAnalysis.dominantEmotion ===
+                                    "SURPRISE"
+                                  ? "집중하여 몰입함 😲"
+                                  : "감정 반응 안정적"}
                           </span>
                         </div>
                         <span className="text-[0.65rem] font-bold uppercase tracking-widest text-[#cebdff] bg-[#cebdff]/10 px-3 py-1 rounded-lg">
@@ -526,19 +647,30 @@ const AnalyticsLayout = () => {
                     )}
 
                     {/* Head Stability & Smile Score */}
-                    {(analysis.nonverbalAnalysis.headStabilityScore != null || analysis.nonverbalAnalysis.smileRatio != null) && (
+                    {(analysis.nonverbalAnalysis.headStabilityScore != null ||
+                      analysis.nonverbalAnalysis.smileRatio != null) && (
                       <div className="space-y-4 pt-2">
-                        {analysis.nonverbalAnalysis.headStabilityScore != null && (
+                        {analysis.nonverbalAnalysis.headStabilityScore !=
+                          null && (
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
-                              <span className="text-[#cbc3d7]/60 uppercase">자세 및 머리 안정도 (Head Stability)</span>
-                              <span className="text-[#cebdff]">{Math.round(analysis.nonverbalAnalysis.headStabilityScore)}%</span>
+                              <span className="text-[#cbc3d7]/60 uppercase">
+                                자세 및 머리 안정도 (Head Stability)
+                              </span>
+                              <span className="text-[#cebdff]">
+                                {Math.round(
+                                  analysis.nonverbalAnalysis.headStabilityScore,
+                                )}
+                                %
+                              </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-[#9b7fed] to-[#cebdff]"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${analysis.nonverbalAnalysis.headStabilityScore}%` }}
+                                animate={{
+                                  width: `${analysis.nonverbalAnalysis.headStabilityScore}%`,
+                                }}
                                 transition={{ duration: 1, ease: "easeOut" }}
                               />
                             </div>
@@ -548,14 +680,23 @@ const AnalyticsLayout = () => {
                         {analysis.nonverbalAnalysis.smileRatio != null && (
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
-                              <span className="text-[#cbc3d7]/60 uppercase">미소 지수 (Smile Ratio)</span>
-                              <span className="text-[#cebdff]">{Math.round(analysis.nonverbalAnalysis.smileRatio)}%</span>
+                              <span className="text-[#cbc3d7]/60 uppercase">
+                                미소 지수 (Smile Ratio)
+                              </span>
+                              <span className="text-[#cebdff]">
+                                {Math.round(
+                                  analysis.nonverbalAnalysis.smileRatio,
+                                )}
+                                %
+                              </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
                               <motion.div
                                 className="h-full bg-gradient-to-r from-[#9b7fed] to-[#cebdff]"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${analysis.nonverbalAnalysis.smileRatio}%` }}
+                                animate={{
+                                  width: `${analysis.nonverbalAnalysis.smileRatio}%`,
+                                }}
                                 transition={{ duration: 1, ease: "easeOut" }}
                               />
                             </div>
@@ -590,8 +731,12 @@ const AnalyticsLayout = () => {
                     </h3>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[0.65rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider">콘텐츠 구조화 점수:</span>
-                    <span className="text-lg font-black text-[#cebdff]">{Math.round(analysis.starAnalysis.totalScore)}점</span>
+                    <span className="text-[0.65rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider">
+                      콘텐츠 구조화 점수:
+                    </span>
+                    <span className="text-lg font-black text-[#cebdff]">
+                      {Math.round(analysis.starAnalysis.totalScore)}점
+                    </span>
                   </div>
                 </div>
 
@@ -601,8 +746,12 @@ const AnalyticsLayout = () => {
                   <div className="bg-black/20 p-5 rounded-2xl border border-white/5 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">S (상황)</span>
-                        <span className="text-[0.65rem] font-black text-white">{Math.round(analysis.starAnalysis.situationScore)}점</span>
+                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
+                          S (상황)
+                        </span>
+                        <span className="text-[0.65rem] font-black text-white">
+                          {Math.round(analysis.starAnalysis.situationScore)}점
+                        </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
                         {analysis.starAnalysis.situationFeedback}
@@ -614,8 +763,12 @@ const AnalyticsLayout = () => {
                   <div className="bg-black/20 p-5 rounded-2xl border border-white/5 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">T (목표/과제)</span>
-                        <span className="text-[0.65rem] font-black text-white">{Math.round(analysis.starAnalysis.taskScore)}점</span>
+                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
+                          T (목표/과제)
+                        </span>
+                        <span className="text-[0.65rem] font-black text-white">
+                          {Math.round(analysis.starAnalysis.taskScore)}점
+                        </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
                         {analysis.starAnalysis.taskFeedback}
@@ -627,8 +780,12 @@ const AnalyticsLayout = () => {
                   <div className="bg-black/20 p-5 rounded-2xl border border-white/5 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">A (해결 행동)</span>
-                        <span className="text-[0.65rem] font-black text-white">{Math.round(analysis.starAnalysis.actionScore)}점</span>
+                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
+                          A (해결 행동)
+                        </span>
+                        <span className="text-[0.65rem] font-black text-white">
+                          {Math.round(analysis.starAnalysis.actionScore)}점
+                        </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
                         {analysis.starAnalysis.actionFeedback}
@@ -640,8 +797,12 @@ const AnalyticsLayout = () => {
                   <div className="bg-black/20 p-5 rounded-2xl border border-white/5 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">R (성과)</span>
-                        <span className="text-[0.65rem] font-black text-white">{Math.round(analysis.starAnalysis.resultScore)}점</span>
+                        <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
+                          R (성과)
+                        </span>
+                        <span className="text-[0.65rem] font-black text-white">
+                          {Math.round(analysis.starAnalysis.resultScore)}점
+                        </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
                         {analysis.starAnalysis.resultFeedback}
@@ -697,25 +858,33 @@ const AnalyticsLayout = () => {
                 </div>
 
                 {/* Follow-up Questions */}
-                {analysis.llmFeedback.followupQuestions && analysis.llmFeedback.followupQuestions.length > 0 && (
-                  <div className="pt-4 space-y-3">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#e1e2e7]">
-                      <HelpCircle size={14} className="text-[#cebdff]" />
-                      <span>추천되는 다음 꼬리 질문 (AI Follow-up Questions)</span>
+                {analysis.llmFeedback.followupQuestions &&
+                  analysis.llmFeedback.followupQuestions.length > 0 && (
+                    <div className="pt-4 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#e1e2e7]">
+                        <HelpCircle size={14} className="text-[#cebdff]" />
+                        <span>
+                          추천되는 다음 꼬리 질문 (AI Follow-up Questions)
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {analysis.llmFeedback.followupQuestions.map(
+                          (qText, idx) => (
+                            <div
+                              key={idx}
+                              className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center gap-3 text-xs text-[#cbc3d7]/80 hover:text-white transition-all hover:bg-white/[0.07]"
+                            >
+                              <TrendingUp
+                                size={12}
+                                className="text-[#cebdff] shrink-0"
+                              />
+                              <span>{qText}</span>
+                            </div>
+                          ),
+                        )}
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      {analysis.llmFeedback.followupQuestions.map((qText, idx) => (
-                        <div
-                          key={idx}
-                          className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center gap-3 text-xs text-[#cbc3d7]/80 hover:text-white transition-all hover:bg-white/[0.07]"
-                        >
-                          <TrendingUp size={12} className="text-[#cebdff] shrink-0" />
-                          <span>{qText}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  )}
               </motion.div>
             )}
           </motion.div>

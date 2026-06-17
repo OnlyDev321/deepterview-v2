@@ -63,7 +63,7 @@ public class AnswerService {
 			throw new CustomException(ErrorCode.VALIDATION_ERROR, "유효하지 않은 completionStatus 입니다.");
 		}
 
-		Answer answer = Answer.create(question, null, request.transcript(), request.durationSec(), status);
+		Answer answer = Answer.create(question, null, request.transcript(), request.transcript(), request.durationSec(), status);
 		answerRepository.save(answer);
 
 		InterviewSession session = question.getSession();
@@ -131,8 +131,9 @@ public class AnswerService {
 			llm = toLlmView(existingLlm.get());
 			star = existingStar.map(this::toStarView).orElse(null);
 		} else {
+			String analyzeText = answer.getSubmittedText() != null ? answer.getSubmittedText() : answer.getTranscript();
 			LlmAnalysisResult result = llmFeedbackService.generateAnalysis(
-					answer.getTranscript(),
+					analyzeText,
 					answer.getQuestion().getContent()
 			);
 
@@ -172,6 +173,7 @@ public class AnswerService {
 
 		return new AnswerAnalysisResponse(
 				answer.getId(),
+				answer.getSubmittedText() != null ? answer.getSubmittedText() : answer.getTranscript(),
 				answer.getTranscript(),
 				answer.getDurationSec(),
 				speech,

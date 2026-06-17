@@ -2,6 +2,7 @@ package com.capstone.deepterview.domain.answer.dto.response;
 
 public record AnswerAnalysisResponse(
 		Long answerId,
+		String submittedText,
 		String transcript,
 		Integer durationSec,
 		SpeechAnalysisView speechAnalysis,

@@ -26,6 +26,10 @@ public class Answer extends BaseTimeEntity {
 	private String audioFilePath;
 
 	@Lob
+	@Column(name = "submitted_text")
+	private String submittedText;
+
+	@Lob
 	private String transcript;
 
 	@Column(name = "duration_sec")
@@ -56,6 +60,7 @@ public class Answer extends BaseTimeEntity {
 	public static Answer create(
 			Question question,
 			String audioFilePath,
+			String submittedText,
 			String transcript,
 			Integer durationSec,
 			CompletionStatus completionStatus
@@ -63,6 +68,7 @@ public class Answer extends BaseTimeEntity {
 		Answer answer = new Answer();
 		answer.question = question;
 		answer.audioFilePath = audioFilePath;
+		answer.submittedText = submittedText;
 		answer.transcript = transcript;
 		answer.durationSec = durationSec;
 		answer.completionStatus = completionStatus;

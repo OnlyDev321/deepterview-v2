@@ -20,7 +20,7 @@ public record QuestionResponse(
 				question.getQuestionType(),
 				question.getTimeLimitSec(),
 				question.getAnswer() != null ? question.getAnswer().getId() : null,
-				question.getAnswer() != null ? question.getAnswer().getTranscript() : null
+				question.getAnswer() != null ? (question.getAnswer().getSubmittedText() != null ? question.getAnswer().getSubmittedText() : question.getAnswer().getTranscript()) : null
 		);
 	}
 }
