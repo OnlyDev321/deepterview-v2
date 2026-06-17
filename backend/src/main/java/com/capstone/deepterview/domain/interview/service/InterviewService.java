@@ -128,7 +128,7 @@ public class InterviewService {
 			throw new CustomException(ErrorCode.VALIDATION_ERROR, "READY 상태의 세션만 시작할 수 있습니다.");
 		}
 		session.start(LocalDateTime.now());
-		return SessionStatusResponse.started(session.getId(), session.getStatus(), session.getStartedAt());
+		return SessionStatusResponse.started(session.getId(), session.getStatus(), session.getStartedAt(), session.getEndedAt());
 	}
 
 	@Transactional
@@ -138,7 +138,7 @@ public class InterviewService {
 			throw new CustomException(ErrorCode.VALIDATION_ERROR, "IN_PROGRESS 상태의 세션만 종료할 수 있습니다.");
 		}
 		session.complete(LocalDateTime.now());
-		return SessionStatusResponse.ended(session.getId(), session.getStatus(), session.getEndedAt());
+		return SessionStatusResponse.ended(session.getId(), session.getStatus(),session.getStartedAt(), session.getEndedAt());
 	}
 
 	@Transactional

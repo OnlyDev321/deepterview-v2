@@ -10,12 +10,12 @@ public record SessionStatusResponse(
 		LocalDateTime startedAt,
 		LocalDateTime endedAt
 ) {
-	public static SessionStatusResponse started(Long sessionId, SessionStatus status, LocalDateTime startedAt) {
-		return new SessionStatusResponse(sessionId, status, startedAt, null);
+	public static SessionStatusResponse started(Long sessionId, SessionStatus status, LocalDateTime startedAt, LocalDateTime endedAt) {
+		return new SessionStatusResponse(sessionId, status, startedAt, endedAt);
 	}
 
-	public static SessionStatusResponse ended(Long sessionId, SessionStatus status, LocalDateTime endedAt) {
-		return new SessionStatusResponse(sessionId, status, null, endedAt);
+	public static SessionStatusResponse ended(Long sessionId, SessionStatus status,LocalDateTime startedAt, LocalDateTime endedAt) {
+		return new SessionStatusResponse(sessionId, status, startedAt, endedAt);
 	}
 }
 
