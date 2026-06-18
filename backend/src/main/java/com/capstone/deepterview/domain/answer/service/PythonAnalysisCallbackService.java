@@ -114,8 +114,8 @@ public class PythonAnalysisCallbackService {
         }
 
         NonverbalSummary summary = result.nonverbalSummary();
-        if (summary != null) {
-            if (nonverbalAnalysisRepository.findByAnswer_Id(answerId).isEmpty()) {
+        if (nonverbalAnalysisRepository.findByAnswer_Id(answerId).isEmpty()) {
+            if (summary != null) {
                 Emotion dominantEmotion = null;
                 try {
                     if (summary.dominantEmotion() != null) {
@@ -143,107 +143,120 @@ public class PythonAnalysisCallbackService {
                         summary.emotionDistributionJson(),
                         nonverbalFeedback
                 ));
-            }
-        } else {
-            // Nếu summary là null, nhưng có gaze_frames, tiến hành tự tính toán
-            List<Map<String, Object>> gazeFrames = result.gazeFrames();
-            if (gazeFrames != null && !gazeFrames.isEmpty() && nonverbalAnalysisRepository.findByAnswer_Id(answerId).isEmpty()) {
-                int total = gazeFrames.size();
+            } else {
+                List<Map<String, Object>> gazeFrames = result.gazeFrames();
+                if (gazeFrames != null && !gazeFrames.isEmpty()) {
+                    int total = gazeFrames.size();
 
-                // 1. Eye contact (gaze_direction == "center")
-                long centerCount = gazeFrames.stream()
-                        .filter(f -> "center".equalsIgnoreCase(String.valueOf(f.get("gaze_direction"))))
-                        .count();
-                float eyeContactScore = ((float) centerCount / total) * 100f;
+                    // 1. Eye contact (gaze_direction == "center")
+                    long centerCount = gazeFrames.stream()
+                            .filter(f -> "center".equalsIgnoreCase(String.valueOf(f.get("gaze_direction"))))
+                            .count();
+                    float eyeContactScore = ((float) centerCount / total) * 100f;
 
-                // 2. Emotion distribution & Smile Ratio
-                Map<String, Integer> emotionCounts = new HashMap<>();
-                long happyCount = 0;
-                for (var frame : gazeFrames) {
-                    String emotionStr = String.valueOf(frame.get("dominant_emotion")).toUpperCase();
-                    emotionCounts.put(emotionStr, emotionCounts.getOrDefault(emotionStr, 0) + 1);
-                    if ("HAPPY".equals(emotionStr)) {
-                        happyCount++;
+                    // 2. Emotion distribution & Smile Ratio
+                    Map<String, Integer> emotionCounts = new HashMap<>();
+                    long happyCount = 0;
+                    for (var frame : gazeFrames) {
+                        String emotionStr = String.valueOf(frame.get("dominant_emotion")).toUpperCase();
+                        emotionCounts.put(emotionStr, emotionCounts.getOrDefault(emotionStr, 0) + 1);
+                        if ("HAPPY".equals(emotionStr)) {
+                            happyCount++;
+                        }
                     }
-                }
 
-                float smileRatio = ((float) happyCount / total) * 100f;
+                    float smileRatio = ((float) happyCount / total) * 100f;
 
-                // Tìm dominant emotion
-                String dominantStr = "NEUTRAL";
-                int maxCount = 0;
-                for (var entry : emotionCounts.entrySet()) {
-                    if (entry.getValue() > maxCount) {
-                        maxCount = entry.getValue();
-                        dominantStr = entry.getKey();
+                    // Tìm dominant emotion
+                    String dominantStr = "NEUTRAL";
+                    int maxCount = 0;
+                    for (var entry : emotionCounts.entrySet()) {
+                        if (entry.getValue() > maxCount) {
+                            maxCount = entry.getValue();
+                            dominantStr = entry.getKey();
+                        }
                     }
-                }
 
-                Emotion dominantEmotion = Emotion.NEUTRAL;
-                try {
-                    dominantEmotion = Emotion.valueOf(dominantStr);
-                } catch (Exception e) {
-                    log.warn("알 수 없는 감정값: {}", dominantStr);
-                }
-
-                // Emotion distribution JSON
-                Map<String, Double> emotionDistribution = new HashMap<>();
-                for (var entry : emotionCounts.entrySet()) {
-                    emotionDistribution.put(entry.getKey(), ((double) entry.getValue() / total) * 100.0);
-                }
-
-                String emotionDistributionJson = null;
-                try {
-                    emotionDistributionJson = objectMapper.writeValueAsString(emotionDistribution);
-                } catch (Exception e) {
-                    log.error("Failed to serialize emotion distribution", e);
-                }
-
-                // 3. Anxiety Score
-                long negativeCount = 0;
-                for (var entry : emotionCounts.entrySet()) {
-                    String k = entry.getKey();
-                    if ("FEAR".equals(k) || "SAD".equals(k) || "ANGRY".equals(k) || "DISGUST".equals(k)) {
-                        negativeCount += entry.getValue();
+                    Emotion dominantEmotion = Emotion.NEUTRAL;
+                    try {
+                        dominantEmotion = Emotion.valueOf(dominantStr);
+                    } catch (Exception e) {
+                        log.warn("알 수 없는 감정값: {}", dominantStr);
                     }
-                }
-                float negativeRatio = ((float) negativeCount / total) * 100f;
-                float lackOfEyeContact = 100f - eyeContactScore;
-                float anxietyScore = (negativeRatio * 0.4f) + (lackOfEyeContact * 0.6f);
-                anxietyScore = Math.max(0f, Math.min(100f, anxietyScore));
 
-                // 4. Confidence Score
-                float confidenceScore = (eyeContactScore * 0.6f) + ((100f - negativeRatio) * 0.4f);
-                confidenceScore = Math.max(0f, Math.min(100f, confidenceScore));
-
-                // 5. Head Stability Score
-                int gazeChanges = 0;
-                String prevGaze = null;
-                for (var frame : gazeFrames) {
-                    String currentGaze = String.valueOf(frame.get("gaze_direction"));
-                    if (prevGaze != null && !prevGaze.equals(currentGaze)) {
-                        gazeChanges++;
+                    // Emotion distribution JSON
+                    Map<String, Double> emotionDistribution = new HashMap<>();
+                    for (var entry : emotionCounts.entrySet()) {
+                        emotionDistribution.put(entry.getKey(), ((double) entry.getValue() / total) * 100.0);
                     }
-                    prevGaze = currentGaze;
+
+                    String emotionDistributionJson = null;
+                    try {
+                        emotionDistributionJson = objectMapper.writeValueAsString(emotionDistribution);
+                    } catch (Exception e) {
+                        log.error("Failed to serialize emotion distribution", e);
+                    }
+
+                    // 3. Anxiety Score
+                    long negativeCount = 0;
+                    for (var entry : emotionCounts.entrySet()) {
+                        String k = entry.getKey();
+                        if ("FEAR".equals(k) || "SAD".equals(k) || "ANGRY".equals(k) || "DISGUST".equals(k)) {
+                            negativeCount += entry.getValue();
+                        }
+                    }
+                    float negativeRatio = ((float) negativeCount / total) * 100f;
+                    float lackOfEyeContact = 100f - eyeContactScore;
+                    float anxietyScore = (negativeRatio * 0.4f) + (lackOfEyeContact * 0.6f);
+                    anxietyScore = Math.max(0f, Math.min(100f, anxietyScore));
+
+                    // 4. Confidence Score
+                    float confidenceScore = (eyeContactScore * 0.6f) + ((100f - negativeRatio) * 0.4f);
+                    confidenceScore = Math.max(0f, Math.min(100f, confidenceScore));
+
+                    // 5. Head Stability Score
+                    int gazeChanges = 0;
+                    String prevGaze = null;
+                    for (var frame : gazeFrames) {
+                        String currentGaze = String.valueOf(frame.get("gaze_direction"));
+                        if (prevGaze != null && !prevGaze.equals(currentGaze)) {
+                            gazeChanges++;
+                        }
+                        prevGaze = currentGaze;
+                    }
+                    float changeRatio = total > 1 ? (float) gazeChanges / (total - 1) : 0f;
+                    float headStabilityScore = 100f - (changeRatio * 50f);
+                    headStabilityScore = Math.max(50f, Math.min(100f, headStabilityScore));
+
+                    // 6. Feedback phi ngôn ngữ
+                    String nonverbalFeedback = generateNonverbalFeedback(eyeContactScore, anxietyScore, headStabilityScore);
+
+                    nonverbalAnalysisRepository.save(NonverbalAnalysis.create(
+                            answer,
+                            eyeContactScore,
+                            confidenceScore,
+                            anxietyScore,
+                            smileRatio,
+                            headStabilityScore,
+                            dominantEmotion,
+                            emotionDistributionJson,
+                            nonverbalFeedback
+                    ));
+                } else {
+                    // Nếu không có dữ liệu hình ảnh (chỉ có audio hoặc không nhận diện được mặt)
+                    // Lưu các giá trị mặc định để tránh null
+                    nonverbalAnalysisRepository.save(NonverbalAnalysis.create(
+                            answer,
+                            0.0f,
+                            0.0f,
+                            0.0f,
+                            0.0f,
+                            0.0f,
+                            Emotion.NEUTRAL,
+                            "{\"NEUTRAL\": 100.0}",
+                            "영상 분석 데이터가 존재하지 않습니다. 카메라가 정상적으로 작동하고 있는지 확인해 주세요."
+                    ));
                 }
-                float changeRatio = total > 1 ? (float) gazeChanges / (total - 1) : 0f;
-                float headStabilityScore = 100f - (changeRatio * 50f);
-                headStabilityScore = Math.max(50f, Math.min(100f, headStabilityScore));
-
-                // 6. Feedback phi ngôn ngữ
-                String nonverbalFeedback = generateNonverbalFeedback(eyeContactScore, anxietyScore, headStabilityScore);
-
-                nonverbalAnalysisRepository.save(NonverbalAnalysis.create(
-                        answer,
-                        eyeContactScore,
-                        confidenceScore,
-                        anxietyScore,
-                        smileRatio,
-                        headStabilityScore,
-                        dominantEmotion,
-                        emotionDistributionJson,
-                        nonverbalFeedback
-                ));
             }
         }
     }
