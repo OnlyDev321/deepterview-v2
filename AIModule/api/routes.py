@@ -17,7 +17,7 @@ async def analyze(payload: dict, background_tasks: BackgroundTasks):
     background_tasks.add_task(run_and_callback, payload)
     return {"status": "processing"}  # Spring은 여기서 바로 받음
 
-async def run_and_callback(payload: dict):
+def run_and_callback(payload: dict):
     try:
         # 백그라운드에서 분석 후 콜백
         result = run_pipeline(payload["video_path"])
@@ -26,7 +26,7 @@ async def run_and_callback(payload: dict):
             "status": "success",
             "result": result
         }
-        await send_to_spring(payload["callback_url"], callback_payload)
+        send_to_spring(payload["callback_url"], callback_payload)
     except Exception as e:
         import traceback
         error_msg = f"Python pipeline error: {str(e)}\n{traceback.format_exc()}"
@@ -37,9 +37,11 @@ async def run_and_callback(payload: dict):
             "error": error_msg
         }
         try:
-            await send_to_spring(payload["callback_url"], callback_payload)
+            send_to_spring(payload["callback_url"], callback_payload)
         except Exception as ex:
+            import traceback
             print(f"[콜백 오류] {str(ex)}")
+            traceback.print_exc()
 
 @router.websocket("/ws/analyze/{session_id}")
 async def realtime_analyze(websocket: WebSocket, session_id: str):

@@ -14,8 +14,8 @@ def clean_hallucinated_text(text: str, max_chars: int = 3000) -> str:
         return text
 
     # Detect if any single token repeats >= 10 times consecutively (hallucination)
-    # e.g. "앱, " repeated → collapse to max 3 occurrences
-    text = re.sub(r'((.{1,20}?)[,\s]+)\2{9,}', r'\1\1\1[...]', text)
+    # e.g. "앱, " or "ทุก" repeated → collapse to max 3 occurrences
+    text = re.sub(r'((.{1,20}?)[,\s]*)\1{9,}', r'\1\1\1[...]', text)
 
     # Hard cap to prevent huge payloads
     if len(text) > max_chars:
@@ -144,13 +144,13 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
 
     return result
 
-async def send_to_spring(callback_url: str, result: dict):
+def send_to_spring(callback_url: str, result: dict):
     """
     분석 결과를 Spring 콜백 엔드포인트로 전송
     """
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
+        with httpx.Client() as client:
+            response = client.post(
                 callback_url,
                 json=result,
                 timeout=60.0
@@ -160,7 +160,9 @@ async def send_to_spring(callback_url: str, result: dict):
             else:
                 print(f"[콜백 실패] status={response.status_code}")
     except Exception as e:
+        import traceback
         print(f"[콜백 오류] {str(e)}")
+        traceback.print_exc()
 
 if __name__ == "__main__":
     result = run_pipeline(
