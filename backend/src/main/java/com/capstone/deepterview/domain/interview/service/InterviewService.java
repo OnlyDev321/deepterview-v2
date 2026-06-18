@@ -3,6 +3,7 @@ package com.capstone.deepterview.domain.interview.service;
 import com.capstone.deepterview.domain.answer.domain.Answer;
 import com.capstone.deepterview.domain.answer.repository.AnswerRepository;
 import com.capstone.deepterview.domain.answer.service.AnswerAsyncAnalysisRunner;
+import com.capstone.deepterview.global.util.DocumentParser;
 import com.capstone.deepterview.domain.interview.domain.*;
 import com.capstone.deepterview.domain.interview.dto.request.CreateSessionRequest;
 import com.capstone.deepterview.domain.interview.dto.response.CreateSessionResponse;
@@ -57,6 +58,11 @@ public class InterviewService {
 
 	@Transactional
 	public CreateSessionResponse createSession(Long userId, CreateSessionRequest request) {
+		return createSession(userId, request, null);
+	}
+
+	@Transactional
+	public CreateSessionResponse createSession(Long userId, CreateSessionRequest request, MultipartFile resume) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
@@ -72,6 +78,15 @@ public class InterviewService {
 
 		SessionType normalizedSessionType = SessionType.TECHNICAL;
 
+		String resumeText = null;
+		if (resume != null && !resume.isEmpty()) {
+			try {
+				resumeText = DocumentParser.extractText(resume);
+			} catch (IOException e) {
+				throw new CustomException(ErrorCode.VALIDATION_ERROR, "이력서 파일 파싱에 실패했습니다: " + e.getMessage());
+			}
+		}
+
 		InterviewSession session = InterviewSession.create(
 				user,
 				jobCategory,
@@ -79,12 +94,18 @@ public class InterviewService {
 				normalizedCareerYears,
 				normalizedSessionType,
 				request.totalQuestions());
+
+		if (resumeText != null) {
+			session.updateResumeContent(resumeText);
+		}
+
 		interviewSessionRepository.save(session);
 
 		String initialContent = llmFeedbackService.generateInitialQuestion(
 				jobCategory.getName(),
 				request.jobTitle(),
-				normalizedCareerYears
+				normalizedCareerYears,
+				resumeText
 		);
 
 		Question initialQuestion = Question.create(

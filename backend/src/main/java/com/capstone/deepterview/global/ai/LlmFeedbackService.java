@@ -169,6 +169,47 @@ public class LlmFeedbackService {
         return String.format("[%s %s] 기술 면접 질문입니다. 본인의 경험을 기반으로 답변해 주세요.", jobCategory, careerLabel);
     }
 
+    public String generateInitialQuestion(String jobCategory, String jobTitle, int careerYears, String resumeContent) {
+        if (resumeContent == null || resumeContent.trim().isEmpty()) {
+            return generateInitialQuestion(jobCategory, jobTitle, careerYears);
+        }
+
+        String careerLabel = careerYears == 0 ? "신입" : careerYears + "년차";
+        String prompt = """
+                당신은 IT 전문 면접관입니다. 다음 직무 정보와 지원자의 이력서(포트폴리오) 내용을 기반으로 지원자에게 물어볼 첫 번째 기술 면접 질문(TECHNICAL question)을 1개만 생성해 주세요.
+                
+                [직군 카테고리]
+                %s
+                
+                [상세 직무명]
+                %s
+                
+                [경력 연차]
+                %s
+                
+                [지원자 이력서/포트폴리오]
+                %s
+                
+                조건:
+                - 반드시 한국어로 작성해 주세요.
+                - 지원자의 이력서/포트폴리오에 기재된 주요 프로젝트, 기술 스택, 경험을 분석하여 해당 직무(상세 직무명 및 경력)에 가장 중요하고 검증이 필요한 핵심 기술 질문 1개만 정중하고 자연스러운 구어체 말투로 생성해 주세요.
+                - 질문 외에 다른 설명, 대괄호나 문맥 소개 등 불필요한 텍스트는 절대 포함하지 말고 오직 질문 한 문장만 반환해 주세요.
+                """.formatted(jobCategory, jobTitle, careerLabel, resumeContent);
+
+        try {
+            String response = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
+            if (response != null && !response.trim().isEmpty()) {
+                return response.trim();
+            }
+        } catch (Exception e) {
+            // Fallback in case of AI service errors
+        }
+        return generateInitialQuestion(jobCategory, jobTitle, careerYears);
+    }
+
     public String generateFollowUpQuestion(String previousQuestion, String userResponse) {
         if (userResponse == null || userResponse.trim().isEmpty() || userResponse.contains("(시간 초과")) {
             return "이전 답변이 제출되지 않았거나 제한 시간이 초과되었습니다. 다음 질문을 진행하기 위해 본인의 관련 프로젝트나 기술 스택에 대한 경험을 간단히 소개해 주시겠습니까?";
@@ -202,5 +243,47 @@ public class LlmFeedbackService {
             // Fallback in case of AI service errors
         }
         return "말씀해 주신 내용에 대해 조금 더 구체적으로 설명해 주시겠습니까?";
+    }
+
+    public String generateFollowUpQuestion(String previousQuestion, String userResponse, String resumeContent) {
+        if (resumeContent == null || resumeContent.trim().isEmpty()) {
+            return generateFollowUpQuestion(previousQuestion, userResponse);
+        }
+
+        if (userResponse == null || userResponse.trim().isEmpty() || userResponse.contains("(시간 초과")) {
+            return "이전 답변이 제출되지 않았거나 제한 시간이 초과되었습니다. 다음 질문을 진행하기 위해 본인의 관련 프로젝트나 기술 스택에 대한 경험을 간단히 소개해 주시겠습니까?";
+        }
+
+        String prompt = """
+                당신은 IT 전문 면접관입니다. 지원자가 이전 질문에 대해 답변한 내용과 지원자의 이력서(포트폴리오) 내용을 바탕으로 지원자에게 물어볼 자연스러운 꼬리 질문(follow-up question)을 1개만 생성해 주세요.
+                
+                [지원자 이력서/포트폴리오]
+                %s
+                
+                [이전 질문]
+                %s
+                
+                [지원자 답변]
+                %s
+                
+                조건:
+                - 반드시 한국어로 작성해 주세요.
+                - 지원자의 이력서/포트폴리오 내용과 이전 답변 내용을 유기적으로 연결하여, 모순되는 부분이나 더 상세한 기술적 디테일(사용 라이브러리, 트레이드오프, 아키텍처 선택 이유 등)에 대해 짚어내며 깊이 있게 질문해 주세요.
+                - 1인칭 면접관 입장에서 정중하고 친근하게 질문해 주세요 (예: "답변 잘 들었습니다. 이력서의 ~ 프로젝트와 관련하여, ~한 상황에서는 어떻게 대처하시나요?").
+                - 질문 외에 다른 설명이나 소개 등 불필요한 텍스트는 절대 포함하지 말고 오직 질문 한 문장만 반환해 주세요.
+                """.formatted(resumeContent, previousQuestion, userResponse);
+
+        try {
+            String response = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
+            if (response != null && !response.trim().isEmpty()) {
+                return response.trim();
+            }
+        } catch (Exception e) {
+            // Fallback in case of AI service errors
+        }
+        return generateFollowUpQuestion(previousQuestion, userResponse);
     }
 }

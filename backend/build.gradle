@@ -49,6 +49,10 @@ dependencies {
 
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// PDF & DOCX Parsing
+	implementation 'org.apache.pdfbox:pdfbox:2.0.30'
+	implementation 'org.apache.poi:poi-ooxml:5.2.5'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

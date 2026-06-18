@@ -1,7 +1,27 @@
 import os
+import re
 import cv2
 import httpx
 from pipeline.extractor import extract_audio
+
+
+def clean_hallucinated_text(text: str, max_chars: int = 3000) -> str:
+    """
+    Whisper sometimes hallucinates by repeating short tokens (e.g. "앱, 앱, 앱, ...").
+    Detect repetitive patterns and collapse them. Also hard-limit total length.
+    """
+    if not text:
+        return text
+
+    # Detect if any single token repeats >= 10 times consecutively (hallucination)
+    # e.g. "앱, " repeated → collapse to max 3 occurrences
+    text = re.sub(r'((.{1,20}?)[,\s]+)\2{9,}', r'\1\1\1[...]', text)
+
+    # Hard cap to prevent huge payloads
+    if len(text) > max_chars:
+        text = text[:max_chars] + "...[잘림]"
+
+    return text
 
 
 def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: int = 5 ) -> dict:
@@ -107,13 +127,13 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
             "pitch_std_hz":  audio_features.get("pitch_std_hz"),
         },
         "transcription": {
-            "text":     stt_result.get("text"),
+            "text":     clean_hallucinated_text(stt_result.get("text") or ""),
             "language": stt_result.get("language"),
             "segments": [
                 {
                     "start": seg["start"],
                     "end":   seg["end"],
-                    "text":  seg["text"]
+                    "text":  clean_hallucinated_text(seg["text"] or "")
                 }
                 for seg in stt_result.get("segments", [])
             ]
@@ -133,7 +153,7 @@ async def send_to_spring(callback_url: str, result: dict):
             response = await client.post(
                 callback_url,
                 json=result,
-                timeout=10.0
+                timeout=60.0
             )
             if response.status_code == 200:
                 print(f"[콜백 성공] interview_id={result['interview_id']}")

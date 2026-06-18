@@ -31,7 +31,11 @@ const DashboardLayout = () => {
       };
 
       console.log("Creating session with payload:", requestPayload);
-      const data = await sessionService.createSession(requestPayload);
+      
+      // Get the first file from the objective list if uploaded
+      const resumeFile = objective && objective.length > 0 ? objective[0] : undefined;
+      
+      const data = await sessionService.createSession(requestPayload, resumeFile);
       console.log("Session created successfully:", data);
 
       if (data && data.sessionId) {

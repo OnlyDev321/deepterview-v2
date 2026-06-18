@@ -55,6 +55,10 @@ public class InterviewSession extends BaseTimeEntity {
 	@Column(name = "full_video_path", length = 500)
 	private String fullVideoPath;
 
+	@Lob
+	@Column(name = "resume_content", columnDefinition = "LONGTEXT")
+	private String resumeContent;
+
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
@@ -106,5 +110,9 @@ public class InterviewSession extends BaseTimeEntity {
 
 	public void updateFullVideoPath(String fullVideoPath) {
 		this.fullVideoPath = fullVideoPath;
+	}
+
+	public void updateResumeContent(String resumeContent) {
+		this.resumeContent = resumeContent;
 	}
 }

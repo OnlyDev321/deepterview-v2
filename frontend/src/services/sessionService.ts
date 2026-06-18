@@ -25,12 +25,32 @@ export const sessionService = {
     return res.data.data;
   },
 
-  createSession: async (request: CreateSessionRequest): Promise<SessionDetail> => {
-    const res = await api.post<ApiResponse<SessionDetail>>(
-      "/api/v1/sessions",
-      request
-    );
-    return res.data.data;
+  createSession: async (request: CreateSessionRequest, resumeFile?: File): Promise<SessionDetail> => {
+    if (resumeFile) {
+      const formData = new FormData();
+      formData.append(
+        "request",
+        new Blob([JSON.stringify(request)], { type: "application/json" })
+      );
+      formData.append("resume", resumeFile);
+
+      const res = await api.post<ApiResponse<SessionDetail>>(
+        "/api/v1/sessions",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return res.data.data;
+    } else {
+      const res = await api.post<ApiResponse<SessionDetail>>(
+        "/api/v1/sessions",
+        request
+      );
+      return res.data.data;
+    }
   },
 
   getSessionDetail: async (sessionId: number): Promise<SessionDetail> => {

@@ -26,10 +26,11 @@ public class Answer extends BaseTimeEntity {
 	private String audioFilePath;
 
 	@Lob
-	@Column(name = "submitted_text")
+	@Column(name = "submitted_text", columnDefinition = "LONGTEXT")
 	private String submittedText;
 
 	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String transcript;
 
 	@Column(name = "duration_sec")

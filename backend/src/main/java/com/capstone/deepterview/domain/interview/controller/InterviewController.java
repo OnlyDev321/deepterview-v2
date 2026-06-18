@@ -37,6 +37,14 @@ public class InterviewController {
 		return ApiResponse.success(interviewService.createSession(principal.getId(), request));
 	}
 
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ApiResponse<CreateSessionResponse> createSessionMultipart(
+			@AuthenticationPrincipal UserPrincipal principal,
+			@RequestPart("request") @Valid CreateSessionRequest request,
+			@RequestPart(value = "resume", required = false) MultipartFile resume) {
+		return ApiResponse.success(interviewService.createSession(principal.getId(), request, resume));
+	}
+
 	@GetMapping
 	public ApiResponse<SessionListResponse> getSessions(
 			@AuthenticationPrincipal UserPrincipal principal,

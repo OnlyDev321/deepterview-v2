@@ -1,4 +1,4 @@
-import { Home, BrainCircuit, History, User, BarChart3 } from "lucide-react";
+import { Home, BrainCircuit, History, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 

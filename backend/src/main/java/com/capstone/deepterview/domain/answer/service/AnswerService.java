@@ -66,12 +66,15 @@ public class AnswerService {
 		Answer answer = Answer.create(question, null, request.transcript(), request.transcript(), request.durationSec(), status);
 		answerRepository.save(answer);
 
+		// Generate next question if needed
 		InterviewSession session = question.getSession();
 		int currentQuestionCount = questionRepository.countBySessionId(session.getId());
 		if (currentQuestionCount < session.getTotalQuestions()) {
+			// Generate follow-up question quickly using the candidate's answer and resumeContent
 			String followUpContent = llmFeedbackService.generateFollowUpQuestion(
 					question.getContent(),
-					request.transcript()
+					request.transcript(),
+					session.getResumeContent()
 			);
 
 			Question nextQuestion = Question.create(
