@@ -424,7 +424,7 @@ const HistoryLayout = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
                   >
-                    <div className="col-span-2 bg-gradient-to-br from-[#232036] to-[#191c1f] backdrop-blur-md rounded-[2rem] p-8 border border-[#9b7fed]/20 shadow-lg shadow-[#9b7fed]/10">
+                    <div className="col-span-1 md:col-span-2 bg-gradient-to-br from-[#232036] to-[#191c1f] backdrop-blur-md rounded-[2rem] p-8 border border-[#9b7fed]/20 shadow-lg shadow-[#9b7fed]/10">
                       <div className="flex items-center gap-3 mb-4">
                         <Sparkles size={20} className="text-[#cebdff]" />
                         <h4 className="text-[1rem] tracking-widest text-[#cebdff] font-black">
@@ -437,34 +437,31 @@ const HistoryLayout = () => {
                       </p>
                     </div>
 
-                    <div className="relative bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border border-emerald-500/10 hover:border-emerald-500/30 transition-all duration-300">
-                      <div className="absolute left-0 top-6 bottom-6 w-1 rounded-full bg-emerald-400" />
-                      <h4 className="text-[1rem] tracking-widest text-emerald-400 font-black mb-3 pl-4">
+                    <div className="bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border-l-4 border-emerald-400 border-t border-r border-b border-t-emerald-500/10 border-r-emerald-500/10 border-b-emerald-500/10 hover:border-l-emerald-300 transition-all duration-300">
+                      <h4 className="text-[1rem] tracking-widest text-emerald-400 font-black mb-3">
                         강점 요약
                       </h4>
-                      <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light pl-4">
+                      <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light">
                         {sessionReport.strengthSummary ||
                           "강점 데이터를 분석 중입니다..."}
                       </p>
                     </div>
 
-                    <div className="relative bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border border-red-500/10 hover:border-red-500/30 transition-all duration-300">
-                      <div className="absolute left-0 top-6 bottom-6 w-1 rounded-full bg-red-400" />
-                      <h4 className="text-[1rem] tracking-widest text-red-400 font-black mb-3 pl-4">
+                    <div className="bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border-l-4 border-red-400 border-t border-r border-b border-t-red-500/10 border-r-red-500/10 border-b-red-500/10 hover:border-l-red-300 transition-all duration-300">
+                      <h4 className="text-[1rem] tracking-widest text-red-400 font-black mb-3">
                         약점 요약
                       </h4>
-                      <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light pl-4">
+                      <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light">
                         {sessionReport.weaknessSummary ||
                           "요약 데이터를 생성하는 중입니다..."}
                       </p>
                     </div>
 
-                    <div className="col-span-2 relative bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
-                      <div className="absolute left-0 top-6 bottom-6 w-1 rounded-full bg-blue-400" />
-                      <h4 className="text-[1rem] tracking-widest text-blue-400 font-black mb-3 pl-4">
+                    <div className="col-span-1 md:col-span-2 bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border-l-4 border-blue-400 border-t border-r border-b border-t-blue-500/10 border-r-blue-500/10 border-b-blue-500/10 hover:border-l-blue-300 transition-all duration-300">
+                      <h4 className="text-[1rem] tracking-widest text-blue-400 font-black mb-3">
                         개선 우선순위
                       </h4>
-                      <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light pl-4">
+                      <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light">
                         {sessionReport.improvementPriority ||
                           "요약 데이터를 생성하는 중입니다..."}
                       </p>
