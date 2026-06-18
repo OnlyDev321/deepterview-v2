@@ -60,6 +60,8 @@ async def realtime_analyze(websocket: WebSocket, session_id: str):
         min_tracking_confidence=0.5
     )
 
+    emotion_analyzer = EmotionAnalyzer()
+
     try:
         while True:
             raw = await websocket.receive_text()
@@ -76,7 +78,7 @@ async def realtime_analyze(websocket: WebSocket, session_id: str):
                     continue
 
                 frame = enhance_frame(frame)
-                emotion = EmotionAnalyzer.analyze_emotion(frame, face_mesh)
+                emotion = emotion_analyzer.analyze_emotion(frame)
                 gaze    = analyze_gaze(frame, face_mesh)
 
                 await websocket.send_json({

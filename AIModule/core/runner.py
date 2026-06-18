@@ -30,6 +30,12 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
         min_tracking_confidence=0.5
     )
 
+    emotion_analyzer = EmotionAnalyzer()
+
+    print(f"[비디오 분석 시작] video_path: {video_path}")
+    total_read_frames = 0
+    analyzed_frames = 0
+    filtered_success_frames = 0
     frame_results = []
     frame_index = 0
 
@@ -38,28 +44,47 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
         if not ret:
             break
         
+        total_read_frames += 1
+        
         if frame_index % frame_interval == 0:
-            frame = enhance_frame(frame);
+            analyzed_frames += 1
+            frame = enhance_frame(frame)
             gaze = analyze_gaze(frame, face_mesh)      # 배열 직접 전달
-            emotion = EmotionAnalyzer.analyze_emotion(frame, face_mesh) # 배열 직접 전달
+            emotion = emotion_analyzer.analyze_emotion(frame)
             
-
             emotion_filtered = filter_emotion_result(emotion)
             gaze_filtered = filter_gaze_result(gaze)
 
             # None이면 해당 프레임 결과를 집계에서 제외
             if emotion_filtered and gaze_filtered:
+                filtered_success_frames += 1
                 frame_results.append({
                     "frame_index": frame_index,
                     "gaze_direction":   gaze_filtered["gaze_direction"],
                     "dominant_emotion": emotion_filtered["dominant_emotion"],
                     "confidence":       emotion_filtered["confidence"]
-            })
+                })
+            else:
+                # Log lý do bị lọc bỏ để debug
+                reasons = []
+                if not emotion_filtered:
+                    if emotion:
+                        reasons.append(f"emotion (face_detected={emotion.get('face_detected')}, conf={emotion.get('confidence')}, neutral={emotion.get('emotions', {}).get('neutral')})")
+                    else:
+                        reasons.append("emotion is None")
+                if not gaze_filtered:
+                    if gaze:
+                        reasons.append(f"gaze (face_detected={gaze.get('face_detected')}, ratio={gaze.get('avg_ratio')})")
+                    else:
+                        reasons.append("gaze is None")
+                # Bạn có thể uncomment dòng dưới nếu muốn xem chi tiết từng frame bị lọc
+                # print(f"  [프레임 {frame_index} 필터 제외] {', '.join(reasons)}")
         
 
         frame_index += 1
 
     cap.release()
+    print(f"[비디오 분석 완료] 총 읽은 프레임: {total_read_frames}, 분석 대상 프레임: {analyzed_frames}, 필터 통과 프레임: {filtered_success_frames}")
 
     if audio_path is not None:
         try:
