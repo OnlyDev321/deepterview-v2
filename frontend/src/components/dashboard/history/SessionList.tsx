@@ -7,7 +7,7 @@ const SessionList = ({
   onSelectSession,
 }: SessionListProps) => {
   return (
-    <div className="w-full lg:w-80 flex flex-col gap-4 pb-6 lg:pb-0 lg:pr-4 border-b lg:border-b-0 lg:border-r border-[#494454]/10 h-64 lg:h-full overflow-y-auto custom-scrollbar">
+    <div className="w-full xl:w-80 flex flex-col gap-4 pb-6 xl:pb-0 xl:pr-4 border-b xl:border-b-0 xl:border-r border-[#494454]/10 h-64 xl:h-full overflow-y-auto custom-scrollbar">
       <div className="px-2 mb-2">
         <h4 className="text-[0.65rem] uppercase tracking-[0.2em] text-[#cbc3d7]/40 font-bold">
           이전 세션

@@ -203,11 +203,11 @@ const AnalyticsLayout = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 pb-32 max-w-[1400px] mx-auto min-h-screen">
+    <div className="flex flex-col xl:flex-row gap-8 pb-32 max-w-[1400px] mx-auto min-h-screen">
       {/* 1. Sidebar Question Switcher */}
       {sessionQuestions.length > 0 && (
         <motion.div
-          className="w-full lg:w-80 shrink-0 bg-[#191c1f]/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 h-fit"
+          className="w-full xl:w-80 shrink-0 bg-[#191c1f]/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 h-fit"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}

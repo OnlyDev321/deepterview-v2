@@ -69,26 +69,27 @@ const SessionDetailHeader = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 shrink-0">
-        <button className="flex flex-nowrap items-center gap-2 px-6 py-3 whitespace-nowrap bg-[#111417] border border-[#494454]/20 text-[#e1e2e7] rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#191c1f] transition-all">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto shrink-0">
+        <button className="flex items-center justify-center gap-2 px-6 py-3 whitespace-nowrap bg-[#111417] border border-[#494454]/20 text-[#e1e2e7] rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#191c1f] transition-all w-full sm:w-auto">
           <Share2 size={14} /> 보고서 공유
         </button>
         <button
           onClick={onViewReport}
-          className="flex flex-nowrap items-center gap-2 px-8 py-4 whitespace-nowrap bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-[#9b7fed]/20 cursor-pointer"
+          className="flex items-center justify-center gap-2 px-8 py-4 whitespace-nowrap bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-[#9b7fed]/20 cursor-pointer w-full sm:w-auto"
         >
           <FileText size={14} /> 전체 분석 보기
         </button>
         {onDeleteSession && (
           <button
             onClick={onDeleteSession}
-            className="flex items-center justify-center p-3.5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 text-red-400 hover:text-red-300 rounded-full transition-all cursor-pointer shadow-md group"
+            className="flex items-center justify-center p-3.5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 hover:border-red-500/30 text-red-400 hover:text-red-300 rounded-full transition-all cursor-pointer shadow-md group w-full sm:w-auto"
             title="세션 삭제"
           >
             <Trash2
               size={16}
               className="group-hover:scale-105 transition-transform"
             />
+            <span className="sm:hidden ml-2 text-xs font-bold uppercase tracking-widest">세션 삭제</span>
           </button>
         )}
       </div>

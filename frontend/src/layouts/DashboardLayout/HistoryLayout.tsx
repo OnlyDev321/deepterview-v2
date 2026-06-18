@@ -341,7 +341,7 @@ const HistoryLayout = () => {
         </div>
       ) : (
         <motion.div
-          className="flex flex-col lg:flex-row gap-10 flex-1 min-h-0"
+          className="flex flex-col xl:flex-row gap-10 flex-1 min-h-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
