@@ -1,5 +1,6 @@
 package com.capstone.deepterview.domain.member.controller;
 
+import com.capstone.deepterview.domain.member.dto.request.UpdateProfileRequest;
 import com.capstone.deepterview.domain.member.dto.response.MeResponse;
 import com.capstone.deepterview.domain.member.dto.response.UserPrincipal;
 import com.capstone.deepterview.domain.member.service.MemberService;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +31,18 @@ public class UserController {
 	)
 	public ApiResponse<MeResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
 		return ApiResponse.success(memberService.getMe(principal.getId()));
+	}
+
+	@PatchMapping("/me")
+	@Operation(
+			summary = "내 프로필 업데이트 API",
+			description = "소개(bio) 및 프로필 이미지를 업데이트합니다. 이름과 이메일은 변경할 수 없습니다."
+	)
+	public ApiResponse<MeResponse> updateProfile(
+			@AuthenticationPrincipal UserPrincipal principal,
+			@RequestBody UpdateProfileRequest request
+	) {
+		return ApiResponse.success(memberService.updateProfile(principal.getId(), request));
 	}
 
 	@DeleteMapping("/me")

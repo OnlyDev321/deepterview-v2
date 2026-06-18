@@ -1,6 +1,7 @@
 package com.capstone.deepterview.domain.member.service;
 
 import com.capstone.deepterview.domain.member.domain.User;
+import com.capstone.deepterview.domain.member.dto.request.UpdateProfileRequest;
 import com.capstone.deepterview.domain.member.dto.response.MeResponse;
 import com.capstone.deepterview.domain.member.repository.UserRepository;
 import com.capstone.deepterview.global.exception.CustomException;
@@ -21,6 +22,14 @@ public class MemberService {
 	public MeResponse getMe(Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+		return MeResponse.from(user);
+	}
+
+	@Transactional
+	public MeResponse updateProfile(Long userId, UpdateProfileRequest request) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+		user.updateMyInfo(request.bio(), request.profileImageUrl());
 		return MeResponse.from(user);
 	}
 

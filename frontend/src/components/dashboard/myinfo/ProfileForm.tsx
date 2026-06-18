@@ -10,9 +10,9 @@ const ProfileForm = ({ profile, onChange }: ProfileFormProps) => {
         <input
           type="text"
           value={profile.name}
-          onChange={(e) => onChange("name", e.target.value)}
+          disabled
           placeholder="김동우"
-          className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all outline-none"
+          className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] opacity-60 cursor-not-allowed outline-none"
         />
       </div>
 
@@ -23,9 +23,9 @@ const ProfileForm = ({ profile, onChange }: ProfileFormProps) => {
         <input
           type="email"
           value={profile.email}
-          onChange={(e) => onChange("email", e.target.value)}
+          disabled
           placeholder="observer@deepterview.ai"
-          className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all outline-none"
+          className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] opacity-60 cursor-not-allowed outline-none"
         />
       </div>
 
