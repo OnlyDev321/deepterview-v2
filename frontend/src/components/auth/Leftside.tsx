@@ -1,6 +1,6 @@
 const Leftside = () => {
   return (
-    <section className="w-full md:w-1/2 min-h-[600px] md:min-h-screen bg-surface-container-lowest relative flex items-center justify-center p-8 md:p-16 lg:p-24 overflow-hidden border-r border-white/5">
+    <section className="hidden md:flex md:w-1/2 md:min-h-screen bg-surface-container-lowest relative items-center justify-center p-8 md:p-16 lg:p-24 overflow-hidden border-r border-white/5">
       {/* Background Decorative Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[120px]" />
       <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] rounded-full bg-secondary/5 blur-[100px]" />

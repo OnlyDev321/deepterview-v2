@@ -1,16 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import type { NavKey } from "../types/index";
 import { useLocation } from "react-router-dom";
-import { Bell, LogOut, User, UserCircle, ChevronRight } from "lucide-react";
+import { Bell, LogOut, User, UserCircle, ChevronRight, Menu } from "lucide-react";
 import { useState, useContext } from "react";
 import { AuthContext } from "../services/AuthContext";
 
 type HeaderProps = {
   activeNav?: NavKey;
   onNavigateSection?: (key: NavKey) => void;
+  onToggleSidebar?: () => void;
 };
 
-const Header = ({ activeNav, onNavigateSection }: HeaderProps) => {
+const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isLogged, logout } = useContext(AuthContext);
@@ -32,7 +33,16 @@ const Header = ({ activeNav, onNavigateSection }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 h-16 w-full shrink-0 border-b border-[rgba(206,189,255,0.1)] bg-[rgba(2,6,23,0.6)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] backdrop-blur-[32px]">
       <div className="relative flex h-full w-full items-center justify-between px-6 sm:px-8">
-        <div>
+        <div className="flex items-center gap-3">
+          {isDashBoardPage && (
+            <button
+              onClick={onToggleSidebar}
+              className="lg:hidden p-2 rounded-xl hover:bg-white/10 transition cursor-pointer"
+              aria-label="Toggle sidebar"
+            >
+              <Menu className="w-6 h-6 text-[#cbc3d7]" />
+            </button>
+          )}
           <button
             className="text-xl font-bold tracking-tight text-[#cebdff] cursor-pointer"
             onClick={() => navigate("/")}

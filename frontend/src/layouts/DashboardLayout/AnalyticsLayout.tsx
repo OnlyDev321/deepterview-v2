@@ -203,11 +203,11 @@ const AnalyticsLayout = () => {
   };
 
   return (
-    <div className="flex gap-8 pb-32 max-w-[1400px] mx-auto min-h-screen">
+    <div className="flex flex-col lg:flex-row gap-8 pb-32 max-w-[1400px] mx-auto min-h-screen">
       {/* 1. Sidebar Question Switcher */}
       {sessionQuestions.length > 0 && (
         <motion.div
-          className="w-80 shrink-0 bg-[#191c1f]/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 h-fit"
+          className="w-full lg:w-80 shrink-0 bg-[#191c1f]/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 h-fit"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -403,7 +403,7 @@ const AnalyticsLayout = () => {
             <div
               className={
                 analysis.nonverbalAnalysis
-                  ? "grid grid-cols-2 gap-8"
+                  ? "grid grid-cols-1 md:grid-cols-2 gap-8"
                   : "grid grid-cols-1 gap-8"
               }
             >
@@ -758,7 +758,7 @@ const AnalyticsLayout = () => {
                 </div>
 
                 {/* Grid Layout of STAR breakdown */}
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {/* Situation */}
                   <div className="bg-black/20 p-5 rounded-2xl border border-white/5 flex flex-col justify-between">
                     <div>
@@ -845,7 +845,7 @@ const AnalyticsLayout = () => {
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
                     <span className="text-[0.6rem] text-emerald-400 font-bold uppercase tracking-widest block mb-2">
                       강점 (Strengths)

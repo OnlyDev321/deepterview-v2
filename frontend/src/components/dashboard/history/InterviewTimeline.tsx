@@ -4,9 +4,9 @@ import { AlertCircle, MessageCircle, Sparkles, User } from "lucide-react";
 
 const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineProps) => {
   return (
-    <div className="relative pl-12 space-y-12 py-8">
+    <div className="relative pl-8 sm:pl-12 space-y-12 py-8">
       {/* Timeline Line */}
-      <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-[#cebdff]/40 via-[#494454]/20 to-transparent" />
+      <div className="absolute left-4 sm:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-[#cebdff]/40 via-[#494454]/20 to-transparent" />
 
       {qaPairs.map((pair, index) => (
         <motion.div
@@ -17,7 +17,7 @@ const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineP
           className="relative"
         >
           {/* Timeline Node */}
-          <div className="absolute -left-12 top-0 w-12 h-12 flex items-center justify-center">
+          <div className="absolute -left-8 sm:-left-12 top-0 w-8 sm:w-12 h-8 sm:h-12 flex items-center justify-center">
             <div className="w-8 h-8 rounded-full bg-[#111417] border-2 border-[#494454] flex items-center justify-center z-10">
               <span className="text-[0.65rem] font-black text-[#cbc3d7]">
                 {index + 1}
@@ -27,7 +27,7 @@ const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineP
 
           <div className="bg-[#191c1f] rounded-[2rem] p-8 border border-[#494454]/10 shadow-[0_0_40px_rgba(0,0,0,0.1)] space-y-8">
             {/* Header / Tags */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex gap-2">
                 <span className="px-3 py-1 bg-white/5 text-[#cbc3d7]/60 text-[0.6rem] font-bold uppercase rounded-full border border-white/10">
                   실시간 대화록

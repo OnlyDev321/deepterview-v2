@@ -8,7 +8,7 @@ const AccountActions = ({
   isSaving,
 }: AccountActionsProps) => {
   return (
-    <div className="flex items-center justify-between pt-8 border-t border-[#494454]/10">
+    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between pt-8 border-t border-[#494454]/10">
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}

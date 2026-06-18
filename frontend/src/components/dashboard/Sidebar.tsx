@@ -2,7 +2,12 @@ import { Home, BrainCircuit, History, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Sidebar = () => {
+type SidebarProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+};
+
+const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
   const navItems = [
     { icon: Home, label: "홈", link: "/dashboard" },
     {
@@ -32,7 +37,9 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 z-40 flex flex-col py-8 px-4 bg-gradient-to-r from-[#191c1f] to-transparent border-r border-[#494454]/10">
+    <aside className={`h-screen w-64 fixed left-0 top-0 z-40 flex flex-col py-8 px-4 bg-[#111316] lg:bg-gradient-to-r lg:from-[#191c1f] lg:to-transparent border-r border-[#494454]/10 transition-transform duration-300 lg:translate-x-0 ${
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    }`}>
       <div className="mb-6 px-2">
         <h1 className="text-xl font-black text-[#cebdff] tracking-tighter">
           Deepterview
@@ -57,6 +64,7 @@ const Sidebar = () => {
               onClick={() => {
                 if (isNavDisabled) return;
                 handleClickSidebarNav(item.link);
+                onClose?.();
               }}
               whileHover={isNavDisabled ? {} : { x: 4 }}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group w-full ${

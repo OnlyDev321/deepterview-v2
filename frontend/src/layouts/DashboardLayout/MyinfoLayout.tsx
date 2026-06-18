@@ -91,7 +91,7 @@ const MyinfoLayout = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.6 }}
       >
-        <h2 className="text-5xl font-black tracking-tighter text-[#e1e2e7] mb-4">
+        <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-[#e1e2e7] mb-4">
           내 프로필
         </h2>
         <p className="text-[#cbc3d7]/60 text-lg font-light">
@@ -100,7 +100,7 @@ const MyinfoLayout = () => {
       </motion.div>
 
       <motion.div
-        className="bg-[#191c1f] rounded-[3rem] p-12 border border-[#494454]/10 shadow-[0_0_80px_rgba(0,0,0,0.3)] space-y-12"
+        className="bg-[#191c1f] rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 border border-[#494454]/10 shadow-[0_0_80px_rgba(0,0,0,0.3)] space-y-12"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}

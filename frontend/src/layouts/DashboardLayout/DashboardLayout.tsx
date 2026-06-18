@@ -58,7 +58,7 @@ const DashboardLayout = () => {
         transition={{ delay: 0.6, duration: 0.6 }}
         className="mb-16"
       >
-        <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-[#e1e2e7] mb-4">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-[#e1e2e7] mb-4">
           세션 설정
         </h2>
         <p className="text-[#cbc3d7] text-xl max-w-2xl leading-relaxed font-light">

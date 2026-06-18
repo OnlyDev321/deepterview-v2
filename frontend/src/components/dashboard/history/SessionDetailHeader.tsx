@@ -11,9 +11,9 @@ const SessionDetailHeader = ({
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#191c1f] rounded-[2.5rem] p-8 border border-[#494454]/10 shadow-[0_0_50px_rgba(0,0,0,0.2)] flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden"
+      className="bg-[#191c1f] rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-[#494454]/10 shadow-[0_0_50px_rgba(0,0,0,0.2)] flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden"
     >
-      <div className="flex items-center gap-8 min-w-0 flex-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 min-w-0 flex-1">
         {/* Score Circle */}
         <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
           <svg className="w-full h-full -rotate-90">
@@ -52,7 +52,7 @@ const SessionDetailHeader = ({
           <p className="text-[#cbc3d7]/60 text-sm mt-1">
             면접 날짜: {session.date}
           </p>
-          <div className="flex items-center gap-4 mt-4 w-max">
+          <div className="flex flex-wrap items-center gap-4 mt-4">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#cebdff]/10 rounded-full border border-[#cebdff]/20">
               <Clock size={12} className="text-[#cebdff]" />
               <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-widest">

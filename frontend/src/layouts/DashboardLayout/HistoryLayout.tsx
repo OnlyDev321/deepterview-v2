@@ -268,7 +268,7 @@ const HistoryLayout = () => {
     >
       {/* Header */}
       <motion.div
-        className="flex items-center justify-between mb-12"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
@@ -277,7 +277,7 @@ const HistoryLayout = () => {
           <span className="text-[0.65rem] uppercase tracking-[0.3em] text-[#cebdff] font-black mb-2 block animate-pulse">
             아카이브 REPORT
           </span>
-          <h2 className="text-5xl font-black tracking-tighter text-[#e1e2e7]">
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-[#e1e2e7]">
             세션 히스토리
           </h2>
         </div>
@@ -341,7 +341,7 @@ const HistoryLayout = () => {
         </div>
       ) : (
         <motion.div
-          className="flex gap-10 flex-1 min-h-0"
+          className="flex flex-col lg:flex-row gap-10 flex-1 min-h-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
@@ -419,7 +419,7 @@ const HistoryLayout = () => {
                 {/* Session AI Qualitative Summaries (If report exists) */}
                 {sessionReport && (
                   <motion.div
-                    className="grid grid-cols-2 gap-6 mt-8"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}

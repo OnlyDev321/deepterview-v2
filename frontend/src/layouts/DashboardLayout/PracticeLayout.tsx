@@ -85,12 +85,12 @@ const PracticeLayout = () => {
   return (
     <InterviewRecordingProvider>
       <motion.div
-        className="grid grid-cols-12 gap-8 min-h-screen items-stretch"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-screen items-stretch"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.6 }}
       >
-        <div className="col-span-8 space-y-8">
+        <div className="col-span-1 lg:col-span-8 space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ const PracticeLayout = () => {
           </motion.div>
         </div>
 
-        <div className="col-span-4 flex flex-col gap-6 self-start">
+        <div className="col-span-1 lg:col-span-4 flex flex-col gap-6 self-start">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
