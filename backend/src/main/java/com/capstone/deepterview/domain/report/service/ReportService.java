@@ -128,7 +128,7 @@ public class ReportService {
                 .filter(Objects::nonNull)
                 .map(StarAnalysis::getTotalScore)
                 .filter(Objects::nonNull)
-                .map(s -> s * 10f)
+                .map(s -> s / 40f * 100f) // totalScore 최대 40점 → 0~100 정규화
                 .toList();
         return scores.isEmpty() ? null
                 : (float) scores.stream().mapToDouble(Float::doubleValue).average().orElse(0);

@@ -730,13 +730,30 @@ const AnalyticsLayout = () => {
                       STAR 프레임워크 역량 평가 (Situation-Task-Action-Result)
                     </h3>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[0.65rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider">
-                      콘텐츠 구조화 점수:
-                    </span>
-                    <span className="text-lg font-black text-[#cebdff]">
-                      {Math.round(analysis.starAnalysis.totalScore)}점
-                    </span>
+                  <div className="flex items-center gap-4 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#cebdff]/10 via-[#9b7fed]/10 to-[#cebdff]/10 border border-[#cebdff]/20 shadow-lg shadow-[#cebdff]/5">
+                    <div className="flex flex-col">
+                      <span className="text-[0.55rem] uppercase tracking-[0.25em] text-[#cbc3d7]/40 font-black">
+                        STAR SCORE
+                      </span>
+                      <span className="text-[0.7rem] text-[#cbc3d7]/60 font-medium">
+                        콘텐츠 구조화 평가
+                      </span>
+                    </div>
+
+                    <div className="h-10 w-px bg-white/10" />
+
+                    <div className="flex items-end gap-1">
+                      <span className="text-4xl font-black bg-gradient-to-r from-[#cebdff] to-white bg-clip-text text-transparent leading-none">
+                        {Math.round(analysis.starAnalysis.situationScore) +
+                          Math.round(analysis.starAnalysis.taskScore) +
+                          Math.round(analysis.starAnalysis.actionScore) +
+                          Math.round(analysis.starAnalysis.resultScore)}
+                      </span>
+
+                      <span className="text-sm text-[#cbc3d7]/40 font-semibold mb-1">
+                        /40
+                      </span>
+                    </div>
                   </div>
                 </div>
 

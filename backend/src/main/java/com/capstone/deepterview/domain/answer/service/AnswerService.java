@@ -185,12 +185,11 @@ public class AnswerService {
 
 	private float calculateStarTotalScore(LlmAnalysisResult.StarPart sp) {
 		float sum = 0;
-		int count = 0;
-		if (sp.situationScore() != null) { sum += sp.situationScore(); count++; }
-		if (sp.taskScore() != null) { sum += sp.taskScore(); count++; }
-		if (sp.actionScore() != null) { sum += sp.actionScore(); count++; }
-		if (sp.resultScore() != null) { sum += sp.resultScore(); count++; }
-		return count > 0 ? sum / count : 0f;
+		if (sp.situationScore() != null) { sum += sp.situationScore(); }
+		if (sp.taskScore() != null) { sum += sp.taskScore(); }
+		if (sp.actionScore() != null) { sum += sp.actionScore(); }
+		if (sp.resultScore() != null) { sum += sp.resultScore(); }
+		return sum; // 최대 40점 (각 항목 최대 10점)
 	}
 
 	private String storeVideoFile(MultipartFile file) {
