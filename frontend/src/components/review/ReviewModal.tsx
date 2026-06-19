@@ -99,11 +99,14 @@ const CommentItem = ({
   const [showReply, setShowReply] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showAllReplies, setShowAllReplies] = useState(false);
   const [localComment, setLocalComment] = useState(comment);
+  const REPLIES_PREVIEW_COUNT = 5;
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLocalComment(comment);
+    setShowAllReplies(false);
   }, [comment]);
 
   const handleReply = async () => {
@@ -243,7 +246,7 @@ const CommentItem = ({
         </div>
       </div>
 
-      {localComment.replies.map((reply) => (
+      {(showAllReplies ? localComment.replies : localComment.replies.slice(0, REPLIES_PREVIEW_COUNT)).map((reply) => (
         <div key={reply.id} className="mt-3">
           <CommentItem
             comment={reply}
@@ -260,6 +263,14 @@ const CommentItem = ({
           />
         </div>
       ))}
+      {!showAllReplies && localComment.replies.length > REPLIES_PREVIEW_COUNT && (
+        <button
+          onClick={() => setShowAllReplies(true)}
+          className="text-xs text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors mt-2 ml-8"
+        >
+          답글 {localComment.replies.length - REPLIES_PREVIEW_COUNT}개 더 보기
+        </button>
+      )}
     </div>
   );
 };
