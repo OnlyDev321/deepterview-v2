@@ -196,8 +196,8 @@ const CommentItem = ({
   const showIndent = depth > 0 && depth <= INDENT_DEPTH;
 
   return (
-    <div className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""} min-w-0`}>
-      <div className="flex gap-2.5 min-w-0">
+    <div className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""}`}>
+      <div className="flex gap-2.5">
         <div className="size-7 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
           {localComment.authorProfileImageUrl ? (
             <img src={localComment.authorProfileImageUrl} alt="" className="size-full object-cover" />
@@ -207,7 +207,7 @@ const CommentItem = ({
             </span>
           )}
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-medium text-[#e1e2e7]">
               {localComment.authorName}
@@ -218,7 +218,7 @@ const CommentItem = ({
               </button>
             )}
           </div>
-          <p className="text-sm text-[#cbc3d7]/80 mt-0.5 whitespace-pre-wrap break-words">
+          <p className="text-sm text-[#cbc3d7]/80 mt-0.5 whitespace-pre">
             {localComment.content}
           </p>
 
@@ -394,7 +394,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
         <motion.div
-          className="relative z-10 w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-3xl border border-[#494454]/20 bg-[#191c1f] p-6 shadow-xl"
+          className="relative z-10 w-full max-w-lg max-h-[85vh] overflow-x-auto overflow-y-auto rounded-3xl border border-[#494454]/20 bg-[#191c1f] p-6 shadow-xl"
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
