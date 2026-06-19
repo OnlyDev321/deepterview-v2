@@ -43,6 +43,28 @@ input:-webkit-autofill:focus {
   display: none; /* Chrome, Safari */
 }
 
+html {
+  scrollbar-color: #323539 #0c0e12;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0e12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #323539;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #494454;
+}
+
 @layer utilities {
   .glow-button {
     box-shadow: 0 0 20px rgba(155, 127, 237, 0.2);

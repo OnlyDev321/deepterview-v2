@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../../services/AuthContext";
 import { reviewService } from "../../services/reviewService";
 import type { ReviewDetailResponse, CommentResponse, Emoji } from "../../types";
-import { X, MessageCircle, Send, Trash2, Reply } from "lucide-react";
+import { X, MessageCircle, Send, Trash2, Reply, SmilePlus } from "lucide-react";
 
 const EMOJIS: { emoji: Emoji; label: string }[] = [
   { emoji: "LIKE", label: "👍" },
@@ -20,45 +20,66 @@ interface ReviewModalProps {
   onDeleted?: (reviewId: number) => void;
 }
 
-const EmojiRow = ({
+const EmojiTrigger = ({
   reactions,
   myReaction,
   onToggle,
-  size = "sm",
+  compact = false,
 }: {
   reactions: Record<string, number>;
   myReaction: string | null;
   onToggle?: (emoji: Emoji) => void;
-  size?: "sm" | "xs";
-}) => (
-  <div className={`flex gap-1 flex-wrap ${size === "xs" ? "mt-1.5" : "mt-3"}`}>
-    {EMOJIS.map(({ emoji, label }) => {
-      const count = reactions[emoji] ?? 0;
-      const isActive = myReaction === emoji;
-      return (
-        <button
-          key={emoji}
-          onClick={() => onToggle?.(emoji)}
-          disabled={!onToggle}
-          className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs transition-all border ${
-            isActive
-              ? "border-[#9B7FED] bg-[#9B7FED]/10"
-              : "border-transparent hover:border-[#494454]/30"
-          } ${!onToggle ? "cursor-default" : "cursor-pointer"}`}
-        >
-          <span className="text-sm">{label}</span>
-          {count > 0 && (
-            <span
-              className={`font-medium tabular-nums ${isActive ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}
-            >
-              {count}
-            </span>
-          )}
-        </button>
-      );
-    })}
-  </div>
-);
+  compact?: boolean;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative inline-flex"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        className={`flex items-center gap-1 rounded-lg transition-all ${
+          compact
+            ? "px-1.5 py-0.5 text-[11px] text-[#cbc3d7]/40 hover:text-[#cebdff] hover:bg-[#cebdff]/5"
+            : "px-2 py-1 text-xs text-[#cbc3d7]/60 hover:text-[#cebdff] hover:bg-[#cebdff]/5"
+        } ${!onToggle ? "cursor-default opacity-40" : "cursor-pointer"}`}
+        disabled={!onToggle}
+      >
+        <SmilePlus size={compact ? 12 : 16} />
+        <span>이모지</span>
+      </button>
+      <AnimatePresence>
+        {open && onToggle && (
+          <motion.div
+            className={`absolute bottom-full left-0 mb-2 flex gap-1 rounded-xl border border-[#494454]/30 bg-[#191c1f] shadow-xl z-10 ${
+              compact ? "p-1.5" : "p-2"
+            }`}
+            initial={{ opacity: 0, y: 8, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.9 }}
+            transition={{ duration: 0.15 }}
+          >
+            {EMOJIS.map(({ emoji, label }) => (
+              <button
+                key={emoji}
+                onClick={() => { onToggle(emoji); setOpen(false); }}
+                className={`flex items-center justify-center rounded-lg text-lg hover:bg-[#323539] transition-colors ${
+                  compact ? "size-8" : "size-9"
+                } ${
+                  myReaction === emoji ? "bg-[#9B7FED]/10 ring-1 ring-[#9B7FED]" : ""
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const CommentItem = ({
   comment,
@@ -161,22 +182,39 @@ const CommentItem = ({
             {localComment.content}
           </p>
 
-          <EmojiRow
-            reactions={localComment.reactions}
-            myReaction={localComment.myReaction}
-            onToggle={isLogged ? handleReaction : undefined}
-            size="xs"
-          />
-
-          {isLogged && (
-            <button
-              onClick={() => { setShowReply(!showReply); setTimeout(() => inputRef.current?.focus(), 50); }}
-              className="flex items-center gap-1 mt-1 text-xs text-[#cbc3d7]/40 hover:text-[#cebdff] transition-colors"
-            >
-              <Reply size={12} />
-              답글
-            </button>
-          )}
+          <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+            <EmojiTrigger
+              reactions={localComment.reactions}
+              myReaction={localComment.myReaction}
+              onToggle={isLogged ? handleReaction : undefined}
+              compact
+            />
+            {EMOJIS.filter(({ emoji }) => (localComment.reactions[emoji] ?? 0) > 0).map(({ emoji, label }) => (
+              <button
+                key={emoji}
+                onClick={() => isLogged && handleReaction(emoji)}
+                className={`flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] border transition-all ${
+                  localComment.myReaction === emoji
+                    ? "border-[#9B7FED] bg-[#9B7FED]/10"
+                    : "border-transparent hover:border-[#494454]/30"
+                }`}
+              >
+                <span>{label}</span>
+                <span className={`tabular-nums ${localComment.myReaction === emoji ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}>
+                  {localComment.reactions[emoji]}
+                </span>
+              </button>
+            ))}
+            {isLogged && (
+              <button
+                onClick={() => { setShowReply(!showReply); setTimeout(() => inputRef.current?.focus(), 50); }}
+                className="flex items-center gap-1 ml-1 text-xs text-[#cbc3d7]/40 hover:text-[#cebdff] transition-colors"
+              >
+                <Reply size={12} />
+                답글
+              </button>
+            )}
+          </div>
 
           {showReply && (
             <div className="flex gap-2 mt-2">
@@ -220,6 +258,14 @@ const CommentItem = ({
       ))}
     </div>
   );
+};
+
+const countAllComments = (comments: CommentResponse[]): number => {
+  let count = 0;
+  for (const c of comments) {
+    count += 1 + countAllComments(c.replies);
+  }
+  return count;
 };
 
 const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
@@ -337,20 +383,38 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                   <p className="mt-3 text-[#cbc3d7] leading-relaxed whitespace-pre-wrap">
                     {review.content}
                   </p>
-                  <EmojiRow
-                    reactions={review.reactions}
-                    myReaction={review.myReaction}
-                    onToggle={isLogged ? handleReviewReaction : undefined}
-                  />
                 </div>
               </div>
 
-              <div className="border-t border-[#494454]/20 pt-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <MessageCircle size={16} className="text-[#cebdff]" />
-                  <span className="text-sm text-[#cbc3d7]">댓글 {review.comments.length}개</span>
+              <div className="flex items-center gap-1 flex-wrap border-t border-[#494454]/20 pt-3 mt-3">
+                <EmojiTrigger
+                  reactions={review.reactions}
+                  myReaction={review.myReaction}
+                  onToggle={isLogged ? handleReviewReaction : undefined}
+                />
+                {EMOJIS.filter(({ emoji }) => (review.reactions[emoji] ?? 0) > 0).map(({ emoji, label }) => (
+                  <button
+                    key={emoji}
+                    onClick={() => isLogged && handleReviewReaction(emoji)}
+                    className={`flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs border transition-all ${
+                      review.myReaction === emoji
+                        ? "border-[#9B7FED] bg-[#9B7FED]/10"
+                        : "border-transparent hover:border-[#494454]/30"
+                    }`}
+                  >
+                    <span>{label}</span>
+                    <span className={`tabular-nums ${review.myReaction === emoji ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}>
+                      {review.reactions[emoji]}
+                    </span>
+                  </button>
+                ))}
+                <div className="flex items-center gap-1 text-[#cbc3d7]/50 ml-auto">
+                  <MessageCircle size={14} />
+                  <span className="text-xs">댓글 {countAllComments(review.comments)}개</span>
                 </div>
+              </div>
 
+              <div className="border-t border-[#494454]/20 pt-4 mt-3">
                 <div className="space-y-4 mb-4">
                   {review.comments.map((comment) => (
                     <CommentItem
