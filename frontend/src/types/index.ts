@@ -170,6 +170,63 @@ export interface SessionDetail {
   questions: QuestionResponse[];
 }
 
+// -------------------------------------------------------------
+// Review (후기) Types
+// -------------------------------------------------------------
+export type Emoji = "LIKE" | "LOVE" | "HAHA" | "WOW" | "SAD" | "ANGRY";
+
+export interface ReviewListResponse {
+  id: number;
+  authorId: number;
+  authorName: string;
+  authorProfileImageUrl?: string;
+  content: string;
+  commentCount: number;
+  reactions: Record<string, number>;
+  createdAt: string;
+}
+
+export interface CommentResponse {
+  id: number;
+  authorId: number;
+  authorName: string;
+  authorProfileImageUrl?: string;
+  content: string;
+  replies: CommentResponse[];
+  reactions: Record<string, number>;
+  myReaction: string | null;
+  createdAt: string;
+}
+
+export interface ReviewDetailResponse {
+  id: number;
+  authorId: number;
+  authorName: string;
+  authorProfileImageUrl?: string;
+  content: string;
+  comments: CommentResponse[];
+  reactions: Record<string, number>;
+  myReaction: string | null;
+  createdAt: string;
+}
+
+export interface ReactionSummary {
+  counts: Record<string, number>;
+  myReaction: string | null;
+}
+
+export interface CreateReviewRequest {
+  content: string;
+}
+
+export interface CreateCommentRequest {
+  content: string;
+}
+
+export interface ToggleReactionRequest {
+  emoji: Emoji;
+}
+
 export interface SessionAnalysisStatus {
   sessionId: number;
   status: SessionStatus;
