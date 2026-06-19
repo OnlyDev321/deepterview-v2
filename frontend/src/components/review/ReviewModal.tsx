@@ -155,9 +155,13 @@ const CommentItem = ({
     }
   };
 
+  const INDENT_DEPTH = 3;
+  const showIndent = depth > 0 && depth <= INDENT_DEPTH;
+  const isDeep = depth > INDENT_DEPTH;
+
   return (
-    <div className={`${depth > 0 ? "ml-8 pl-4 border-l border-[#494454]/20" : ""}`}>
-      <div className="flex gap-2.5">
+    <div className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""} ${isDeep ? "overflow-x-auto" : ""}`}>
+      <div className="flex gap-2.5 min-w-0">
         <div className="size-7 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
           {localComment.authorProfileImageUrl ? (
             <img src={localComment.authorProfileImageUrl} alt="" className="size-full object-cover" />
@@ -246,7 +250,7 @@ const CommentItem = ({
             reviewId={reviewId}
             currentUserId={currentUserId}
             isLogged={isLogged}
-            depth={1}
+            depth={depth + 1}
             onCommentDeleted={(id) => {
               setLocalComment((prev) => ({
                 ...prev,
@@ -274,9 +278,12 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
   const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showAllComments, setShowAllComments] = useState(false);
+  const COMMENT_PREVIEW_COUNT = 5;
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setShowAllComments(false);
     reviewService.getReview(reviewId).then((data) => {
       setReview(data);
       setLoading(false);
@@ -416,7 +423,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
 
               <div className="border-t border-[#494454]/20 pt-4 mt-3">
                 <div className="space-y-4 mb-4">
-                  {review.comments.map((comment) => (
+                  {(showAllComments ? review.comments : review.comments.slice(0, COMMENT_PREVIEW_COUNT)).map((comment) => (
                     <CommentItem
                       key={comment.id}
                       comment={comment}
@@ -431,6 +438,14 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                     <p className="text-center text-sm text-[#cbc3d7]/40 py-4">
                       첫 번째 댓글을 남겨보세요
                     </p>
+                  )}
+                  {!showAllComments && review.comments.length > COMMENT_PREVIEW_COUNT && (
+                    <button
+                      onClick={() => setShowAllComments(true)}
+                      className="text-sm text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors"
+                    >
+                      댓글 {review.comments.length - COMMENT_PREVIEW_COUNT}개 더 보기
+                    </button>
                   )}
                 </div>
 
