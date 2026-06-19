@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../../services/AuthContext";
 import { reviewService } from "../../services/reviewService";
@@ -32,14 +32,45 @@ const EmojiTrigger = ({
   compact?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const POPUP_GAP = 6;
+
+  const updatePos = useCallback(() => {
+    if (!buttonRef.current || !open) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setPos({ top: rect.top - POPUP_GAP, left: rect.left });
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    updatePos();
+    window.addEventListener("scroll", updatePos, true);
+    window.addEventListener("resize", updatePos);
+    return () => {
+      window.removeEventListener("scroll", updatePos, true);
+      window.removeEventListener("resize", updatePos);
+    };
+  }, [open, updatePos]);
+
+  const handleMouseEnter = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimer.current = setTimeout(() => setOpen(false), 200);
+  };
 
   return (
     <div
       className="relative inline-flex"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <button
+        ref={buttonRef}
         className={`flex items-center gap-1 rounded-lg transition-all ${
           compact
             ? "px-1.5 py-0.5 text-[11px] text-[#cbc3d7]/40 hover:text-[#cebdff] hover:bg-[#cebdff]/5"
@@ -53,9 +84,12 @@ const EmojiTrigger = ({
       <AnimatePresence>
         {open && onToggle && (
           <motion.div
-            className={`absolute bottom-full left-0 mb-2 flex gap-1 rounded-xl border border-[#494454]/30 bg-[#191c1f] shadow-xl z-10 ${
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className={`fixed z-[100] flex gap-1 rounded-xl border border-[#494454]/30 bg-[#191c1f] shadow-xl ${
               compact ? "p-1.5" : "p-2"
             }`}
+            style={{ top: pos.top, left: pos.left }}
             initial={{ opacity: 0, y: 8, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.9 }}
@@ -160,10 +194,9 @@ const CommentItem = ({
 
   const INDENT_DEPTH = 3;
   const showIndent = depth > 0 && depth <= INDENT_DEPTH;
-  const isDeep = depth > INDENT_DEPTH;
 
   return (
-    <div className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""} ${isDeep ? "overflow-x-auto" : ""}`}>
+    <div className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""} min-w-0`}>
       <div className="flex gap-2.5 min-w-0">
         <div className="size-7 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
           {localComment.authorProfileImageUrl ? (
@@ -185,7 +218,7 @@ const CommentItem = ({
               </button>
             )}
           </div>
-          <p className="text-sm text-[#cbc3d7]/80 mt-0.5 whitespace-pre-wrap">
+          <p className="text-sm text-[#cbc3d7]/80 mt-0.5 whitespace-pre-wrap break-words">
             {localComment.content}
           </p>
 
