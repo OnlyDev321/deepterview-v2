@@ -7,7 +7,7 @@ import ReviewModal from "../review/ReviewModal";
 import { MessageCircle, Plus } from "lucide-react";
 
 const TestimonialsSection = () => {
-  const { isLogged, user } = useContext(AuthContext);
+  const { isLogged } = useContext(AuthContext);
   const [reviews, setReviews] = useState<ReviewListResponse[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(
     null,

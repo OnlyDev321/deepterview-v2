@@ -1,0 +1,12 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+.idea
+.vscode
+.DS_Store
+*.md
+output
+debug
+Analyze_Test.mp4

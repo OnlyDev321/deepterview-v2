@@ -21,12 +21,10 @@ interface ReviewModalProps {
 }
 
 const EmojiTrigger = ({
-  reactions,
   myReaction,
   onToggle,
   compact = false,
 }: {
-  reactions: Record<string, number>;
   myReaction: string | null;
   onToggle?: (emoji: Emoji) => void;
   compact?: boolean;
@@ -34,7 +32,7 @@ const EmojiTrigger = ({
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const   closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const POPUP_GAP = 6;
 
   const updatePos = useCallback(() => {
@@ -224,7 +222,6 @@ const CommentItem = ({
 
           <div className="flex items-center gap-1 mt-1.5 flex-wrap">
             <EmojiTrigger
-              reactions={localComment.reactions}
               myReaction={localComment.myReaction}
               onToggle={isLogged ? handleReaction : undefined}
               compact
@@ -439,7 +436,6 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
 
               <div className="flex items-center gap-1 flex-wrap border-t border-[#494454]/20 pt-3 mt-3">
                 <EmojiTrigger
-                  reactions={review.reactions}
                   myReaction={review.myReaction}
                   onToggle={isLogged ? handleReviewReaction : undefined}
                 />
