@@ -10,3 +10,7 @@ __pycache__
 output
 debug
 Analyze_Test.mp4
+Screenshot*
+*.png
+*.jpg
+*.jpeg

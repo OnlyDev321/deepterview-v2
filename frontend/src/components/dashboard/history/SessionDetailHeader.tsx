@@ -52,16 +52,16 @@ const SessionDetailHeader = ({
           <p className="text-[#cbc3d7]/60 text-sm mt-1">
             면접 날짜: {session.date}
           </p>
-          <div className="flex flex-wrap items-center gap-4 mt-4">
+          <div className="flex items-center gap-4 mt-4">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#cebdff]/10 rounded-full border border-[#cebdff]/20">
               <Clock size={12} className="text-[#cebdff]" />
-              <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-widest">
+              <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-widest w-max">
                 {session.duration}
               </span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#7bd0ff]/10 rounded-full border border-[#7bd0ff]/20">
               <MessageSquare size={12} className="text-[#7bd0ff]" />
-              <span className="text-[0.65rem] font-bold text-[#7bd0ff] uppercase tracking-widest">
+              <span className="text-[0.65rem] font-bold text-[#7bd0ff] uppercase tracking-widest w-max">
                 {session.questionCount} 질문
               </span>
             </div>
@@ -89,7 +89,9 @@ const SessionDetailHeader = ({
               size={16}
               className="group-hover:scale-105 transition-transform"
             />
-            <span className="sm:hidden ml-2 text-xs font-bold uppercase tracking-widest">세션 삭제</span>
+            <span className="sm:hidden ml-2 text-xs font-bold uppercase tracking-widest">
+              세션 삭제
+            </span>
           </button>
         )}
       </div>
