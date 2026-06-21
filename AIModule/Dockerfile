@@ -11,8 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN python3 -m pip install --no-cache-dir --upgrade --ignore-installed pip && \
-    grep -vE "^(tensorflow|tf-keras)" requirements.txt > req_docker.txt && \
+RUN grep -vE "^(tensorflow|tf-keras)" requirements.txt > req_docker.txt && \
     python3 -m pip install --no-cache-dir -r req_docker.txt && \
     python3 -m pip install "setuptools<71" --force-reinstall && \
     python3 -m pip install --no-cache-dir openai-whisper==20231117 --no-build-isolation && \
