@@ -11,11 +11,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
+
+# Cài torch CPU-only TRƯỚC để whisper không tự kéo bản CUDA nặng
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install "setuptools<71" --force-reinstall && \
+    pip install --no-cache-dir "setuptools<71" --force-reinstall && \
     pip install --no-cache-dir openai-whisper==20231117 --no-build-isolation && \
-    rm -rf /root/.cache/pip
+    rm -rf /root/.cache/pip /root/.cache
 
 COPY . .
 
