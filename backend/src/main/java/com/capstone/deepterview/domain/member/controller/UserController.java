@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.MediaType;
+
 @Tag(name = "유저 컨트롤러")
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
 	private final MemberService memberService;
+
+	@PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Operation(
+			summary = "프로필 이미지 업로드 API",
+			description = "프로필 이미지를 업로드하고 저장된 URL을 반환합니다."
+	)
+	public ApiResponse<String> uploadAvatar(
+			@AuthenticationPrincipal UserPrincipal principal,
+			@RequestParam("avatar") MultipartFile avatar
+	) {
+		String avatarUrl = memberService.uploadAvatar(principal.getId(), avatar);
+		return ApiResponse.success(avatarUrl);
+	}
 
 	@GetMapping("/me")
 	@Operation(

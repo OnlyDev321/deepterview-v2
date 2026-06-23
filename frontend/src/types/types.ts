@@ -70,7 +70,7 @@ export interface AccountActionsProps {
 
 export interface AvatarUploadProps {
   avatar: string;
-  onAvatarChange: (newAvatar: string) => void;
+  onAvatarChange: (file: File) => void;
 }
 
 export interface ProfileFormProps {

@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Bell, LogOut, User, UserCircle, ChevronRight, Menu } from "lucide-react";
 import { useState, useContext } from "react";
 import { AuthContext } from "../services/AuthContext";
+import { getImageUrl } from "../lib/api";
 
 type HeaderProps = {
   activeNav?: NavKey;
@@ -143,7 +144,7 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
               >
                 {user?.profileImageUrl ? (
                   <img
-                    src={user.profileImageUrl}
+                    src={getImageUrl(user.profileImageUrl)}
                     alt="User avatar"
                     className="w-full h-full object-cover"
                   />

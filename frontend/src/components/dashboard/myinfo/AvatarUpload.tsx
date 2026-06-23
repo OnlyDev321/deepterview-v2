@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import type { AvatarUploadProps } from "../../../types/types";
 import { Camera } from "lucide-react";
+import { getImageUrl } from "../../../lib/api";
 
 const AvatarUpload = ({ avatar, onAvatarChange }: AvatarUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -9,11 +10,7 @@ const AvatarUpload = ({ avatar, onAvatarChange }: AvatarUploadProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onAvatarChange(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      onAvatarChange(file);
     }
   };
   return (
@@ -24,7 +21,7 @@ const AvatarUpload = ({ avatar, onAvatarChange }: AvatarUploadProps) => {
           className="w-40 h-40 rounded-full border-4 border-[#cebdff]/20 overflow-hidden bg-[#111417] shadow-[0_0_50px_rgba(206,189,255,0.1)]"
         >
           <img
-            src={avatar || "https://picsum.photos/seed/avatar/200/200"}
+            src={getImageUrl(avatar)}
             alt="Profile"
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"

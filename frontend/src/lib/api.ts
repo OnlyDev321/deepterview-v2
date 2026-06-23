@@ -74,4 +74,12 @@ api.interceptors.response.use(
   },
 );
 
+export const getImageUrl = (url?: string | null) => {
+  if (!url) return "https://picsum.photos/seed/avatar/200/200";
+  if (url.startsWith("/api/")) {
+    return `${API_BASE_URL}${url}`;
+  }
+  return url;
+};
+
 export default api;

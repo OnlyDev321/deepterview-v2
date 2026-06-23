@@ -11,6 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.UUID;
+
 import java.time.LocalDateTime;
 
 @Service
@@ -18,6 +26,34 @@ import java.time.LocalDateTime;
 public class MemberService {
 
 	private final UserRepository userRepository;
+
+	@Transactional
+	public String uploadAvatar(Long userId, MultipartFile file) {
+		if (file == null || file.isEmpty()) {
+			throw new CustomException(ErrorCode.VALIDATION_ERROR, "파일이 비어있습니다.");
+		}
+
+		try {
+			Path projectRoot = Paths.get(System.getProperty("user.dir")).normalize();
+			Path dir = projectRoot.resolve("storage/uploads").normalize();
+			Files.createDirectories(dir);
+
+			String original = Optional.ofNullable(file.getOriginalFilename()).orElse("avatar.png");
+			String ext = "";
+			int dot = original.lastIndexOf('.');
+			if (dot >= 0) {
+				ext = original.substring(dot);
+			}
+			String filename = "avatar_" + UUID.randomUUID() + ext;
+
+			Path target = dir.resolve(filename);
+			file.transferTo(target);
+
+			return "/api/v1/uploads/" + filename;
+		} catch (IOException e) {
+			throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "프로필 이미지 저장에 실패했습니다.");
+		}
+	}
 
 	@Transactional(readOnly = true)
 	public MeResponse getMe(Long userId) {

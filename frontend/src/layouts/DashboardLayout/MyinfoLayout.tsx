@@ -47,6 +47,16 @@ const MyinfoLayout = () => {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleAvatarChange = async (file: File) => {
+    try {
+      const avatarUrl = await authService.uploadAvatar(file);
+      handleFieldChange("profileImageUrl", avatarUrl);
+    } catch (error) {
+      console.error("Failed to upload avatar:", error);
+      alert("프로필 이미지 업로드에 실패했습니다.");
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -113,9 +123,7 @@ const MyinfoLayout = () => {
       >
         <AvatarUpload
           avatar={profile.profileImageUrl}
-          onAvatarChange={(newAvatar) =>
-            handleFieldChange("profileImageUrl", newAvatar)
-          }
+          onAvatarChange={handleAvatarChange}
         />
 
         <ProfileForm profile={profile} onChange={handleFieldChange} />
