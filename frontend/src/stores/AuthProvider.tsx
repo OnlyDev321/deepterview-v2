@@ -56,6 +56,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         accessToken,
         user,
+        setUser,
         isLogged,
         setIsLogged,
         setAccessToken,

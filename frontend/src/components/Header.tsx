@@ -14,7 +14,7 @@ type HeaderProps = {
 const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLogged, logout } = useContext(AuthContext);
+  const { isLogged, logout, user } = useContext(AuthContext);
 
   const isLandingPage = location.pathname === "/";
   const isSignInPage = location.pathname === "/signin";
@@ -139,12 +139,20 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
             <div className="relative">
               <button
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(155,127,237,0.15)] hover:bg-[rgba(155,127,237,0.25)] transition cursor-pointer"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(155,127,237,0.15)] hover:bg-[rgba(155,127,237,0.25)] transition cursor-pointer overflow-hidden"
               >
-                <UserCircle
-                  className="text-[#9B7FED] w-6 h-6"
-                  strokeWidth={2}
-                />
+                {user?.profileImageUrl ? (
+                  <img
+                    src={user.profileImageUrl}
+                    alt="User avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <UserCircle
+                    className="text-[#9B7FED] w-6 h-6"
+                    strokeWidth={2}
+                  />
+                )}
               </button>
 
               {isOpen && (

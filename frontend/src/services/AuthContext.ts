@@ -4,6 +4,7 @@ import type { User } from "../types";
 interface AuthContextType {
   isLogged: boolean;
   user: User | null;
+  setUser: (user: User | null) => void;
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
   setIsLogged: (isLogged: boolean) => void;
@@ -15,6 +16,7 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType>({
   isLogged: false,
   user: null,
+  setUser: () => {},
   setIsLogged: () => {},
   accessToken: null,
   setAccessToken: () => {},

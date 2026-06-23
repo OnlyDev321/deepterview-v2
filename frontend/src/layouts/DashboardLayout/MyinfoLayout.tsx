@@ -19,7 +19,7 @@ const MyinfoLayout = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
-  const { logout } = useContext(AuthContext);
+  const { logout, setUser } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -50,11 +50,13 @@ const MyinfoLayout = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await authService.updateProfile({
+      const updatedUser = await authService.updateProfile({
         name: profile.name,
         bio: profile.bio,
         profileImageUrl: profile.profileImageUrl,
       });
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
       alert("프로필이 성공적으로 업데이트되었습니다!");
     } catch (error) {
       console.error("Failed to update profile:", error);
