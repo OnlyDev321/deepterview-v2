@@ -4,6 +4,7 @@ import { AuthContext } from "../../services/AuthContext";
 import { reviewService } from "../../services/reviewService";
 import type { ReviewDetailResponse, CommentResponse, Emoji } from "../../types";
 import { X, MessageCircle, Send, Trash2, Reply, SmilePlus } from "lucide-react";
+import { getImageUrl } from "../../lib/api";
 
 const EMOJIS: { emoji: Emoji; label: string }[] = [
   { emoji: "LIKE", label: "👍" },
@@ -198,7 +199,7 @@ const CommentItem = ({
       <div className="flex gap-2.5">
         <div className="size-7 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
           {localComment.authorProfileImageUrl ? (
-            <img src={localComment.authorProfileImageUrl} alt="" className="size-full object-cover" />
+            <img src={getImageUrl(localComment.authorProfileImageUrl)} alt="" className="size-full object-cover" />
           ) : (
             <span className="text-[10px] font-bold text-[#cebdff]">
               {localComment.authorName[0]}
@@ -412,7 +413,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
               <div className="flex items-start gap-3 mb-4">
                 <div className="size-10 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
                   {review.authorProfileImageUrl ? (
-                    <img src={review.authorProfileImageUrl} alt="" className="size-full object-cover" />
+                    <img src={getImageUrl(review.authorProfileImageUrl)} alt="" className="size-full object-cover" />
                   ) : (
                     <span className="text-sm font-bold text-[#cebdff]">
                       {review.authorName[0]}

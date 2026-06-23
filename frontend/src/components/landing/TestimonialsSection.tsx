@@ -5,6 +5,7 @@ import { reviewService } from "../../services/reviewService";
 import type { ReviewListResponse } from "../../types";
 import ReviewModal from "../review/ReviewModal";
 import { MessageCircle, Plus } from "lucide-react";
+import { getImageUrl } from "../../lib/api";
 
 const TestimonialsSection = () => {
   const { isLogged } = useContext(AuthContext);
@@ -85,7 +86,7 @@ const TestimonialsSection = () => {
               <div className="size-10 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden shrink-0">
                 {review.authorProfileImageUrl ? (
                   <img
-                    src={review.authorProfileImageUrl}
+                    src={getImageUrl(review.authorProfileImageUrl)}
                     alt=""
                     className="size-full object-cover"
                   />
