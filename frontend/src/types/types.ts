@@ -58,6 +58,7 @@ export interface UserProfile {
   email: string;
   profileImageUrl: string;
   bio: string;
+  loginProvider?: string;
 }
 
 export interface AccountActionsProps {

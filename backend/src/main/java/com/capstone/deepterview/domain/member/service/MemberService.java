@@ -1,5 +1,6 @@
 package com.capstone.deepterview.domain.member.service;
 
+import com.capstone.deepterview.domain.member.domain.OAuthProvider;
 import com.capstone.deepterview.domain.member.domain.User;
 import com.capstone.deepterview.domain.member.dto.request.UpdateProfileRequest;
 import com.capstone.deepterview.domain.member.dto.response.MeResponse;
@@ -29,7 +30,13 @@ public class MemberService {
 	public MeResponse updateProfile(Long userId, UpdateProfileRequest request) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
-		user.updateMyInfo(request.bio(), request.profileImageUrl());
+
+		String newName = request.name();
+		if (newName == null || newName.trim().isEmpty()) {
+			throw new CustomException(ErrorCode.VALIDATION_ERROR, "이름은 필수 입력 항목입니다.");
+		}
+
+		user.updateMyInfo(newName, request.bio(), request.profileImageUrl());
 		return MeResponse.from(user);
 	}
 

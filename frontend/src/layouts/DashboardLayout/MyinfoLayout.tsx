@@ -14,6 +14,7 @@ const MyinfoLayout = () => {
     email: "kimdongju123@gmail.com",
     profileImageUrl: "",
     bio: "",
+    loginProvider: "LOCAL",
   });
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const MyinfoLayout = () => {
           email: data.email || "",
           profileImageUrl: data.profileImageUrl || "",
           bio: data.bio || "",
+          loginProvider: data.loginProvider || "LOCAL",
         });
       } catch (error) {
         console.error("Failed to fetch profile:", error);

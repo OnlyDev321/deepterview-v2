@@ -10,21 +10,20 @@ const ProfileForm = ({ profile, onChange }: ProfileFormProps) => {
         <input
           type="text"
           value={profile.name}
-          disabled
+          onChange={(e) => onChange("name", e.target.value)}
           placeholder="김동우"
-          className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] opacity-60 cursor-not-allowed outline-none"
+          className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all outline-none"
         />
       </div>
 
       <div className="space-y-3">
         <label className="text-[0.65rem] uppercase tracking-[0.3em] text-[#cebdff] font-black ml-1">
-          이메일
+          {profile.loginProvider === "GOOGLE" ? "이메일" : "아이디"}
         </label>
         <input
-          type="email"
+          type="text"
           value={profile.email}
           disabled
-          placeholder="observer@deepterview.ai"
           className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] opacity-60 cursor-not-allowed outline-none"
         />
       </div>

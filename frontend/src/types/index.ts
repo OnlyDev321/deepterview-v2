@@ -7,6 +7,7 @@ export interface User {
   email?: string;
   profileImageUrl?: string;
   bio?: string;
+  loginProvider?: string;
 }
 
 // -------------------------------------------------------------
