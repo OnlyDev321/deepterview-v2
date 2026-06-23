@@ -5,6 +5,7 @@ export interface User {
   id: number;
   name?: string;
   email?: string;
+  loginId?: string;
   profileImageUrl?: string;
   bio?: string;
   loginProvider?: string;

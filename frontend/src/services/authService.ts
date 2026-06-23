@@ -16,4 +16,12 @@ export const authService = {
     const res = await api.patch("/api/v1/users/me", profileData);
     return res.data.data;
   },
+  login: async (id: string, password: string): Promise<any> => {
+    const res = await api.post("/api/v1/auth/login", { id, password });
+    return res.data.data;
+  },
+  register: async (id: string, password: string): Promise<any> => {
+    const res = await api.post("/api/v1/auth/register", { id, password });
+    return res.data.data;
+  },
 };

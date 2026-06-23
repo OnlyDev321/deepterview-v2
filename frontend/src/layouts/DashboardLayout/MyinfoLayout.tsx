@@ -12,6 +12,7 @@ const MyinfoLayout = () => {
   const [profile, setProfile] = useState<UserProfile>({
     name: "김동우",
     email: "kimdongju123@gmail.com",
+    loginId: "",
     profileImageUrl: "",
     bio: "",
     loginProvider: "LOCAL",
@@ -28,6 +29,7 @@ const MyinfoLayout = () => {
         setProfile({
           name: data.name || "",
           email: data.email || "",
+          loginId: data.loginId || "",
           profileImageUrl: data.profileImageUrl || "",
           bio: data.bio || "",
           loginProvider: data.loginProvider || "LOCAL",

@@ -22,7 +22,7 @@ const ProfileForm = ({ profile, onChange }: ProfileFormProps) => {
         </label>
         <input
           type="text"
-          value={profile.email}
+          value={profile.loginProvider === "GOOGLE" ? profile.email : profile.loginId}
           disabled
           className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-4 px-6 text-[#e1e2e7] opacity-60 cursor-not-allowed outline-none"
         />

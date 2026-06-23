@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record MeResponse(
 		Long id,
 		String email,
+		String loginId,
 		String name,
 		String profileImageUrl,
 		String bio,
@@ -22,6 +23,7 @@ public record MeResponse(
 		return new MeResponse(
 				user.getId(),
 				user.getEmail(),
+				user.getLoginId(),
 				user.getName(),
 				user.getProfileImageUrl(),
 				user.getBio(),

@@ -24,8 +24,14 @@ public class User extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true, length = 255)
+	@Column(unique = true, length = 255)
 	private String email;
+
+	@Column(name = "login_id", unique = true, length = 255)
+	private String loginId;
+
+	@Column(length = 255)
+	private String password;
 
 	@Column(nullable = false, length = 100)
 	private String name;
@@ -49,6 +55,15 @@ public class User extends BaseTimeEntity {
 		user.email = email;
 		user.name = name;
 		user.profileImageUrl = profileImageUrl;
+		return user;
+	}
+
+	public static User ofLocal(String loginId, String passwordHash, String name) {
+		User user = new User();
+		user.loginId = loginId;
+		user.password = passwordHash;
+		user.name = name;
+		user.email = loginId.contains("@") ? loginId : loginId + "@local.deepterview.org";
 		return user;
 	}
 

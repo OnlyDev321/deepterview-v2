@@ -4,6 +4,8 @@ import com.capstone.deepterview.domain.member.domain.OAuthProvider;
 import com.capstone.deepterview.domain.member.domain.User;
 import com.capstone.deepterview.domain.member.domain.UserOauth;
 import com.capstone.deepterview.domain.member.dto.response.TokenResponse;
+import com.capstone.deepterview.domain.member.dto.request.RegisterRequest;
+import com.capstone.deepterview.domain.member.dto.request.LoginRequest;
 import com.capstone.deepterview.domain.member.repository.UserOauthRepository;
 import com.capstone.deepterview.domain.member.repository.UserRepository;
 import com.capstone.deepterview.global.config.JwtTokenProvider;
@@ -12,6 +14,7 @@ import com.capstone.deepterview.global.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,30 @@ public class AuthService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserRepository userRepository;
 	private final UserOauthRepository userOauthRepository;
+	private final PasswordEncoder passwordEncoder;
+
+	@Transactional
+	public void register(RegisterRequest request) {
+		if (userRepository.existsByLoginId(request.id())) {
+			throw new CustomException(ErrorCode.CONFLICT, "이미 존재하는 아이디입니다.");
+		}
+
+		String encodedPassword = passwordEncoder.encode(request.password());
+		User user = User.ofLocal(request.id(), encodedPassword, "사용자_" + request.id());
+		userRepository.save(user);
+	}
+
+	@Transactional
+	public TokenResponse login(LoginRequest request) {
+		User user = userRepository.findByLoginId(request.id())
+				.orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다."));
+
+		if (user.getPassword() == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
+			throw new CustomException(ErrorCode.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다.");
+		}
+
+		return issueTokensAndSaveRefresh(user.getId(), OAuthProvider.LOCAL, "local-" + user.getId());
+	}
 
 	@Transactional
 	public TokenResponse issueTokensAndSaveRefresh(Long userId, OAuthProvider provider, String providerId) {

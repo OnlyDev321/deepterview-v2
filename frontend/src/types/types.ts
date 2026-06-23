@@ -56,6 +56,7 @@ export interface SessionDetailHeaderProps {
 export interface UserProfile {
   name: string;
   email: string;
+  loginId?: string;
   profileImageUrl: string;
   bio: string;
   loginProvider?: string;

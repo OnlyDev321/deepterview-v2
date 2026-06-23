@@ -1,5 +1,7 @@
 package com.capstone.deepterview.domain.member.controller;
 
+import com.capstone.deepterview.domain.member.dto.request.RegisterRequest;
+import com.capstone.deepterview.domain.member.dto.request.LoginRequest;
 import com.capstone.deepterview.domain.member.dto.request.LogoutRequest;
 import com.capstone.deepterview.domain.member.dto.request.TokenReissueRequest;
 import com.capstone.deepterview.domain.member.dto.response.TokenResponse;
@@ -21,6 +23,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
 	private final AuthService authService;
+
+	@PostMapping("/register")
+	@Operation(
+			summary = "회원가입 API",
+			description = "아이디와 비밀번호로 새로운 계정을 등록합니다."
+	)
+	public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
+		authService.register(request);
+		return ApiResponse.successMessage("회원가입이 완료되었습니다.");
+	}
+
+	@PostMapping("/login")
+	@Operation(
+			summary = "로그인 API",
+			description = "아이디와 비밀번호로 로그인하여 JWT 토큰을 발급받습니다."
+	)
+	public ApiResponse<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+		return ApiResponse.success(authService.login(request));
+	}
 
 	@PostMapping("/reissue")
 	@Operation(

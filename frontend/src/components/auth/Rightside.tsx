@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import iconGoogle from "../../assets/iconGoogle.svg";
-import { fakeLogin } from "../../mocks/signData";
 import { AuthContext } from "../../services/AuthContext";
 import { authService } from "../../services/authService";
 
@@ -60,7 +59,7 @@ const Rightside = () => {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
         if (!passwordRegex.test(password)) {
           setMessage(
-            "비밀번호는 8자 이상이며 대문자, 소문자, 숫자 및 특수문자를 포함",
+            "비밀번호는 8자 이상이며 대문자, 소문자, 숫자 및 특수문자를 포함해야 합니다",
           );
           setMessageType("error");
           return;
@@ -72,10 +71,9 @@ const Rightside = () => {
           return;
         }
 
-        setTimeout(() => {
-          setMessage("회원가입이 완료되었습니다!");
-          setMessageType("success");
-        });
+        await authService.register(id, password);
+        setMessage("회원가입이 완료되었습니다!");
+        setMessageType("success");
         setTimeout(() => {
           setMessage(null);
           setMessageType(null);
@@ -104,15 +102,23 @@ const Rightside = () => {
           setMessageType("error");
           return;
         }
-        const data = await fakeLogin(1);
-        login(data.accessToken, data.refreshToken, data.user);
-        console.log(data);
-        // const data = await authService.getProfile();
-        navigate("/dashboard");
+        
+        const tokenData = await authService.login(id, password);
+        // Save token to localStorage temporarily so getProfile can authorize
+        localStorage.setItem("accesstoken", tokenData.accessToken);
+        try {
+          const userData = await authService.getProfile();
+          login(tokenData.accessToken, tokenData.refreshToken, userData);
+          navigate("/dashboard");
+        } catch (profileError) {
+          localStorage.removeItem("accesstoken");
+          throw profileError;
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      setMessage("Register fall");
+      const backendMessage = error?.response?.data?.message;
+      setMessage(backendMessage || (isRegister ? "회원가입에 실패했습니다." : "로그인에 실패했습니다."));
       setMessageType("error");
     }
   };
