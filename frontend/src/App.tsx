@@ -12,71 +12,81 @@ import AnalyticsLayout from "./layouts/DashboardLayout/AnalyticsLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 
+import { useDocumentTitle } from "./hooks/useDocumentTitle";
+
+function AppContent() {
+  useDocumentTitle();
+
+  return (
+    <Routes>
+      {/* Public Routes - Anyone can access */}
+      <Route path="/" element={<Landing />} />
+      <Route path="/oauth2/success" element={<OAuth2Success />} />
+
+      {/* Auth Routes - Only for non-logged in users */}
+      <Route element={<PublicRoute />}>
+        <Route path="/signin" element={<SignIn />} />
+      </Route>
+
+      {/* Protected Routes - Only for logged-in users */}
+      <Route element={<ProtectedRoute />}>
+        <Route
+          path="/dashboard"
+          element={
+            <Dashboard>
+              <DashboardLayout />
+            </Dashboard>
+          }
+        />
+        <Route
+          path="/dashboard/practice"
+          element={
+            <Dashboard>
+              <PracticeLayout />
+            </Dashboard>
+          }
+        />
+        <Route
+          path="/dashboard/practice/processing"
+          element={
+            <Dashboard>
+              <ProcessingLayout />
+            </Dashboard>
+          }
+        />
+        <Route
+          path="/dashboard/history"
+          element={
+            <Dashboard>
+              <HistoryLayout />
+            </Dashboard>
+          }
+        />
+        <Route
+          path="/dashboard/history/:sessionId/analytics"
+          element={
+            <Dashboard>
+              <AnalyticsLayout />
+            </Dashboard>
+          }
+        />
+        <Route
+          path="/dashboard/myinfo"
+          element={
+            <Dashboard>
+              <MyinfoLayout />
+            </Dashboard>
+          }
+        />
+      </Route>
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public Routes - Anyone can access */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/oauth2/success" element={<OAuth2Success />} />
-
-        {/* Auth Routes - Only for non-logged in users */}
-        <Route element={<PublicRoute />}>
-          <Route path="/signin" element={<SignIn />} />
-        </Route>
-
-        {/* Protected Routes - Only for logged-in users */}
-        <Route element={<ProtectedRoute />}>
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard>
-                <DashboardLayout />
-              </Dashboard>
-            }
-          />
-          <Route
-            path="/dashboard/practice"
-            element={
-              <Dashboard>
-                <PracticeLayout />
-              </Dashboard>
-            }
-          />
-          <Route
-            path="/dashboard/practice/processing"
-            element={
-              <Dashboard>
-                <ProcessingLayout />
-              </Dashboard>
-            }
-          />
-          <Route
-            path="/dashboard/history"
-            element={
-              <Dashboard>
-                <HistoryLayout />
-              </Dashboard>
-            }
-          />
-          <Route
-            path="/dashboard/history/:sessionId/analytics"
-            element={
-              <Dashboard>
-                <AnalyticsLayout />
-              </Dashboard>
-            }
-          />
-          <Route
-            path="/dashboard/myinfo"
-            element={
-              <Dashboard>
-                <MyinfoLayout />
-              </Dashboard>
-            }
-          />
-        </Route>
-      </Routes>
+      <AppContent />
     </BrowserRouter>
   );
 }
