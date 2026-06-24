@@ -258,6 +258,17 @@ const Transcript = ({
     );
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void handleSubmit();
+    }
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputText(e.target.value);
+  };
+
   const submitDisabled =
     isSubmitting ||
     !isInterviewStarted ||
@@ -271,11 +282,12 @@ const Transcript = ({
           <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
             <Sparkles size={18} className="text-[#cebdff]" />
           </div>
-          <input
-            type="text"
+          <textarea
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={handleTextChange}
+            onKeyDown={handleKeyDown}
             disabled={submitDisabled}
+            rows={1}
             placeholder={
               !hasMoreQuestions
                 ? "모든 질문에 답변했습니다. 면접 종료 버튼을 눌러 주세요."
@@ -283,7 +295,7 @@ const Transcript = ({
                   ? "말씀해 주세요... 실시간으로 받아적고 있습니다..."
                   : "메모를 입력하거나 음성 인식으로 답변하세요..."
             }
-            className="w-full bg-[#191c1f] border border-[#494454]/20 rounded-full py-5 pl-14 pr-5 text-sm text-[#e1e2e7] focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all outline-none disabled:opacity-50"
+            className="w-full bg-[#191c1f] border border-[#494454]/20 rounded-xl py-5 pl-14 pr-5 text-sm text-[#e1e2e7] focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all outline-none disabled:opacity-50 resize-none overflow-y-auto"
           />
         </div>
 
