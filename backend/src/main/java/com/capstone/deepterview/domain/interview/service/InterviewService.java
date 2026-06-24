@@ -12,7 +12,7 @@ import com.capstone.deepterview.domain.interview.dto.response.QuestionResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionDetailResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionListResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionListItemResponse;
-import com.capstone.deepterview.domain.interview.dto.response.SessionAnalysisStatusResponse;
+import com.capstone.deepterview.domain.interview.dto.response.AnalysisProgressResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionStatusResponse;
 import com.capstone.deepterview.domain.interview.repository.InterviewSessionRepository;
 import com.capstone.deepterview.domain.report.repository.FeedbackReportRepository;
@@ -183,22 +183,26 @@ public class InterviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public SessionAnalysisStatusResponse getAnalysisStatus(Long userId, Long sessionId) {
-		InterviewSession session = getOwnedSession(userId, sessionId);
+	public AnalysisProgressResponse getAnalysisProgress(Long userId, Long sessionId) {
+		getOwnedSession(userId, sessionId);
 
-		int answeredCount = (int) answerRepository.countBySessionId(sessionId);
-		int answersWithVideoCount = answerRepository.findBySessionIdWithVideoPath(sessionId).size();
-		int analysesReadyCount = (int) answerRepository.countPythonAnalysesReadyBySessionId(sessionId);
-		boolean feedbackReportExists = feedbackReportRepository.findBySession_Id(sessionId).isPresent();
+		int totalAnswers = (int) answerRepository.countBySessionId(sessionId);
+		int answersWithVideo = (int) answerRepository.countBySessionIdWithVideoPath(sessionId);
+		int speechAnalyzed = (int) answerRepository.countSpeechAnalyzedBySessionId(sessionId);
+		int nonverbalAnalyzed = (int) answerRepository.countNonverbalAnalyzedBySessionId(sessionId);
+		int starAnalyzed = (int) answerRepository.countStarAnalyzedBySessionId(sessionId);
+		int llmFeedbackDone = (int) answerRepository.countLlmFeedbackDoneBySessionId(sessionId);
+		boolean reportReady = feedbackReportRepository.findBySession_Id(sessionId).isPresent();
 
-		return new SessionAnalysisStatusResponse(
-				session.getId(),
-				session.getStatus(),
-				session.getTotalQuestions(),
-				answeredCount,
-				answersWithVideoCount,
-				analysesReadyCount,
-				feedbackReportExists);
+		return new AnalysisProgressResponse(
+				sessionId,
+				totalAnswers,
+				answersWithVideo,
+				speechAnalyzed,
+				nonverbalAnalyzed,
+				starAnalyzed,
+				llmFeedbackDone,
+				reportReady);
 	}
 
 	@Transactional

@@ -3,7 +3,7 @@ package com.capstone.deepterview.domain.interview.controller;
 import com.capstone.deepterview.domain.interview.domain.SessionStatus;
 import com.capstone.deepterview.domain.interview.dto.request.CreateSessionRequest;
 import com.capstone.deepterview.domain.interview.dto.response.CreateSessionResponse;
-import com.capstone.deepterview.domain.interview.dto.response.SessionAnalysisStatusResponse;
+import com.capstone.deepterview.domain.interview.dto.response.AnalysisProgressResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionDetailResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionListResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionStatusResponse;
@@ -85,12 +85,12 @@ public class InterviewController {
 		return ApiResponse.successMessage("세션이 삭제되었습니다.");
 	}
 
-	@GetMapping("/{sessionId}/analysis-status")
-	@Operation(summary = "세션 분석 진행 상태 조회", description = "답변 수, Python 분석 완료 수, 피드백 리포트 생성 여부를 반환합니다.")
-	public ApiResponse<SessionAnalysisStatusResponse> getAnalysisStatus(
+	@GetMapping("/{sessionId}/analysis-progress")
+	@Operation(summary = "세션 분석 상세 진행률 조회", description = "각 분석 유형별 완료 상태와 종합 진행률을 반환합니다.")
+	public ApiResponse<AnalysisProgressResponse> getAnalysisProgress(
 			@AuthenticationPrincipal UserPrincipal principal,
 			@PathVariable Long sessionId) {
-		return ApiResponse.success(interviewService.getAnalysisStatus(principal.getId(), sessionId));
+		return ApiResponse.success(interviewService.getAnalysisProgress(principal.getId(), sessionId));
 	}
 
 	@PostMapping(value = "/{sessionId}/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

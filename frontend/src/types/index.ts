@@ -233,12 +233,14 @@ export interface ToggleReactionRequest {
   emoji: Emoji;
 }
 
-export interface SessionAnalysisStatus {
+export interface AnalysisProgress {
   sessionId: number;
-  status: SessionStatus;
-  totalQuestions: number;
-  answeredCount: number;
-  answersWithVideoCount: number;
-  analysesReadyCount: number;
-  feedbackReportExists: boolean;
+  totalAnswers: number;
+  answersWithVideo: number;
+  speechAnalyzed: number;
+  nonverbalAnalyzed: number;
+  starAnalyzed: number;
+  llmFeedbackDone: boolean;
+  reportReady: boolean;
+  progressPercent: number;
 }

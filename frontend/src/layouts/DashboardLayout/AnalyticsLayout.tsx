@@ -88,10 +88,11 @@ const AnalyticsLayout = () => {
     if (!sessionId || !isPendingAnalysis) return;
 
     void sessionService
-      .getAnalysisStatus(Number(sessionId))
-      .then((status) => {
+      .getAnalysisProgress(Number(sessionId))
+      .then((progress) => {
+        const target = Math.max(progress.answersWithVideo, progress.totalAnswers);
         setAnalysisStatusLabel(
-          `Python 분석 ${status.analysesReadyCount}/${Math.max(status.answersWithVideoCount, status.answeredCount)} 완료`,
+          `AI 분석 ${progress.speechAnalyzed}/${Math.max(target, 1)} 완료`,
         );
       })
       .catch(() => setAnalysisStatusLabel("AI 분석이 진행 중입니다."));
@@ -102,9 +103,9 @@ const AnalyticsLayout = () => {
 
     const interval = setInterval(() => {
       void fetchAnalysis(activeAnswerId);
-    }, 5000);
+    }, 2000);
 
-    const timeout = setTimeout(() => clearInterval(interval), 120000);
+    const timeout = setTimeout(() => clearInterval(interval), 60000);
 
     return () => {
       clearInterval(interval);

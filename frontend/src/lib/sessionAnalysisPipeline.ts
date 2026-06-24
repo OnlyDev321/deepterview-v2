@@ -3,11 +3,10 @@ import { reportService } from "../services/reportService";
 import { sessionService } from "../services/sessionService";
 import type {
   AnswerAnalysis,
-  SessionAnalysisStatus,
   SessionReport,
 } from "../types";
 
-const POLL_INTERVAL_MS = 3000;
+const POLL_INTERVAL_MS = 1000;
 const MAX_POLL_ATTEMPTS = 60;
 
 export type PipelinePhase = "polling" | "creating-report" | "done" | "error";
@@ -33,86 +32,25 @@ function isPythonAnalysisReady(analysis: AnswerAnalysis): boolean {
   return Boolean(analysis.speechAnalysis || analysis.nonverbalAnalysis);
 }
 
-function analysisTargetCount(
-  answersWithVideo: number,
-  answeredCount: number,
-): number {
-  if (answersWithVideo > 0) {
-    return answersWithVideo;
-  }
-  return answeredCount;
-}
-
-function isStatusReady(
-  analysesReadyCount: number,
-  answersWithVideoCount: number,
-  answeredCount: number,
-): boolean {
-  const target = analysisTargetCount(answersWithVideoCount, answeredCount);
-  if (target === 0) {
-    return true;
-  }
-  return analysesReadyCount >= target;
-}
-
-async function fetchAnalysisStatusSafe(
-  sessionId: number,
-): Promise<SessionAnalysisStatus | null> {
-  try {
-    return await sessionService.getAnalysisStatus(sessionId);
-  } catch (err) {
-    console.warn(
-      "analysis-status API unavailable, using fallback polling:",
-      err,
-    );
-    return null;
-  }
-}
-
-async function countReadyAnalyses(answerIds: number[]): Promise<number> {
-  if (answerIds.length === 0) {
-    return 0;
-  }
-
-  const batchSize = 3;
-  let ready = 0;
-  for (let i = 0; i < answerIds.length; i += batchSize) {
-    const batch = answerIds.slice(i, i + batchSize);
-    const results = await Promise.all(
-      batch.map((id) => answerService.getAnalysis(id).catch(() => null)),
-    );
-    ready += results.filter((r) => r && isPythonAnalysisReady(r)).length;
-  }
-  return ready;
-}
-
 async function pollUntilAnalysesReady(
   sessionId: number,
   onProgress?: (progress: PipelineProgress) => void,
 ): Promise<{ timedOut: boolean; existingReport: SessionReport | null }> {
-  let timedOut = false;
-  const useStatusApi = (await fetchAnalysisStatusSafe(sessionId)) !== null;
-
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
-    if (useStatusApi) {
-      const status = await fetchAnalysisStatusSafe(sessionId);
-      if (!status) {
-        break;
-      }
-
-      const target = analysisTargetCount(
-        status.answersWithVideoCount,
-        status.answeredCount,
-      );
+    try {
+      const progress = await sessionService.getAnalysisProgress(sessionId);
+      const videoTarget = Math.max(progress.answersWithVideo, progress.totalAnswers);
 
       onProgress?.({
         phase: "polling",
-        message: "AI가 답변 영상을 분석하고 있습니다...",
-        completedAnswers: status.analysesReadyCount,
-        totalAnswers: target,
+        message: videoTarget > 0
+          ? `AI가 답변 영상을 분석하고 있습니다...`
+          : "면접 데이터를 처리하고 있습니다...",
+        completedAnswers: progress.speechAnalyzed,
+        totalAnswers: videoTarget || 1,
       });
 
-      if (status.feedbackReportExists) {
+      if (progress.reportReady) {
         try {
           const report = await reportService.getSessionReport(sessionId);
           return { timedOut: false, existingReport: report };
@@ -121,16 +59,13 @@ async function pollUntilAnalysesReady(
         }
       }
 
-      if (
-        isStatusReady(
-          status.analysesReadyCount,
-          status.answersWithVideoCount,
-          status.answeredCount,
-        )
-      ) {
+      const allSpeechDone = videoTarget === 0 || progress.speechAnalyzed >= videoTarget;
+      const allNonverbalDone = videoTarget === 0 || progress.nonverbalAnalyzed >= videoTarget;
+      const allStarDone = progress.totalAnswers === 0 || progress.starAnalyzed >= progress.totalAnswers;
+      if (allSpeechDone && allNonverbalDone && allStarDone) {
         return { timedOut: false, existingReport: null };
       }
-    } else {
+    } catch {
       try {
         const report = await reportService.getSessionReport(sessionId);
         return { timedOut: false, existingReport: report };
@@ -143,29 +78,38 @@ async function pollUntilAnalysesReady(
         .map((q) => q.answerId)
         .filter((id): id is number => id != null);
 
-      const ready = await countReadyAnalyses(answerIds);
-
-      onProgress?.({
-        phase: "polling",
-        message: "AI가 답변 영상을 분석하고 있습니다...",
-        completedAnswers: ready,
-        totalAnswers: answerIds.length,
-      });
-
-      if (answerIds.length === 0 || ready >= answerIds.length) {
+      if (answerIds.length > 0) {
+        const batchSize = 3;
+        let ready = 0;
+        for (let i = 0; i < answerIds.length; i += batchSize) {
+          const batch = answerIds.slice(i, i + batchSize);
+          const results = await Promise.all(
+            batch.map((id) => answerService.getAnalysis(id).catch(() => null)),
+          );
+          ready += results.filter((r) => r && isPythonAnalysisReady(r)).length;
+        }
+        onProgress?.({
+          phase: "polling",
+          message: "AI가 답변 영상을 분석하고 있습니다...",
+          completedAnswers: ready,
+          totalAnswers: answerIds.length,
+        });
+        if (ready >= answerIds.length) {
+          return { timedOut: false, existingReport: null };
+        }
+      } else {
         return { timedOut: false, existingReport: null };
       }
     }
 
     if (attempt === MAX_POLL_ATTEMPTS - 1) {
-      timedOut = true;
-      break;
+      return { timedOut: true, existingReport: null };
     }
 
     await sleep(POLL_INTERVAL_MS);
   }
 
-  return { timedOut, existingReport: null };
+  return { timedOut: false, existingReport: null };
 }
 
 export async function runSessionAnalysisPipeline(

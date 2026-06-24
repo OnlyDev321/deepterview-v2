@@ -18,6 +18,9 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 	@Query("SELECT a FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId AND a.audioFilePath IS NOT NULL")
 	List<Answer> findBySessionIdWithVideoPath(@Param("sessionId") Long sessionId);
 
+	@Query("SELECT COUNT(a) FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId AND a.audioFilePath IS NOT NULL")
+	long countBySessionIdWithVideoPath(@Param("sessionId") Long sessionId);
+
 	@Query("SELECT COUNT(a) FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId")
 	long countBySessionId(@Param("sessionId") Long sessionId);
 
@@ -30,6 +33,18 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 			AND (s IS NOT NULL OR n IS NOT NULL)
 			""")
 	long countPythonAnalysesReadyBySessionId(@Param("sessionId") Long sessionId);
+
+	@Query("SELECT COUNT(a) FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId AND a.speechAnalysis IS NOT NULL")
+	long countSpeechAnalyzedBySessionId(@Param("sessionId") Long sessionId);
+
+	@Query("SELECT COUNT(a) FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId AND a.nonverbalAnalysis IS NOT NULL")
+	long countNonverbalAnalyzedBySessionId(@Param("sessionId") Long sessionId);
+
+	@Query("SELECT COUNT(a) FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId AND a.starAnalysis IS NOT NULL")
+	long countStarAnalyzedBySessionId(@Param("sessionId") Long sessionId);
+
+	@Query("SELECT COUNT(a) FROM Answer a JOIN a.question q WHERE q.session.id = :sessionId AND a.llmFeedback IS NOT NULL")
+	long countLlmFeedbackDoneBySessionId(@Param("sessionId") Long sessionId);
 
 	@Query("""
 			SELECT a FROM Answer a

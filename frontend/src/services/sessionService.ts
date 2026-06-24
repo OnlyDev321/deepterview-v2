@@ -1,11 +1,11 @@
 import api from "../lib/api";
 import type {
+  AnalysisProgress,
   ApiResponse,
   SessionListResponse,
   CreateSessionRequest,
   SessionDetail,
   SessionStatus,
-  SessionAnalysisStatus,
 } from "../types";
 
 export const sessionService = {
@@ -89,9 +89,9 @@ export const sessionService = {
     await api.post<ApiResponse<void>>(`/api/v1/sessions/${sessionId}/report/generate`);
   },
 
-  getAnalysisStatus: async (sessionId: number): Promise<SessionAnalysisStatus> => {
-    const res = await api.get<ApiResponse<SessionAnalysisStatus>>(
-      `/api/v1/sessions/${sessionId}/analysis-status`,
+  getAnalysisProgress: async (sessionId: number): Promise<AnalysisProgress> => {
+    const res = await api.get<ApiResponse<AnalysisProgress>>(
+      `/api/v1/sessions/${sessionId}/analysis-progress`,
     );
     return res.data.data;
   },
