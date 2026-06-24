@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Play, VibrateOff, VideoOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Play, VibrateOff, VideoOff, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { sessionService } from "../../../services/sessionService";
 import { useInterviewRecording } from "../../../contexts/InterviewRecordingContext";
@@ -8,19 +8,27 @@ import { useInterviewRecording } from "../../../contexts/InterviewRecordingConte
 interface VideoFeedProps {
   sessionId?: number;
   hasMoreQuestions?: boolean;
+  remainingQuestions?: number;
   onStartInterview?: () => void;
   onEndInterview?: () => void;
 }
 
 const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
   (
-    { sessionId, hasMoreQuestions = true, onStartInterview, onEndInterview },
+    {
+      sessionId,
+      hasMoreQuestions = true,
+      remainingQuestions = 0,
+      onStartInterview,
+      onEndInterview,
+    },
     ref,
   ) => {
     const [isVideoOn] = useState(true);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [recordingTime, setRecordingTime] = useState(0);
     const [isEnding, setIsEnding] = useState(false);
+    const [showEndConfirm, setShowEndConfirm] = useState(false);
 
     const navigate = useNavigate();
     const {
@@ -136,9 +144,19 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
       }
     };
 
+    const handleEndClick = () => {
+      if (isEnding) return;
+      if (hasMoreQuestions && isRecording) {
+        setShowEndConfirm(true);
+      } else {
+        void stopRecordingAndNavigate();
+      }
+    };
+
     const stopRecordingAndNavigate = async () => {
       if (isEnding) return;
       setIsEnding(true);
+      setShowEndConfirm(false);
 
       try {
         await stopRecorder();
@@ -151,6 +169,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
           } catch (err) {
             console.error("Failed to end session via API:", err);
             alert("세션 종료에 실패했습니다. 다시 시도해 주세요.");
+            setIsEnding(false);
             return;
           }
 
@@ -255,11 +274,68 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
             whileTap={{ scale: 0.95 }}
             disabled={isEnding}
             className="w-14 h-14 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/30 hover:shadow-red-500/50 cursor-pointer disabled:opacity-60"
-            onClick={stopRecordingAndNavigate}
+            onClick={handleEndClick}
           >
             <VibrateOff size={24} />
           </motion.button>
         </div>
+
+        {/* End-early confirmation modal */}
+        <AnimatePresence>
+          {showEndConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 rounded-[2.5rem]"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="bg-[#1a1d23] border border-[#494454]/30 rounded-3xl p-8 mx-4 max-w-sm w-full shadow-2xl"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-[#e1e2e7]">
+                    면접 종료
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowEndConfirm(false)}
+                    className="w-8 h-8 rounded-full bg-[#191c1f] flex items-center justify-center hover:bg-[#23242a] transition-colors cursor-pointer"
+                  >
+                    <X size={16} className="text-[#cbc3d7]" />
+                  </button>
+                </div>
+                <p className="text-sm text-[#cbc3d7]/70 leading-relaxed mb-2">
+                  아직 <strong className="text-[#e1e2e7]">{remainingQuestions}개</strong>의
+                  질문이 남았습니다. 지금 종료하면 남은 질문은 AI 분석에서
+                  제외되며, 지금까지 답변한 내용만 분석됩니다.
+                </p>
+                <p className="text-sm text-[#cbc3d7]/50 leading-relaxed mb-6">
+                  종료하시겠습니까?
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowEndConfirm(false)}
+                    className="flex-1 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-full text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer"
+                  >
+                    계속 녹화
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void stopRecordingAndNavigate()}
+                    className="flex-1 px-5 py-3 bg-red-500 text-white rounded-full text-xs font-bold hover:brightness-110 transition-all cursor-pointer"
+                  >
+                    종료하기
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   },

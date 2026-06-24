@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import VideoFeed from "../../components/dashboard/practice/VideoFeed";
 import Transcript from "../../components/dashboard/practice/Transcript";
 import EmotionAnalysis from "../../components/dashboard/practice/EmotionAnalysis";
@@ -63,9 +64,15 @@ const PracticeLayout = () => {
 
   const unansweredQuestions =
     session?.questions.filter((q) => !q.answerId) ?? [];
+  const answeredCount =
+    session?.questions.filter((q) => q.answerId).length ?? 0;
   const currentQuestion: QuestionResponse | null =
     unansweredQuestions[0] ?? null;
   const hasMoreQuestions = unansweredQuestions.length > 0;
+  const remainingQuestions = Math.max(
+    0,
+    (session?.totalQuestions ?? 0) - answeredCount,
+  );
 
   const handleQuestionAnswered = useCallback(() => {
     void sessionService
@@ -76,8 +83,9 @@ const PracticeLayout = () => {
 
   if (!sessionId || isLoadingSession) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh] text-[#cbc3d7]">
-        세션을 불러오는 중...
+      <div className="flex items-center justify-center min-h-[40vh] gap-3 text-[#cbc3d7]">
+        <RefreshCw size={20} className="animate-spin" />
+        <span>세션을 불러오는 중...</span>
       </div>
     );
   }
@@ -91,6 +99,22 @@ const PracticeLayout = () => {
         transition={{ delay: 0.6, duration: 0.6 }}
       >
         <div className="col-span-1 lg:col-span-8 space-y-8">
+          {/* Reload warning — shown once interview starts */}
+          {isInterviewStarted && (
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="px-5 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3"
+            >
+              <AlertTriangle size={18} className="shrink-0" />
+              <span>
+                <strong>주의:</strong> 면접 진행 중 페이지를 새로고침하면
+                녹화 데이터가 손실되어 복구할 수 없습니다.
+                새로고침하지 마세요.
+              </span>
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -100,6 +124,7 @@ const PracticeLayout = () => {
               ref={videoRef}
               sessionId={sessionId}
               hasMoreQuestions={hasMoreQuestions}
+              remainingQuestions={remainingQuestions}
               onStartInterview={() => setIsInterviewStarted(true)}
               onEndInterview={() => setIsInterviewStarted(false)}
             />

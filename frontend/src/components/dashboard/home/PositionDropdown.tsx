@@ -17,7 +17,7 @@ const isTouchDevice =
 const PositionDropdown = ({ categories, value, onSelect }: PositionDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDept, setActiveDept] = useState<JobCategory | null>(null);
-  const deptTimer = useRef<ReturnType<typeof setTimeout>>();
+  const deptTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
