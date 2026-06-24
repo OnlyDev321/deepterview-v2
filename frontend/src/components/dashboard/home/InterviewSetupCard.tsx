@@ -1,21 +1,20 @@
-import { Sliders, ChevronDown } from "lucide-react";
+import { ChevronDown, Sliders } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { jobCategoryService } from "../../../services/jobCategoryService";
+import PositionDropdown from "./PositionDropdown";
+import type { JobCategory, SessionType } from "../../../types";
 
 type InterviewSetupCardProps = {
   totalQuestions: number;
   careerYears: number;
   openPosition: string;
+  sessionType: SessionType;
   setTotalQuestions: (m: number) => void;
   setCareerYears: (m: number) => void;
   setOpenPosition: (m: string) => void;
   setJobCategoryId: (id: number) => void;
-};
-
-type JobCategory = {
-  id: number;
-  name: string;
+  setSessionType: (t: SessionType) => void;
 };
 
 const InterviewSetupCard = ({
@@ -26,6 +25,7 @@ const InterviewSetupCard = ({
   setCareerYears,
   setOpenPosition,
   setJobCategoryId,
+  setSessionType,
 }: InterviewSetupCardProps) => {
   const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
 
@@ -33,13 +33,6 @@ const InterviewSetupCard = ({
     const fetchJobCategories = async () => {
       const data = await jobCategoryService.getJobCategories();
       setJobCategories(data);
-      if (data && data.length > 0) {
-        // Automatically default to the first fetched job category
-        if (!openPosition) {
-          setOpenPosition(data[0].name);
-        }
-        setJobCategoryId(data[0].id);
-      }
     };
 
     fetchJobCategories();
@@ -64,33 +57,15 @@ const InterviewSetupCard = ({
             모집 포지션
           </label>
 
-          <div className="relative group">
-            <select
-              className="w-full h-[58px] bg-[#0c0e12] border border-[#494454]/10 rounded-2xl px-5 text-[#e1e2e7] appearance-none focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all cursor-pointer outline-none"
-              value={openPosition}
-              onChange={(e) => {
-                setOpenPosition(e.target.value);
-                const job = jobCategories.find(
-                  (v) => v.name === e.target.value,
-                );
-                if (job) {
-                  setJobCategoryId(job.id);
-                }
-                console.log({ job });
-              }}
-            >
-              {jobCategories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-
-            <ChevronDown
-              size={18}
-              className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#cbc3d7] group-hover:text-[#cebdff] transition-colors"
-            />
-          </div>
+          <PositionDropdown
+            categories={jobCategories}
+            value={openPosition}
+            onSelect={(name, id, type) => {
+              setOpenPosition(name);
+              setJobCategoryId(id);
+              setSessionType(type);
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">

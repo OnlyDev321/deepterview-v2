@@ -72,11 +72,9 @@ public class InterviewService {
 		// careerYears가 0이면 신입으로 취급합니다.
 		int normalizedCareerYears = Math.max(request.careerYears(), 0);
 
-		if (request.sessionType() != SessionType.TECHNICAL && request.sessionType() != null) {
-			throw new CustomException(ErrorCode.NOT_FOUND, "잘못된 세션 타입입니다.");
-		}
-
-		SessionType normalizedSessionType = SessionType.TECHNICAL;
+		SessionType normalizedSessionType = request.sessionType() != null
+				? request.sessionType()
+				: SessionType.TECHNICAL;
 
 		String resumeText = null;
 		if (resume != null && !resume.isEmpty()) {
@@ -172,9 +170,15 @@ public class InterviewService {
 
 	@Transactional(readOnly = true)
 	public List<JobCategoryResponse> getJobCategories() {
-		return jobCategoryRepository.findByActiveTrueOrderByIdAsc()
-				.stream()
-				.map(JobCategoryResponse::from)
+		List<JobCategory> departments = jobCategoryRepository.findByActiveTrueAndParentIsNullOrderByIdAsc();
+		return departments.stream()
+				.map(department -> {
+					List<JobCategory> children = jobCategoryRepository.findByActiveTrueAndParentIdOrderByIdAsc(department.getId());
+					List<JobCategoryResponse> childResponses = children.stream()
+							.map(JobCategoryResponse::from)
+							.toList();
+					return JobCategoryResponse.withChildren(department, childResponses);
+				})
 				.toList();
 	}
 
@@ -275,9 +279,8 @@ public class InterviewService {
 		return java.util.stream.IntStream.rangeClosed(1, totalQuestions)
 				.mapToObj(order -> {
 					QuestionType questionType = switch (sessionType) {
-						case TECHNICAL -> QuestionType.TECHNICAL;
-						case PERSONALITY -> QuestionType.BEHAVIORAL;
-						case COMBINED -> order % 2 == 0 ? QuestionType.BEHAVIORAL : QuestionType.TECHNICAL;
+						case TECHNICAL, GLOBAL_TRADE, KOREAN_STUDIES, BUSINESS, MARKETING,
+							ECONOMICS, ACCOUNTING_TAX, MEDIA_COMM, DESIGN -> QuestionType.TECHNICAL;
 					};
 					String careerLabel = careerYears == 0 ? "신입" : careerYears + "년차";
 					String content = String.format("[%s %s] 모의 질문 %d번입니다. 본인의 경험을 기반으로 답변해주세요.", sessionType,

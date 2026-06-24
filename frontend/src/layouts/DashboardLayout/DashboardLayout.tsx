@@ -5,10 +5,12 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { sessionService } from "../../services/sessionService";
+import type { SessionType } from "../../types";
 
 const DashboardLayout = () => {
   const [openPosition, setOpenPosition] = useState("");
   const [jobCategoryId, setJobCategoryId] = useState<number | null>(null);
+  const [sessionType, setSessionType] = useState<SessionType>("TECHNICAL");
   const [careerYears, setCareerYears] = useState<number>(0);
   const [totalQuestions, setTotalQuestions] = useState<number>(1);
   const [objective, setObjective] = useState<File[] | null>(null);
@@ -21,18 +23,16 @@ const DashboardLayout = () => {
         return;
       }
 
-      // Prepare request payload for JSON API
       const requestPayload = {
         jobCategoryId,
         jobTitle: openPosition,
         careerYears,
-        sessionType: "TECHNICAL" as const,
+        sessionType,
         totalQuestions,
       };
 
       console.log("Creating session with payload:", requestPayload);
       
-      // Get the first file from the objective list if uploaded
       const resumeFile = objective && objective.length > 0 ? objective[0] : undefined;
       
       const data = await sessionService.createSession(requestPayload, resumeFile);
@@ -77,10 +77,12 @@ const DashboardLayout = () => {
           totalQuestions={totalQuestions}
           careerYears={careerYears}
           openPosition={openPosition}
+          sessionType={sessionType}
           setTotalQuestions={setTotalQuestions}
           setCareerYears={setCareerYears}
           setOpenPosition={setOpenPosition}
           setJobCategoryId={setJobCategoryId}
+          setSessionType={setSessionType}
         />
         <DocumentsCard objective={objective} setObjective={setObjective} />
       </motion.div>

@@ -36,7 +36,7 @@ public class InterviewSession extends BaseTimeEntity {
 	private int careerYears;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "session_type", nullable = false, length = 20)
+	@Column(name = "session_type", nullable = false, length = 30)
 	private SessionType sessionType;
 
 	@Enumerated(EnumType.STRING)

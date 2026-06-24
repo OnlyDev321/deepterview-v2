@@ -93,10 +93,14 @@ export interface AnswerAnalysis {
 // -------------------------------------------------------------
 // Job Category Service Types
 // -------------------------------------------------------------
+export type SessionType = "TECHNICAL" | "GLOBAL_TRADE" | "KOREAN_STUDIES" | "BUSINESS" | "MARKETING" | "ECONOMICS" | "ACCOUNTING_TAX" | "MEDIA_COMM" | "DESIGN";
+
 export interface JobCategory {
   id: number;
   name: string;
+  type: SessionType | null;
   description?: string;
+  children: JobCategory[];
 }
 
 // -------------------------------------------------------------
@@ -105,7 +109,7 @@ export interface JobCategory {
 export interface SessionReport {
   sessionId: number;
   jobTitle: string;
-  sessionType: "TECHNICAL" | "PERSONALITY" | "COMBINED";
+  sessionType: SessionType;
   speechScore: number;
   nonverbalScore: number;
   contentScore: number;
@@ -126,7 +130,7 @@ export type SessionStatus = "READY" | "IN_PROGRESS" | "COMPLETED" | "ABORTED";
 export interface SessionListItem {
   sessionId: number;
   jobTitle: string;
-  sessionType: "TECHNICAL" | "PERSONALITY" | "COMBINED";
+  sessionType: SessionType;
   status: SessionStatus;
   overallScore?: number;
   grade?: "S" | "A" | "B" | "C" | "D";
@@ -145,7 +149,7 @@ export interface CreateSessionRequest {
   jobCategoryId: number;
   jobTitle: string;
   careerYears?: number;
-  sessionType: "TECHNICAL" | "PERSONALITY" | "COMBINED";
+  sessionType: SessionType;
   totalQuestions?: number;
 }
 
@@ -164,7 +168,7 @@ export interface SessionDetail {
   jobCategoryName: string;
   jobTitle: string;
   careerYears: number;
-  sessionType: "TECHNICAL" | "PERSONALITY" | "COMBINED";
+  sessionType: SessionType;
   status: SessionStatus;
   totalQuestions: number;
   startedAt?: string | Date;
