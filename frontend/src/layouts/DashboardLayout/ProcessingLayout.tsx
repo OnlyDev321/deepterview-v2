@@ -32,7 +32,7 @@ const analysisSteps: AnalysisStep[] = [
   { key: "reportReady", label: "최종 리포트", icon: FileText, desc: "종합 점수 및 등급" },
 ];
 
-const POLL_INTERVAL = 1000;
+const POLL_INTERVAL = 3000;
 
 const ProcessingLayout = () => {
   const navigate = useNavigate();
@@ -64,6 +64,7 @@ const ProcessingLayout = () => {
       try {
         const data = await sessionService.getAnalysisProgress(sessionId);
         setProgress(data);
+        if (data.reportReady) clearInterval(pollInterval);
       } catch {
         /* ignore */
       }
