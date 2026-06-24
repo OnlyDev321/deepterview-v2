@@ -47,6 +47,7 @@ const ProcessingLayout = () => {
     totalAnswers: 0,
   });
   const [progress, setProgress] = useState<AnalysisProgress | null>(null);
+  const [displayPercent, setDisplayPercent] = useState(0);
   const [hasFailed, setHasFailed] = useState(false);
   const startedRef = useRef(false);
   const cancelledRef = useRef(false);
@@ -64,7 +65,12 @@ const ProcessingLayout = () => {
       try {
         const data = await sessionService.getAnalysisProgress(sessionId);
         setProgress(data);
-        if (data.reportReady) clearInterval(pollInterval);
+        if (data.reportReady) {
+          setDisplayPercent(100);
+          clearInterval(pollInterval);
+        } else {
+          setDisplayPercent((prev) => Math.min(prev + 8, 90));
+        }
       } catch {
         /* ignore */
       }
@@ -83,6 +89,7 @@ const ProcessingLayout = () => {
       clearInterval(pollInterval);
 
       if (result.success) {
+        setDisplayPercent(100);
         try {
           const data = await sessionService.getAnalysisProgress(sessionId);
           if (cancelledRef.current) return;
@@ -109,10 +116,7 @@ const ProcessingLayout = () => {
     };
   }, [sessionId, navigate, skipPythonTrigger]);
 
-  const progressPercent = progress?.progressPercent ?? 
-    (pipelineProgress.phase === "creating-report" ? 85 
-      : pipelineProgress.phase === "done" ? 100 
-      : 15);
+  const progressPercent = progress?.reportReady ? 100 : displayPercent;
 
   return (
     <motion.div
