@@ -17,12 +17,15 @@ import InterviewTimeline from "../../components/dashboard/history/InterviewTimel
 
 import { sessionService } from "../../services/sessionService";
 import { reportService } from "../../services/reportService";
+import { jobCategoryService } from "../../services/jobCategoryService";
 import { runSessionAnalysisPipeline } from "../../lib/sessionAnalysisPipeline";
 import { isAnalyzing } from "../../lib/analysisTracker";
+import JobCategoryFilter from "../../components/dashboard/history/JobCategoryFilter";
 import type {
   SessionListItem,
   SessionDetail,
   SessionReport,
+  JobCategory,
 } from "../../types";
 import type { InterviewSession, QAPair } from "../../types/types";
 
@@ -51,13 +54,18 @@ const HistoryLayout = () => {
   const [successBanner, setSuccessBanner] = useState<string | null>(
     reportReadyNotice ? "AI 피드백 리포트가 생성되었습니다." : null,
   );
+  const [selectedJobCategoryId, setSelectedJobCategoryId] = useState<number | null>(null);
+  const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
 
-  const loadSessionsList = async (shouldAutoSelect: boolean = true) => {
+  const loadSessionsList = async (
+    shouldAutoSelect: boolean = true,
+    categoryId?: number | null
+  ) => {
     try {
       setIsLoadingList(true);
       setError(null);
-      // Load sessions
-      const res = await sessionService.getSessions(0, 50);
+      const cid = categoryId !== undefined ? categoryId : selectedJobCategoryId;
+      const res = await sessionService.getSessions(0, 50, undefined, cid ?? undefined);
       const completedSessions = res.content || [];
       setSessions(completedSessions);
 
@@ -95,7 +103,12 @@ const HistoryLayout = () => {
 
   useEffect(() => {
     void loadSessionsList(!focusSessionId);
+    void jobCategoryService.getJobCategories().then(setJobCategories).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    void loadSessionsList(true, selectedJobCategoryId);
+  }, [selectedJobCategoryId]);
 
   useEffect(() => {
     if (focusSessionId) {
@@ -288,9 +301,11 @@ const HistoryLayout = () => {
           <button className="flex items-center gap-3 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer">
             <Calendar size={14} /> 최근 30일
           </button>
-          <button className="flex items-center gap-3 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer">
-            <Filter size={14} /> 모든 직무
-          </button>
+          <JobCategoryFilter
+            categories={jobCategories}
+            selectedId={selectedJobCategoryId}
+            onChange={(id) => setSelectedJobCategoryId(id)}
+          />
         </div>
       </motion.div>
 

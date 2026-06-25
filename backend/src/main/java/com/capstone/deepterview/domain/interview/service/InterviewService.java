@@ -127,10 +127,8 @@ public class InterviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public SessionListResponse getSessions(Long userId, SessionStatus status, Pageable pageable) {
-		Page<InterviewSession> page = status == null
-				? interviewSessionRepository.findByUserId(userId, pageable)
-				: interviewSessionRepository.findByUserIdAndStatus(userId, status, pageable);
+	public SessionListResponse getSessions(Long userId, SessionStatus status, Long jobCategoryId, Pageable pageable) {
+		Page<InterviewSession> page = interviewSessionRepository.findByUserIdWithFilters(userId, status, jobCategoryId, pageable);
 
 		Page<SessionListItemResponse> mappedPage = page.map(SessionListItemResponse::from);
 		return SessionListResponse.from(mappedPage);

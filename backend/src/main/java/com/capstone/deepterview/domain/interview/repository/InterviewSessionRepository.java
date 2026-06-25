@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -16,6 +18,15 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
 
 	@EntityGraph(attributePaths = {"jobCategory", "feedbackReport"})
 	Page<InterviewSession> findByUserIdAndStatus(Long userId, SessionStatus status, Pageable pageable);
+
+	@EntityGraph(attributePaths = {"jobCategory", "feedbackReport"})
+	@Query("SELECT s FROM InterviewSession s WHERE s.user.id = :userId "
+			+ "AND (:status IS NULL OR s.status = :status) "
+			+ "AND (:jobCategoryId IS NULL OR s.jobCategory.id = :jobCategoryId)")
+	Page<InterviewSession> findByUserIdWithFilters(@Param("userId") Long userId,
+			@Param("status") SessionStatus status,
+			@Param("jobCategoryId") Long jobCategoryId,
+			Pageable pageable);
 
 	@EntityGraph(attributePaths = {"jobCategory", "questions"})
 	Optional<InterviewSession> findByIdAndUserId(Long id, Long userId);
