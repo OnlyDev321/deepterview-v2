@@ -21,7 +21,10 @@ export const useDocumentTitle = () => {
     // Matching static routes
     if (routeTitles[path]) {
       title = routeTitles[path];
-    } else if (path.startsWith("/dashboard/history/") && path.endsWith("/analytics")) {
+    } else if (
+      path.startsWith("/dashboard/history/") &&
+      path.endsWith("/analytics")
+    ) {
       title = "면접 분석 결과 | Deepterview";
     }
 
