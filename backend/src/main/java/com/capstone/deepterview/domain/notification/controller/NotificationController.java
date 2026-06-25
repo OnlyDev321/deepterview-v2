@@ -71,4 +71,13 @@ public class NotificationController {
         notificationService.deleteNotification(principal.getId(), id);
         return ApiResponse.successMessage("알림이 삭제되었습니다.");
     }
+
+    @DeleteMapping
+    @Operation(summary = "모든 알림 삭제 API")
+    public ApiResponse<Void> deleteAllNotifications(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        notificationService.deleteAllNotifications(principal.getId());
+        return ApiResponse.successMessage("모든 알림이 삭제되었습니다.");
+    }
 }

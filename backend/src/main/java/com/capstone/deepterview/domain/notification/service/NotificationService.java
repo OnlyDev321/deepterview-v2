@@ -137,6 +137,13 @@ public class NotificationService {
         notification.softDelete();
     }
 
+    @Transactional
+    public void deleteAllNotifications(Long userId) {
+        notificationRepository
+                .findByRecipientIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId)
+                .forEach(Notification::softDelete);
+    }
+
     private String buildReactionContent(User actor, int count, String referenceName) {
         if (count <= 1) {
             return actor.getName() + "님이 회원님의 " + referenceName + "을(를) 좋아합니다";

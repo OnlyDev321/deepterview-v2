@@ -35,7 +35,11 @@ type HeaderProps = {
   onToggleSidebar?: () => void;
 };
 
-const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) => {
+const Header = ({
+  activeNav,
+  onNavigateSection,
+  onToggleSidebar,
+}: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isLogged, logout, user } = useContext(AuthContext);
@@ -45,7 +49,9 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
   const isDashBoardPage = location.pathname.startsWith("/dashboard");
   const [isOpen, setIsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [sessionNotifs, setSessionNotifs] = useState<AnalysisNotification[]>([]);
+  const [sessionNotifs, setSessionNotifs] = useState<AnalysisNotification[]>(
+    [],
+  );
   const [reviewNotifs, setReviewNotifs] = useState<NotificationResponse[]>([]);
   const [notifTitles, setNotifTitles] = useState<Record<number, string>>({});
   const [loadingTitles, setLoadingTitles] = useState(false);
@@ -139,10 +145,13 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
     setSessionNotifs(getSessionNotifications());
   };
 
-  const handleDismissAll = () => {
+  const handleDismissAll = async () => {
+    await notificationService.deleteAllNotifications();
     dismissAllSession();
+    setReviewNotifs([]);
     setSessionNotifs([]);
     setNotifTitles({});
+    setReviewUnread(0);
   };
 
   const NOTIF_ICONS: Record<string, React.ReactNode> = {
@@ -318,12 +327,20 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
                   <div className="max-h-80 overflow-y-auto">
                     {loadingTitles ? (
                       <div className="flex items-center justify-center py-8">
-                        <RefreshCw size={18} className="text-[#cebdff] animate-spin" />
+                        <RefreshCw
+                          size={18}
+                          className="text-[#cebdff] animate-spin"
+                        />
                       </div>
                     ) : allNotifs.length === 0 ? (
                       <div className="py-8 text-center">
-                        <Bell size={24} className="mx-auto text-[#494454] mb-2" />
-                        <p className="text-xs text-[#494454]">알림이 없습니다</p>
+                        <Bell
+                          size={24}
+                          className="mx-auto text-[#494454] mb-2"
+                        />
+                        <p className="text-xs text-[#494454]">
+                          알림이 없습니다
+                        </p>
                       </div>
                     ) : (
                       allNotifs.map((item) => {
@@ -346,16 +363,20 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-white truncate">
-                                  {notifTitles[n.sessionId] || `Session #${n.sessionId}`}
+                                  {notifTitles[n.sessionId] ||
+                                    `Session #${n.sessionId}`}
                                 </p>
                                 <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
                                   AI 분석 완료 ·{" "}
-                                  {new Date(n.completedAt).toLocaleDateString("ko-KR", {
-                                    month: "long",
-                                    day: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
+                                  {new Date(n.completedAt).toLocaleDateString(
+                                    "ko-KR",
+                                    {
+                                      month: "long",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    },
+                                  )}
                                 </p>
                               </div>
                             </button>
@@ -378,7 +399,11 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
                               />
                             </div>
                             <div className="mt-1 shrink-0">
-                              <span className={NOTIF_ICON_COLORS[n.type] || "text-[#94A3B8]"}>
+                              <span
+                                className={
+                                  NOTIF_ICON_COLORS[n.type] || "text-[#94A3B8]"
+                                }
+                              >
                                 {NOTIF_ICONS[n.type] || <Bell size={14} />}
                               </span>
                             </div>
@@ -387,12 +412,15 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
                                 {n.content}
                               </p>
                               <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
-                                {new Date(n.createdAt).toLocaleDateString("ko-KR", {
-                                  month: "long",
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
+                                {new Date(n.createdAt).toLocaleDateString(
+                                  "ko-KR",
+                                  {
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  },
+                                )}
                               </p>
                             </div>
                           </button>

@@ -23,4 +23,8 @@ export const notificationService = {
   deleteNotification: async (id: number): Promise<void> => {
     await api.delete(`/api/v1/notifications/${id}`);
   },
+
+  deleteAllNotifications: async (): Promise<void> => {
+    await api.delete("/api/v1/notifications");
+  },
 };
