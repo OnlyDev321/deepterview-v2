@@ -7,6 +7,7 @@ import {
   AlertCircle,
   RefreshCw,
   FileText,
+  Loader,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -17,6 +18,7 @@ import InterviewTimeline from "../../components/dashboard/history/InterviewTimel
 import { sessionService } from "../../services/sessionService";
 import { reportService } from "../../services/reportService";
 import { runSessionAnalysisPipeline } from "../../lib/sessionAnalysisPipeline";
+import { isAnalyzing } from "../../lib/analysisTracker";
 import type {
   SessionListItem,
   SessionDetail,
@@ -386,34 +388,55 @@ const HistoryLayout = () => {
                 {!sessionReport &&
                   sessionDetail?.status === "COMPLETED" &&
                   sessionDetail.questions.some((q) => q.answerId) && (
-                    <motion.div
-                      className="mt-6 p-6 rounded-[2rem] bg-[#191c1f]/80 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <div className="text-left">
-                        <h4 className="text-sm font-bold text-amber-400 mb-1">
-                          종합 리포트가 아직 없습니다
-                        </h4>
-                        <p className="text-xs text-[#cbc3d7]/60">
-                          AI 분석이 완료되면 종합 점수와 요약을 생성할 수
-                          있습니다.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => void handleCreateReport()}
-                        disabled={isCreatingReport}
-                        className="shrink-0 px-6 py-3 bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer disabled:opacity-50"
+                    selectedSessionId && isAnalyzing(selectedSessionId) ? (
+                      <motion.div
+                        className="mt-6 p-6 rounded-[2rem] bg-[#191c1f]/80 border border-[#cebdff]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
                       >
-                        {isCreatingReport ? (
-                          <RefreshCw size={14} className="animate-spin" />
-                        ) : (
-                          <FileText size={14} />
-                        )}
-                        리포트 생성
-                      </button>
-                    </motion.div>
+                        <div className="flex items-center gap-4">
+                          <Loader size={20} className="text-[#cebdff] animate-spin shrink-0" />
+                          <div>
+                            <h4 className="text-sm font-bold text-[#cebdff] mb-1">
+                              AI 분석 진행 중
+                            </h4>
+                            <p className="text-xs text-[#cbc3d7]/60">
+                              답변 영상 및 텍스트를 분석하여 리포트를 생성하고 있습니다.
+                              잠시만 기다려 주세요.
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        className="mt-6 p-6 rounded-[2rem] bg-[#191c1f]/80 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <div className="text-left">
+                          <h4 className="text-sm font-bold text-amber-400 mb-1">
+                            종합 리포트가 아직 없습니다
+                          </h4>
+                          <p className="text-xs text-[#cbc3d7]/60">
+                            AI 분석이 완료되면 종합 점수와 요약을 생성할 수
+                            있습니다.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => void handleCreateReport()}
+                          disabled={isCreatingReport}
+                          className="shrink-0 px-6 py-3 bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          {isCreatingReport ? (
+                            <RefreshCw size={14} className="animate-spin" />
+                          ) : (
+                            <FileText size={14} />
+                          )}
+                          리포트 생성
+                        </button>
+                      </motion.div>
+                    )
                   )}
 
                 {/* Session AI Qualitative Summaries (If report exists) */}

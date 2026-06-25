@@ -1,6 +1,7 @@
 import { answerService } from "../services/answerService";
 import { reportService } from "../services/reportService";
 import { sessionService } from "../services/sessionService";
+import { markAnalyzing, unmarkAnalyzing } from "./analysisTracker";
 import type {
   AnswerAnalysis,
   SessionReport,
@@ -119,6 +120,7 @@ export async function runSessionAnalysisPipeline(
     skipPythonTrigger?: boolean;
   },
 ): Promise<PipelineResult> {
+  markAnalyzing(sessionId);
   const onProgress = options?.onProgress;
 
   try {
@@ -217,5 +219,7 @@ export async function runSessionAnalysisPipeline(
       totalAnswers: 0,
     });
     return { success: false, report: null, timedOut: false };
+  } finally {
+    unmarkAnalyzing(sessionId);
   }
 }
