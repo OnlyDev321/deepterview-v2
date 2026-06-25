@@ -64,8 +64,8 @@ api.interceptors.response.use(
         localStorage.removeItem("refreshtoken");
         localStorage.removeItem("user");
 
-        // Chuyển hướng về trang login (hoặc reload để AuthProvider xử lý)
-        window.location.href = "/signin";
+        // Dispatch event để AuthProvider xử lý logout trong React tree
+        window.dispatchEvent(new CustomEvent("auth:force-logout"));
         return Promise.reject(refreshError);
       }
     }

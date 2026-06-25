@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { AuthContext } from "../services/AuthContext";
 import { authService } from "../services/authService";
 import type { User } from "../types";
@@ -12,6 +12,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
   const [isLogged, setIsLogged] = useState<boolean>(!!accessToken);
+
+  useEffect(() => {
+    const handleForceLogout = () => {
+      logout();
+    };
+    window.addEventListener("auth:force-logout", handleForceLogout);
+    return () => window.removeEventListener("auth:force-logout", handleForceLogout);
+  }, []);
 
   // Normal login (ID/PW)
   const login = (accessToken: string, refreshToken: string, userData: User) => {

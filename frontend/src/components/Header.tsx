@@ -73,10 +73,11 @@ const Header = ({
   }, []);
 
   useEffect(() => {
+    if (!isLogged) return;
     refreshNotifications();
     const handle = setInterval(refreshNotifications, 5000);
     return () => clearInterval(handle);
-  }, [refreshNotifications]);
+  }, [isLogged, refreshNotifications]);
 
   // Close dropdown on outside click
   useEffect(() => {
