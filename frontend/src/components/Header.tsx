@@ -9,18 +9,24 @@ import {
   ChevronRight,
   Menu,
   RefreshCw,
+  MessageCircle,
+  SmilePlus,
+  AtSign,
+  Reply,
 } from "lucide-react";
 import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { AuthContext } from "../services/AuthContext";
 import { sessionService } from "../services/sessionService";
+import { notificationService } from "../services/notificationService";
 import {
-  getNotifications,
-  getUnreadCount,
-  markAsRead,
-  markAllAsRead,
-  dismissAll,
+  getNotifications as getSessionNotifications,
+  getUnreadCount as getSessionUnreadCount,
+  markAsRead as markSessionRead,
+  markAllAsRead as markAllSessionRead,
+  dismissAll as dismissAllSession,
 } from "../lib/notificationTracker";
 import type { AnalysisNotification } from "../lib/notificationTracker";
+import type { NotificationResponse } from "../types";
 import { getImageUrl } from "../lib/api";
 
 type HeaderProps = {
@@ -39,14 +45,25 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
   const isDashBoardPage = location.pathname.startsWith("/dashboard");
   const [isOpen, setIsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState<AnalysisNotification[]>([]);
+  const [sessionNotifs, setSessionNotifs] = useState<AnalysisNotification[]>([]);
+  const [reviewNotifs, setReviewNotifs] = useState<NotificationResponse[]>([]);
   const [notifTitles, setNotifTitles] = useState<Record<number, string>>({});
   const [loadingTitles, setLoadingTitles] = useState(false);
+  const [reviewUnread, setReviewUnread] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Refresh notification list & unread count on mount and after pipeline completes
-  const refreshNotifications = useCallback(() => {
-    setNotifications(getNotifications());
+  const refreshNotifications = useCallback(async () => {
+    setSessionNotifs(getSessionNotifications());
+    try {
+      const [reviews, unread] = await Promise.all([
+        notificationService.getNotifications(),
+        notificationService.getUnreadCount(),
+      ]);
+      setReviewNotifs(reviews);
+      setReviewUnread(unread);
+    } catch {
+      // backend not available
+    }
   }, []);
 
   useEffect(() => {
@@ -66,14 +83,14 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
     return () => document.removeEventListener("mousedown", handleClick);
   }, [notifOpen]);
 
-  const unreadCount = getUnreadCount();
+  const unreadCount = getSessionUnreadCount() + reviewUnread;
 
   const handleBellClick = async () => {
     const next = !notifOpen;
     setNotifOpen(next);
     if (next) {
-      const notifs = getNotifications();
-      setNotifications(notifs);
+      const notifs = getSessionNotifications();
+      setSessionNotifs(notifs);
       const ids = notifs.map((n) => n.sessionId);
       if (ids.length > 0) {
         setLoadingTitles(true);
@@ -94,13 +111,70 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
     }
   };
 
-  const handleNotifClick = (n: AnalysisNotification) => {
-    markAsRead(n.id);
+  const handleSessionNotifClick = (n: AnalysisNotification) => {
+    markSessionRead(n.id);
     setNotifOpen(false);
     navigate("/dashboard/history", {
       state: { focusSessionId: n.sessionId },
     });
   };
+
+  const handleReviewNotifClick = async (n: NotificationResponse) => {
+    if (!n.isRead) {
+      await notificationService.markAsRead(n.id);
+      setReviewNotifs((prev) =>
+        prev.map((r) => (r.id === n.id ? { ...r, isRead: true } : r)),
+      );
+      setReviewUnread((prev) => Math.max(0, prev - 1));
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    await Promise.all([
+      notificationService.markAllAsRead(),
+      Promise.resolve(markAllSessionRead()),
+    ]);
+    setReviewNotifs((prev) => prev.map((r) => ({ ...r, isRead: true })));
+    setReviewUnread(0);
+    setSessionNotifs(getSessionNotifications());
+  };
+
+  const handleDismissAll = () => {
+    dismissAllSession();
+    setSessionNotifs([]);
+    setNotifTitles({});
+  };
+
+  const NOTIF_ICONS: Record<string, React.ReactNode> = {
+    REVIEW_COMMENT: <MessageCircle size={14} />,
+    REVIEW_REPLY: <Reply size={14} />,
+    REVIEW_REACTION: <SmilePlus size={14} />,
+    COMMENT_REACTION: <SmilePlus size={14} />,
+    MENTION: <AtSign size={14} />,
+  };
+
+  const NOTIF_ICON_COLORS: Record<string, string> = {
+    REVIEW_COMMENT: "text-blue-400",
+    REVIEW_REPLY: "text-green-400",
+    REVIEW_REACTION: "text-yellow-400",
+    COMMENT_REACTION: "text-yellow-400",
+    MENTION: "text-purple-400",
+  };
+
+  const allNotifs = [
+    ...sessionNotifs.map((n) => ({ type: "session" as const, data: n })),
+    ...reviewNotifs.map((n) => ({ type: "review" as const, data: n })),
+  ].sort((a, b) => {
+    const dateA =
+      a.type === "session"
+        ? new Date(a.data.completedAt).getTime()
+        : new Date(a.data.createdAt).getTime();
+    const dateB =
+      b.type === "session"
+        ? new Date(b.data.completedAt).getTime()
+        : new Date(b.data.createdAt).getTime();
+    return dateB - dateA;
+  });
 
   const navLinkClass = (key: NavKey) => {
     const base =
@@ -230,12 +304,9 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
                   <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
                     <h3 className="text-sm font-bold text-white">알림</h3>
                     <div className="flex items-center gap-2">
-                      {notifications.length > 0 && (
+                      {allNotifs.length > 0 && (
                         <button
-                          onClick={() => {
-                            markAllAsRead();
-                            setNotifications(getNotifications());
-                          }}
+                          onClick={handleMarkAllRead}
                           className="text-[0.6rem] uppercase tracking-wider text-[#cebdff] hover:text-white transition cursor-pointer"
                         >
                           모두 읽음
@@ -249,54 +320,91 @@ const Header = ({ activeNav, onNavigateSection, onToggleSidebar }: HeaderProps) 
                       <div className="flex items-center justify-center py-8">
                         <RefreshCw size={18} className="text-[#cebdff] animate-spin" />
                       </div>
-                    ) : notifications.length === 0 ? (
+                    ) : allNotifs.length === 0 ? (
                       <div className="py-8 text-center">
                         <Bell size={24} className="mx-auto text-[#494454] mb-2" />
                         <p className="text-xs text-[#494454]">알림이 없습니다</p>
                       </div>
                     ) : (
-                      notifications.map((n) => (
-                        <button
-                          key={n.id}
-                          onClick={() => handleNotifClick(n)}
-                          className={`w-full flex items-start gap-3 px-5 py-4 text-left transition hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-b-0 ${
-                            !n.read ? "bg-[#cebdff]/5" : ""
-                          }`}
-                        >
-                          <div className="mt-1.5">
-                            <div
-                              className={`w-2 h-2 rounded-full ${
-                                n.read ? "bg-transparent" : "bg-[#cebdff]"
+                      allNotifs.map((item) => {
+                        if (item.type === "session") {
+                          const n = item.data;
+                          return (
+                            <button
+                              key={`session-${n.id}`}
+                              onClick={() => handleSessionNotifClick(n)}
+                              className={`w-full flex items-start gap-3 px-5 py-4 text-left transition hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-b-0 ${
+                                !n.read ? "bg-[#cebdff]/5" : ""
                               }`}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white truncate">
-                              {notifTitles[n.sessionId] || `Session #${n.sessionId}`}
-                            </p>
-                            <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
-                              AI 분석 완료 ·{" "}
-                              {new Date(n.completedAt).toLocaleDateString("ko-KR", {
-                                month: "long",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
-                          </div>
-                        </button>
-                      ))
+                            >
+                              <div className="mt-1.5">
+                                <div
+                                  className={`w-2 h-2 rounded-full ${
+                                    n.read ? "bg-transparent" : "bg-[#cebdff]"
+                                  }`}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-white truncate">
+                                  {notifTitles[n.sessionId] || `Session #${n.sessionId}`}
+                                </p>
+                                <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
+                                  AI 분석 완료 ·{" "}
+                                  {new Date(n.completedAt).toLocaleDateString("ko-KR", {
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        }
+                        const n = item.data;
+                        return (
+                          <button
+                            key={`review-${n.id}`}
+                            onClick={() => handleReviewNotifClick(n)}
+                            className={`w-full flex items-start gap-3 px-5 py-4 text-left transition hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-b-0 ${
+                              !n.isRead ? "bg-[#cebdff]/5" : ""
+                            }`}
+                          >
+                            <div className="mt-1.5">
+                              <div
+                                className={`w-2 h-2 rounded-full ${
+                                  n.isRead ? "bg-transparent" : "bg-[#cebdff]"
+                                }`}
+                              />
+                            </div>
+                            <div className="mt-1 shrink-0">
+                              <span className={NOTIF_ICON_COLORS[n.type] || "text-[#94A3B8]"}>
+                                {NOTIF_ICONS[n.type] || <Bell size={14} />}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-[#e1e2e7] leading-snug line-clamp-2">
+                                {n.content}
+                              </p>
+                              <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
+                                {new Date(n.createdAt).toLocaleDateString("ko-KR", {
+                                  month: "long",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })
                     )}
                   </div>
 
-                  {notifications.length > 0 && (
+                  {allNotifs.length > 0 && (
                     <div className="border-t border-white/5 px-5 py-3">
                       <button
-                        onClick={() => {
-                          dismissAll();
-                          setNotifications([]);
-                          setNotifTitles({});
-                        }}
+                        onClick={handleDismissAll}
                         className="w-full text-[0.6rem] uppercase tracking-wider text-[#494454] hover:text-white transition cursor-pointer text-center"
                       >
                         모든 알림 지우기

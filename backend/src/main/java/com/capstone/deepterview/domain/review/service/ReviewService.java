@@ -2,6 +2,8 @@ package com.capstone.deepterview.domain.review.service;
 
 import com.capstone.deepterview.domain.member.domain.User;
 import com.capstone.deepterview.domain.member.repository.UserRepository;
+import com.capstone.deepterview.domain.notification.domain.NotificationType;
+import com.capstone.deepterview.domain.notification.service.NotificationService;
 import com.capstone.deepterview.domain.review.domain.Comment;
 import com.capstone.deepterview.domain.review.domain.Emoji;
 import com.capstone.deepterview.domain.review.domain.Reaction;
@@ -39,6 +41,7 @@ public class ReviewService {
     private final CommentRepository commentRepository;
     private final ReactionRepository reactionRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public Page<ReviewListResponse> getReviews(Pageable pageable) {
@@ -105,6 +108,8 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "후기를 찾을 수 없습니다."));
         Comment comment = Comment.of(review, author, request.content());
         commentRepository.save(comment);
+        notificationService.notifyCommentCreated(comment);
+        notificationService.notifyMentions(request.content(), author, "REVIEW", reviewId);
         return CommentResponse.of(comment, List.of(), Map.of(), null);
     }
 
@@ -125,6 +130,8 @@ public class ReviewService {
 
         Comment reply = Comment.ofReply(review, author, actualParent, content);
         commentRepository.save(reply);
+        notificationService.notifyReplyCreated(reply);
+        notificationService.notifyMentions(request.content(), author, "REVIEW", reviewId);
         return CommentResponse.of(reply, List.of(), Map.of(), null);
     }
 
@@ -145,16 +152,33 @@ public class ReviewService {
         Emoji emoji = Emoji.valueOf(request.emoji());
 
         var existing = reactionRepository.findByUserIdAndTargetTypeAndTargetId(userId, targetType, targetId);
+        boolean shouldNotify = false;
         if (existing.isPresent()) {
             Reaction reaction = existing.get();
             if (reaction.getEmoji() == emoji) {
                 reactionRepository.delete(reaction);
             } else {
                 reaction.changeEmoji(emoji);
+                shouldNotify = true;
             }
         } else {
             Reaction reaction = Reaction.of(user, targetType, targetId, emoji);
             reactionRepository.save(reaction);
+            shouldNotify = true;
+        }
+
+        if (shouldNotify) {
+            if (targetType == ReactionTargetType.REVIEW) {
+                Review review = reviewRepository.findById(targetId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "후기를 찾을 수 없습니다."));
+                notificationService.notifyReactionToggled(user, review.getAuthor().getId(),
+                        "bài viết", NotificationType.REVIEW_REACTION, targetId);
+            } else {
+                Comment comment = commentRepository.findById(targetId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "댓글을 찾을 수 없습니다."));
+                notificationService.notifyReactionToggled(user, comment.getAuthor().getId(),
+                        "bình luận", NotificationType.COMMENT_REACTION, comment.getReview().getId());
+            }
         }
 
         List<Reaction> reactions = reactionRepository.findByTargetTypeAndTargetId(targetType, targetId);

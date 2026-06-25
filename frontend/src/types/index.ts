@@ -234,6 +234,20 @@ export interface ToggleReactionRequest {
   emoji: Emoji;
 }
 
+export interface NotificationResponse {
+  id: number;
+  actorId: number | null;
+  actorName: string | null;
+  actorProfileImageUrl: string | null;
+  type: string;
+  referenceType: string | null;
+  referenceId: number | null;
+  content: string;
+  isRead: boolean;
+  actorCount: number;
+  createdAt: string;
+}
+
 export interface AnalysisProgress {
   sessionId: number;
   totalAnswers: number;
