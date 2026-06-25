@@ -26,6 +26,7 @@ import com.capstone.deepterview.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,11 +100,16 @@ public class InterviewService {
 
 		interviewSessionRepository.save(session);
 
+		List<String> pastQuestions = questionRepository
+				.findPastQuestionContentsByUserAndJobCategory(userId, jobCategory.getId(),
+						PageRequest.of(0, 20));
+
 		String initialContent = llmFeedbackService.generateInitialQuestion(
 				jobCategory.getName(),
 				request.jobTitle(),
 				normalizedCareerYears,
-				resumeText
+				resumeText,
+				pastQuestions
 		);
 
 		Question initialQuestion = Question.create(

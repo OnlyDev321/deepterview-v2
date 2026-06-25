@@ -6,4 +6,3 @@ public enum QuestionType {
 	SITUATIONAL,
 	EXPERIENCE
 }
-

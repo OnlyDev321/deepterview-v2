@@ -135,8 +135,10 @@ public class LlmFeedbackService {
         }
     }
 
-    public String generateInitialQuestion(String jobCategory, String jobTitle, int careerYears) {
+    public String generateInitialQuestion(String jobCategory, String jobTitle, int careerYears, List<String> pastQuestions) {
         String careerLabel = careerYears == 0 ? "신입" : careerYears + "년차";
+        String conditions = buildConditions(pastQuestions,
+                "- 지원자의 이력서가 없으므로 해당 직무와 경력 연차에 맞는 핵심적이고 실제 면접에서 자주 나오는 핵심 기술 질문 1개만 정중하고 자연스러운 구어체 말투로 생성해 주세요.");
         String prompt = """
                 당신은 IT 전문 면접관입니다. 다음 정보를 기반으로 지원자에게 물어볼 첫 번째 기술 면접 질문(TECHNICAL question)을 1개만 생성해 주세요.
                 
@@ -148,12 +150,11 @@ public class LlmFeedbackService {
                 
                 [경력 연차]
                 %s
-                
+                %s
                 조건:
-                - 반드시 한국어로 작성해 주세요.
-                - 지원자의 이력서가 없으므로 해당 직무와 경력 연차에 맞는 핵심적이고 실제 면접에서 자주 나오는 핵심 기술 질문 1개만 정중하고 자연스러운 구어체 말투로 생성해 주세요.
+                %s
                 - 질문 외에 다른 설명, 대괄호나 문맥 소개 등 불필요한 텍스트는 절대 포함하지 말고 오직 질문 한 문장만 반환해 주세요.
-                """.formatted(jobCategory, jobTitle, careerLabel);
+                """.formatted(jobCategory, jobTitle, careerLabel, formatPastQuestionsSection(pastQuestions), conditions);
 
         try {
             String response = chatClient.prompt()
@@ -169,12 +170,14 @@ public class LlmFeedbackService {
         return String.format("[%s %s] 기술 면접 질문입니다. 본인의 경험을 기반으로 답변해 주세요.", jobCategory, careerLabel);
     }
 
-    public String generateInitialQuestion(String jobCategory, String jobTitle, int careerYears, String resumeContent) {
+    public String generateInitialQuestion(String jobCategory, String jobTitle, int careerYears, String resumeContent, List<String> pastQuestions) {
         if (resumeContent == null || resumeContent.trim().isEmpty()) {
-            return generateInitialQuestion(jobCategory, jobTitle, careerYears);
+            return generateInitialQuestion(jobCategory, jobTitle, careerYears, pastQuestions);
         }
 
         String careerLabel = careerYears == 0 ? "신입" : careerYears + "년차";
+        String conditions = buildConditions(pastQuestions,
+                "- 지원자의 이력서/포트폴리오에 기재된 주요 프로젝트, 기술 스택, 경험을 분석하여 해당 직무(상세 직무명 및 경력)에 가장 중요하고 검증이 필요한 핵심 기술 질문 1개만 정중하고 자연스러운 구어체 말투로 생성해 주세요.");
         String prompt = """
                 당신은 IT 전문 면접관입니다. 다음 직무 정보와 지원자의 이력서(포트폴리오) 내용을 기반으로 지원자에게 물어볼 첫 번째 기술 면접 질문(TECHNICAL question)을 1개만 생성해 주세요.
                 
@@ -189,12 +192,11 @@ public class LlmFeedbackService {
                 
                 [지원자 이력서/포트폴리오]
                 %s
-                
+                %s
                 조건:
-                - 반드시 한국어로 작성해 주세요.
-                - 지원자의 이력서/포트폴리오에 기재된 주요 프로젝트, 기술 스택, 경험을 분석하여 해당 직무(상세 직무명 및 경력)에 가장 중요하고 검증이 필요한 핵심 기술 질문 1개만 정중하고 자연스러운 구어체 말투로 생성해 주세요.
+                %s
                 - 질문 외에 다른 설명, 대괄호나 문맥 소개 등 불필요한 텍스트는 절대 포함하지 말고 오직 질문 한 문장만 반환해 주세요.
-                """.formatted(jobCategory, jobTitle, careerLabel, resumeContent);
+                """.formatted(jobCategory, jobTitle, careerLabel, resumeContent, formatPastQuestionsSection(pastQuestions), conditions);
 
         try {
             String response = chatClient.prompt()
@@ -207,7 +209,26 @@ public class LlmFeedbackService {
         } catch (Exception e) {
             // Fallback in case of AI service errors
         }
-        return generateInitialQuestion(jobCategory, jobTitle, careerYears);
+        return generateInitialQuestion(jobCategory, jobTitle, careerYears, pastQuestions);
+    }
+
+    private String formatPastQuestionsSection(List<String> pastQuestions) {
+        if (pastQuestions == null || pastQuestions.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder("\n[지금까지 이 지원자에게 했던 질문들]\n");
+        for (int i = 0; i < pastQuestions.size(); i++) {
+            sb.append(i + 1).append(". ").append(pastQuestions.get(i)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    private String buildConditions(List<String> pastQuestions, String mainCondition) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("- 반드시 한국어로 작성해 주세요.\n");
+        if (!pastQuestions.isEmpty()) {
+            sb.append("- 위의 \"지금까지 이 지원자에게 했던 질문들\"에 있는 질문과 중복되거나 같은 주제의 질문은 절대 생성하지 마세요.\n");
+        }
+        sb.append(mainCondition).append("\n");
+        return sb.toString();
     }
 
     public String generateFollowUpQuestion(String previousQuestion, String userResponse) {

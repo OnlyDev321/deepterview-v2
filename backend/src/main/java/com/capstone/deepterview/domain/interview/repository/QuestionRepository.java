@@ -1,6 +1,7 @@
 package com.capstone.deepterview.domain.interview.repository;
 
 import com.capstone.deepterview.domain.interview.domain.Question;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,5 +19,16 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 	Optional<Question> findByIdWithSessionUser(@Param("id") Long id);
 
 	int countBySessionId(Long sessionId);
+
+	@Query("""
+			SELECT q.content FROM Question q
+			JOIN q.session s
+			WHERE s.user.id = :userId
+			  AND s.jobCategory.id = :jobCategoryId
+			  AND s.deletedAt IS NULL
+			  AND q.deletedAt IS NULL
+			ORDER BY q.createdAt DESC""")
+	List<String> findPastQuestionContentsByUserAndJobCategory(@Param("userId") Long userId,
+			@Param("jobCategoryId") Long jobCategoryId, Pageable pageable);
 }
 
