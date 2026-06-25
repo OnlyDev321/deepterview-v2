@@ -117,7 +117,17 @@ const Header = ({
     }
   };
 
+  const confirmLeaveInterview = () => {
+    if (sessionStorage.getItem("interviewActive") !== "true") return true;
+    const ok = window.confirm(
+      "현재 진행 중인 인터뷰가 있습니다. 페이지를 떠나면 인터뷰가 취소됩니다.",
+    );
+    if (ok) sessionStorage.removeItem("interviewActive");
+    return ok;
+  };
+
   const handleSessionNotifClick = (n: AnalysisNotification) => {
+    if (!confirmLeaveInterview()) return;
     markSessionRead(n.id);
     setNotifOpen(false);
     navigate("/dashboard/history", {
@@ -126,6 +136,7 @@ const Header = ({
   };
 
   const handleReviewNotifClick = async (n: NotificationResponse) => {
+    if (!confirmLeaveInterview()) return;
     if (!n.isRead) {
       await notificationService.markAsRead(n.id);
       setReviewNotifs((prev) =>

@@ -24,6 +24,25 @@ const PracticeLayout = () => {
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
 
+  // Sync interview state to sessionStorage so Header (outside this tree) can read it
+  useEffect(() => {
+    if (isInterviewStarted) {
+      sessionStorage.setItem("interviewActive", "true");
+    } else {
+      sessionStorage.removeItem("interviewActive");
+    }
+  }, [isInterviewStarted]);
+
+  // Prevent tab close / refresh during interview
+  useEffect(() => {
+    if (!isInterviewStarted) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isInterviewStarted]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const analysisResult = useFaceAnalysis(videoRef, isInterviewStarted);
 
