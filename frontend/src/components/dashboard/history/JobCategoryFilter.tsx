@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Filter, ChevronRight } from "lucide-react";
-import type { JobCategory } from "../../types";
+import type { JobCategory } from "../../../types";
 
 interface Props {
   categories: JobCategory[];
@@ -95,7 +95,7 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
                         className="overflow-hidden"
                       >
                         <div className="bg-[#13161a] py-1">
-                          {parent.children.map((child) => (
+                          {parent.children.map((child: JobCategory) => (
                             <button
                               key={child.id}
                               onClick={() => handleSelect(child.id)}
