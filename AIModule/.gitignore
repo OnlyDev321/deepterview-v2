@@ -188,5 +188,9 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Intermediate audio files
+output/audio.wav
+output/enhanced_audio.wav
+
 # Docker
 Dockerfile

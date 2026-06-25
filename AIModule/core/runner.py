@@ -108,10 +108,7 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
 
     if audio_path is not None:
         try:
-            raw_audio_path = audio_path
             audio_path = enhance_audio(audio_path, os.path.join(output_dir, "enhanced_audio.wav"))
-            if os.path.exists(raw_audio_path) and raw_audio_path != audio_path:
-                os.remove(raw_audio_path)
             audio_features = analyze_audio_librosa(audio_path)
             stt_result = transcribe_audio_whisper(audio_path)
         except Exception as e:
@@ -144,11 +141,6 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
         "frame_count": len(frame_results),
         "gaze_frames": frame_results
     }
-
-    # Clean up intermediate audio files
-    for f in os.listdir(output_dir):
-        if f.endswith(".wav"):
-            os.remove(os.path.join(output_dir, f))
 
     return result
 
