@@ -194,6 +194,7 @@ export interface ReviewListResponse {
 
 export interface CommentResponse {
   id: number;
+  parentId: number | null;
   authorId: number;
   authorName: string;
   authorProfileImageUrl?: string;

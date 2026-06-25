@@ -121,6 +121,7 @@ const CommentItem = ({
   isLogged,
   depth = 0,
   onCommentDeleted,
+  onReplyCreated,
 }: {
   comment: CommentResponse;
   reviewId: number;
@@ -128,6 +129,7 @@ const CommentItem = ({
   isLogged: boolean;
   depth: number;
   onCommentDeleted: (commentId: number) => void;
+  onReplyCreated?: (reply: CommentResponse) => void;
 }) => {
   const [showReply, setShowReply] = useState(false);
   const [replyText, setReplyText] = useState("");
@@ -151,16 +153,31 @@ const CommentItem = ({
         localComment.id,
         { content: replyText.trim() },
       );
-      setLocalComment((prev) => ({
-        ...prev,
-        replies: [...prev.replies, newReply],
-      }));
+      if (newReply.parentId === localComment.id) {
+        setLocalComment((prev) => ({
+          ...prev,
+          replies: [...prev.replies, newReply],
+        }));
+      } else {
+        onReplyCreated?.(newReply);
+      }
       setReplyText("");
       setShowReply(false);
     } catch {
       alert("답글 작성 중 오류가 발생했습니다.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleReplyClick = () => {
+    const isOpening = !showReply;
+    setShowReply(isOpening);
+    if (isOpening) {
+      if (depth > 0 && !replyText) {
+        setReplyText(`@${localComment.authorName} `);
+      }
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
@@ -245,7 +262,7 @@ const CommentItem = ({
             ))}
             {isLogged && (
               <button
-                onClick={() => { setShowReply(!showReply); setTimeout(() => inputRef.current?.focus(), 50); }}
+                onClick={handleReplyClick}
                 className="flex items-center gap-1 ml-1 text-xs text-[#cbc3d7]/40 hover:text-[#cebdff] transition-colors"
               >
                 <Reply size={12} />
@@ -290,6 +307,16 @@ const CommentItem = ({
                 ...prev,
                 replies: prev.replies.filter((r) => r.id !== id),
               }));
+            }}
+            onReplyCreated={(newReply) => {
+              if (newReply.parentId === localComment.id) {
+                setLocalComment((prev) => ({
+                  ...prev,
+                  replies: [...prev.replies, newReply],
+                }));
+              } else {
+                onReplyCreated?.(newReply);
+              }
             }}
           />
         </div>
@@ -473,6 +500,19 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                       isLogged={isLogged}
                       depth={0}
                       onCommentDeleted={handleCommentDeleted}
+                      onReplyCreated={(newReply) => {
+                        setReview((prev) => {
+                          if (!prev) return prev;
+                          return {
+                            ...prev,
+                            comments: prev.comments.map((c) =>
+                              c.id === newReply.parentId
+                                ? { ...c, replies: [...c.replies, newReply] }
+                                : c,
+                            ),
+                          };
+                        });
+                      }}
                     />
                   ))}
                   {review.comments.length === 0 && (

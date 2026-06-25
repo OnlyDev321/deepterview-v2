@@ -116,7 +116,14 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "후기를 찾을 수 없습니다."));
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "댓글을 찾을 수 없습니다."));
-        Comment reply = Comment.ofReply(review, author, parent, request.content());
+
+        Comment actualParent = parent;
+        String content = request.content();
+        if (parent.getParent() != null) {
+            actualParent = parent.getParent();
+        }
+
+        Comment reply = Comment.ofReply(review, author, actualParent, content);
         commentRepository.save(reply);
         return CommentResponse.of(reply, List.of(), Map.of(), null);
     }
@@ -186,12 +193,23 @@ public class ReviewService {
     private CommentResponse toCommentTree(Comment comment, Map<Long, List<Comment>> childrenMap,
                                            Map<Long, Map<String, Long>> reactionsMap,
                                            Map<Long, String> myReactions, Long currentUserId) {
-        List<Comment> children = childrenMap.getOrDefault(comment.getId(), List.of());
-        List<CommentResponse> childResponses = children.stream()
-                .map(child -> toCommentTree(child, childrenMap, reactionsMap, myReactions, currentUserId))
+        List<Comment> descendants = new ArrayList<>();
+        collectDescendants(comment.getId(), childrenMap, descendants);
+        List<CommentResponse> flatReplies = descendants.stream()
+                .map(child -> CommentResponse.of(child, List.of(),
+                        reactionsMap.getOrDefault(child.getId(), Map.of()),
+                        myReactions.getOrDefault(child.getId(), null)))
                 .toList();
-        return CommentResponse.of(comment, childResponses,
+        return CommentResponse.of(comment, flatReplies,
                 reactionsMap.getOrDefault(comment.getId(), Map.of()),
                 myReactions.getOrDefault(comment.getId(), null));
+    }
+
+    private void collectDescendants(Long parentId, Map<Long, List<Comment>> childrenMap, List<Comment> result) {
+        List<Comment> children = childrenMap.getOrDefault(parentId, List.of());
+        for (Comment child : children) {
+            result.add(child);
+            collectDescendants(child.getId(), childrenMap, result);
+        }
     }
 }

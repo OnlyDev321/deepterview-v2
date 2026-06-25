@@ -8,6 +8,7 @@ import java.util.Map;
 
 public record CommentResponse(
         Long id,
+        Long parentId,
         Long authorId,
         String authorName,
         String authorProfileImageUrl,
@@ -20,6 +21,7 @@ public record CommentResponse(
     public static CommentResponse of(Comment comment, List<CommentResponse> replies, Map<String, Long> reactions, String myReaction) {
         return new CommentResponse(
                 comment.getId(),
+                comment.getParent() != null ? comment.getParent().getId() : null,
                 comment.getAuthor().getId(),
                 comment.getAuthor().getName(),
                 comment.getAuthor().getProfileImageUrl(),
