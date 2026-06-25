@@ -2,6 +2,7 @@ import { answerService } from "../services/answerService";
 import { reportService } from "../services/reportService";
 import { sessionService } from "../services/sessionService";
 import { markAnalyzing, unmarkAnalyzing } from "./analysisTracker";
+import { addNotification } from "./notificationTracker";
 import type {
   AnswerAnalysis,
   SessionReport,
@@ -36,8 +37,11 @@ function isPythonAnalysisReady(analysis: AnswerAnalysis): boolean {
 async function pollUntilAnalysesReady(
   sessionId: number,
   onProgress?: (progress: PipelineProgress) => void,
+  shouldCancel?: () => boolean,
 ): Promise<{ timedOut: boolean; existingReport: SessionReport | null }> {
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+    if (shouldCancel?.()) return { timedOut: false, existingReport: null };
+
     try {
       const progress = await sessionService.getAnalysisProgress(sessionId);
       const videoTarget = Math.max(progress.answersWithVideo, progress.totalAnswers);
@@ -108,6 +112,7 @@ async function pollUntilAnalysesReady(
     }
 
     await sleep(POLL_INTERVAL_MS);
+    if (shouldCancel?.()) return { timedOut: false, existingReport: null };
   }
 
   return { timedOut: false, existingReport: null };
@@ -118,12 +123,16 @@ export async function runSessionAnalysisPipeline(
   options?: {
     onProgress?: (progress: PipelineProgress) => void;
     skipPythonTrigger?: boolean;
+    cancelledRef?: { current: boolean };
   },
 ): Promise<PipelineResult> {
   markAnalyzing(sessionId);
   const onProgress = options?.onProgress;
+  const shouldCancel = () => options?.cancelledRef?.current === true;
 
   try {
+    if (shouldCancel()) return { success: false, report: null, timedOut: false };
+
     if (!options?.skipPythonTrigger) {
       try {
         await sessionService.generatePythonReport(sessionId);
@@ -135,6 +144,8 @@ export async function runSessionAnalysisPipeline(
       }
     }
 
+    if (shouldCancel()) return { success: false, report: null, timedOut: false };
+
     onProgress?.({
       phase: "polling",
       message: "AI가 답변 영상을 분석하고 있습니다...",
@@ -142,9 +153,11 @@ export async function runSessionAnalysisPipeline(
       totalAnswers: 0,
     });
 
-    const pollResult = await pollUntilAnalysesReady(sessionId, onProgress);
+    const pollResult = await pollUntilAnalysesReady(sessionId, onProgress, shouldCancel);
+    if (shouldCancel()) return { success: false, report: null, timedOut: false };
 
     if (pollResult.existingReport) {
+      addNotification(sessionId);
       onProgress?.({
         phase: "done",
         message: "피드백 리포트가 준비되었습니다.",
@@ -163,6 +176,8 @@ export async function runSessionAnalysisPipeline(
       .map((q) => q.answerId)
       .filter((id): id is number => id != null);
 
+    if (shouldCancel()) return { success: false, report: null, timedOut: false };
+
     if (answerIds.length > 0) {
       onProgress?.({
         phase: "polling",
@@ -174,6 +189,8 @@ export async function runSessionAnalysisPipeline(
       let llmReady = 0;
       const batchSize = 3;
       for (let i = 0; i < answerIds.length; i += batchSize) {
+        if (shouldCancel()) return { success: false, report: null, timedOut: false };
+
         const batch = answerIds.slice(i, i + batchSize);
         const results = await Promise.all(
           batch.map((id) => answerService.getAnalysis(id).catch(() => null)),
@@ -190,6 +207,8 @@ export async function runSessionAnalysisPipeline(
       }
     }
 
+    if (shouldCancel()) return { success: false, report: null, timedOut: false };
+
     onProgress?.({
       phase: "creating-report",
       message: "종합 피드백 리포트를 생성하고 있습니다...",
@@ -198,6 +217,8 @@ export async function runSessionAnalysisPipeline(
     });
 
     const report = await reportService.createSessionReport(sessionId);
+
+    if (report) addNotification(sessionId);
 
     onProgress?.({
       phase: "done",

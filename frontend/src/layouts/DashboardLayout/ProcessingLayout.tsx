@@ -49,8 +49,9 @@ const ProcessingLayout = () => {
   const [progress, setProgress] = useState<AnalysisProgress | null>(null);
   const [displayPercent, setDisplayPercent] = useState(0);
   const [hasFailed, setHasFailed] = useState(false);
-  const startedRef = useRef(false);
-  const cancelledRef = useRef(false);
+
+  const currentSessionIdRef = useRef(sessionId);
+  currentSessionIdRef.current = sessionId;
 
   useEffect(() => {
     if (!sessionId) {
@@ -58,16 +59,30 @@ const ProcessingLayout = () => {
       return;
     }
 
-    cancelledRef.current = false;
+    let mounted = true;
+    const localCancelledRef = { current: false };
+    let navigated = false;
+
+    const doNavigate = () => {
+      if (navigated) return;
+      navigated = true;
+      navigate("/dashboard/history", {
+        replace: true,
+        state: { focusSessionId: sessionId, reportReady: true },
+      });
+    };
 
     const pollInterval = setInterval(async () => {
-      if (cancelledRef.current) return;
+      if (!mounted) return;
       try {
         const data = await sessionService.getAnalysisProgress(sessionId);
+        if (!mounted) return;
         setProgress(data);
         if (data.reportReady) {
           setDisplayPercent(100);
           clearInterval(pollInterval);
+          if (!mounted) return;
+          doNavigate();
         } else {
           setDisplayPercent((prev) => Math.min(prev + 8, 90));
         }
@@ -76,42 +91,38 @@ const ProcessingLayout = () => {
       }
     }, POLL_INTERVAL);
 
-    if (startedRef.current) return;
-    startedRef.current = true;
-
     void (async () => {
       const result = await runSessionAnalysisPipeline(sessionId, {
         skipPythonTrigger,
         onProgress: setPipelineProgress,
+        cancelledRef: localCancelledRef,
       });
 
-      if (cancelledRef.current) return;
+      if (!mounted) return;
       clearInterval(pollInterval);
 
       if (result.success) {
         setDisplayPercent(100);
         try {
           const data = await sessionService.getAnalysisProgress(sessionId);
-          if (cancelledRef.current) return;
+          if (!mounted) return;
           setProgress(data);
         } catch {
           /* ignore */
         }
         setTimeout(() => {
-          if (cancelledRef.current) return;
-          navigate("/dashboard/history", {
-            replace: true,
-            state: { focusSessionId: sessionId, reportReady: true },
-          });
+          if (!mounted) return;
+          doNavigate();
         }, 500);
         return;
       }
 
-      if (!cancelledRef.current) setHasFailed(true);
+      if (mounted) setHasFailed(true);
     })();
 
     return () => {
-      cancelledRef.current = true;
+      mounted = false;
+      localCancelledRef.current = true;
       clearInterval(pollInterval);
     };
   }, [sessionId, navigate, skipPythonTrigger]);
@@ -238,7 +249,6 @@ const ProcessingLayout = () => {
           <button
             type="button"
             onClick={() => {
-              startedRef.current = false;
               setHasFailed(false);
               setPipelineProgress({
                 phase: "polling",
@@ -246,7 +256,8 @@ const ProcessingLayout = () => {
                 completedAnswers: 0,
                 totalAnswers: 0,
               });
-              void runSessionAnalysisPipeline(sessionId, { onProgress: setPipelineProgress }).then(
+              const retryCancelledRef = { current: false };
+              void runSessionAnalysisPipeline(sessionId, { onProgress: setPipelineProgress, cancelledRef: retryCancelledRef }).then(
                 (result) => {
                   if (result.success) {
                     navigate("/dashboard/history", {
