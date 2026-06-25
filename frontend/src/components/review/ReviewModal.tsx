@@ -33,7 +33,7 @@ const EmojiTrigger = ({
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const   closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const POPUP_GAP = 6;
 
   const updatePos = useCallback(() => {
@@ -97,11 +97,16 @@ const EmojiTrigger = ({
             {EMOJIS.map(({ emoji, label }) => (
               <button
                 key={emoji}
-                onClick={() => { onToggle(emoji); setOpen(false); }}
-                className={`flex items-center justify-center rounded-lg text-lg hover:bg-[#323539] transition-colors ${
+                onClick={() => {
+                  onToggle(emoji);
+                  setOpen(false);
+                }}
+                className={`flex items-center justify-center rounded-lg text-lg hover:bg-[#323539] transition-colors cursor-pointer ${
                   compact ? "size-8" : "size-9"
                 } ${
-                  myReaction === emoji ? "bg-[#9B7FED]/10 ring-1 ring-[#9B7FED]" : ""
+                  myReaction === emoji
+                    ? "bg-[#9B7FED]/10 ring-1 ring-[#9B7FED]"
+                    : ""
                 }`}
               >
                 {label}
@@ -212,11 +217,17 @@ const CommentItem = ({
   const showIndent = depth > 0 && depth <= INDENT_DEPTH;
 
   return (
-    <div className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""}`}>
+    <div
+      className={`${showIndent ? "ml-8" : ""} ${depth > 0 ? "pl-4 border-l border-[#494454]/20" : ""}`}
+    >
       <div className="flex gap-2.5">
         <div className="size-7 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
           {localComment.authorProfileImageUrl ? (
-            <img src={getImageUrl(localComment.authorProfileImageUrl)} alt="" className="size-full object-cover" />
+            <img
+              src={getImageUrl(localComment.authorProfileImageUrl)}
+              alt=""
+              className="size-full object-cover"
+            />
           ) : (
             <span className="text-[10px] font-bold text-[#cebdff]">
               {localComment.authorName[0]}
@@ -229,7 +240,10 @@ const CommentItem = ({
               {localComment.authorName}
             </span>
             {localComment.authorId === currentUserId && (
-              <button onClick={handleDelete} className="text-[#cbc3d7]/30 hover:text-red-400 transition-colors">
+              <button
+                onClick={handleDelete}
+                className="text-[#cbc3d7]/30 hover:text-red-400 transition-colors"
+              >
                 <Trash2 size={11} />
               </button>
             )}
@@ -244,7 +258,9 @@ const CommentItem = ({
               onToggle={isLogged ? handleReaction : undefined}
               compact
             />
-            {EMOJIS.filter(({ emoji }) => (localComment.reactions[emoji] ?? 0) > 0).map(({ emoji, label }) => (
+            {EMOJIS.filter(
+              ({ emoji }) => (localComment.reactions[emoji] ?? 0) > 0,
+            ).map(({ emoji, label }) => (
               <button
                 key={emoji}
                 onClick={() => isLogged && handleReaction(emoji)}
@@ -255,7 +271,9 @@ const CommentItem = ({
                 }`}
               >
                 <span>{label}</span>
-                <span className={`tabular-nums ${localComment.myReaction === emoji ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}>
+                <span
+                  className={`tabular-nums ${localComment.myReaction === emoji ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}
+                >
                   {localComment.reactions[emoji]}
                 </span>
               </button>
@@ -263,7 +281,7 @@ const CommentItem = ({
             {isLogged && (
               <button
                 onClick={handleReplyClick}
-                className="flex items-center gap-1 ml-1 text-xs text-[#cbc3d7]/40 hover:text-[#cebdff] transition-colors"
+                className="flex items-center gap-1 ml-1 text-xs text-[#cbc3d7]/40 hover:text-[#cebdff] transition-colors cursor-pointer"
               >
                 <Reply size={12} />
                 답글
@@ -294,7 +312,10 @@ const CommentItem = ({
         </div>
       </div>
 
-      {(showAllReplies ? localComment.replies : localComment.replies.slice(0, REPLIES_PREVIEW_COUNT)).map((reply) => (
+      {(showAllReplies
+        ? localComment.replies
+        : localComment.replies.slice(0, REPLIES_PREVIEW_COUNT)
+      ).map((reply) => (
         <div key={reply.id} className="mt-3">
           <CommentItem
             comment={reply}
@@ -321,14 +342,15 @@ const CommentItem = ({
           />
         </div>
       ))}
-      {!showAllReplies && localComment.replies.length > REPLIES_PREVIEW_COUNT && (
-        <button
-          onClick={() => setShowAllReplies(true)}
-          className="text-xs text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors mt-2 ml-8"
-        >
-          답글 {localComment.replies.length - REPLIES_PREVIEW_COUNT}개 더 보기
-        </button>
-      )}
+      {!showAllReplies &&
+        localComment.replies.length > REPLIES_PREVIEW_COUNT && (
+          <button
+            onClick={() => setShowAllReplies(true)}
+            className="text-xs text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors mt-2 ml-8 cursor-pointer"
+          >
+            답글 {localComment.replies.length - REPLIES_PREVIEW_COUNT}개 더 보기
+          </button>
+        )}
     </div>
   );
 };
@@ -392,9 +414,13 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
   const handleReviewReaction = async (emoji: Emoji) => {
     if (!review) return;
     try {
-      const result = await reviewService.toggleReviewReaction(reviewId, { emoji });
+      const result = await reviewService.toggleReviewReaction(reviewId, {
+        emoji,
+      });
       setReview((prev) =>
-        prev ? { ...prev, reactions: result.counts, myReaction: result.myReaction } : prev,
+        prev
+          ? { ...prev, reactions: result.counts, myReaction: result.myReaction }
+          : prev,
       );
     } catch {
       console.error("reaction failed");
@@ -417,7 +443,10 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+        <div
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          onClick={onClose}
+        />
         <motion.div
           className="relative z-10 w-full max-w-lg max-h-[85vh] overflow-x-auto overflow-y-auto rounded-3xl border border-[#494454]/20 bg-[#191c1f] p-6 shadow-xl"
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -440,7 +469,11 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
               <div className="flex items-start gap-3 mb-4">
                 <div className="size-10 shrink-0 rounded-full bg-[#323539] flex items-center justify-center overflow-hidden">
                   {review.authorProfileImageUrl ? (
-                    <img src={getImageUrl(review.authorProfileImageUrl)} alt="" className="size-full object-cover" />
+                    <img
+                      src={getImageUrl(review.authorProfileImageUrl)}
+                      alt=""
+                      className="size-full object-cover"
+                    />
                   ) : (
                     <span className="text-sm font-bold text-[#cebdff]">
                       {review.authorName[0]}
@@ -449,9 +482,14 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-[#e1e2e7]">{review.authorName}</span>
+                    <span className="font-semibold text-[#e1e2e7]">
+                      {review.authorName}
+                    </span>
                     {review.authorId === user?.id && (
-                      <button onClick={handleDeleteReview} className="text-[#cbc3d7]/40 hover:text-red-400 transition-colors">
+                      <button
+                        onClick={handleDeleteReview}
+                        className="text-[#cbc3d7]/40 hover:text-red-400 transition-colors"
+                      >
                         <Trash2 size={14} />
                       </button>
                     )}
@@ -467,7 +505,9 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                   myReaction={review.myReaction}
                   onToggle={isLogged ? handleReviewReaction : undefined}
                 />
-                {EMOJIS.filter(({ emoji }) => (review.reactions[emoji] ?? 0) > 0).map(({ emoji, label }) => (
+                {EMOJIS.filter(
+                  ({ emoji }) => (review.reactions[emoji] ?? 0) > 0,
+                ).map(({ emoji, label }) => (
                   <button
                     key={emoji}
                     onClick={() => isLogged && handleReviewReaction(emoji)}
@@ -478,20 +518,27 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                     }`}
                   >
                     <span>{label}</span>
-                    <span className={`tabular-nums ${review.myReaction === emoji ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}>
+                    <span
+                      className={`tabular-nums ${review.myReaction === emoji ? "text-[#cebdff]" : "text-[#cbc3d7]/50"}`}
+                    >
                       {review.reactions[emoji]}
                     </span>
                   </button>
                 ))}
                 <div className="flex items-center gap-1 text-[#cbc3d7]/50 ml-auto">
                   <MessageCircle size={14} />
-                  <span className="text-xs">댓글 {countAllComments(review.comments)}개</span>
+                  <span className="text-xs">
+                    댓글 {countAllComments(review.comments)}개
+                  </span>
                 </div>
               </div>
 
               <div className="border-t border-[#494454]/20 pt-4 mt-3">
                 <div className="space-y-4 mb-4">
-                  {(showAllComments ? review.comments : review.comments.slice(0, COMMENT_PREVIEW_COUNT)).map((comment) => (
+                  {(showAllComments
+                    ? review.comments
+                    : review.comments.slice(0, COMMENT_PREVIEW_COUNT)
+                  ).map((comment) => (
                     <CommentItem
                       key={comment.id}
                       comment={comment}
@@ -520,14 +567,16 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                       첫 번째 댓글을 남겨보세요
                     </p>
                   )}
-                  {!showAllComments && review.comments.length > COMMENT_PREVIEW_COUNT && (
-                    <button
-                      onClick={() => setShowAllComments(true)}
-                      className="text-sm text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors"
-                    >
-                      댓글 {review.comments.length - COMMENT_PREVIEW_COUNT}개 더 보기
-                    </button>
-                  )}
+                  {!showAllComments &&
+                    review.comments.length > COMMENT_PREVIEW_COUNT && (
+                      <button
+                        onClick={() => setShowAllComments(true)}
+                        className="text-sm text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors"
+                      >
+                        댓글 {review.comments.length - COMMENT_PREVIEW_COUNT}개
+                        더 보기
+                      </button>
+                    )}
                 </div>
 
                 {isLogged ? (
@@ -544,7 +593,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                     <button
                       onClick={handleComment}
                       disabled={!commentText.trim() || submitting}
-                      className="rounded-xl bg-[#9B7FED] p-2.5 text-white disabled:opacity-40 hover:bg-[#8a6fe0] transition-colors"
+                      className="rounded-xl bg-[#9B7FED] p-2.5 text-white disabled:opacity-40 hover:bg-[#8a6fe0] transition-colors cursor-pointer"
                     >
                       <Send size={16} />
                     </button>
@@ -557,7 +606,9 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
               </div>
             </>
           ) : (
-            <p className="text-center py-12 text-[#cbc3d7]">후기를 불러올 수 없습니다.</p>
+            <p className="text-center py-12 text-[#cbc3d7]">
+              후기를 불러올 수 없습니다.
+            </p>
           )}
         </motion.div>
       </motion.div>

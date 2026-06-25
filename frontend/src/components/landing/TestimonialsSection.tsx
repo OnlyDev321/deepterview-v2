@@ -78,7 +78,7 @@ const TestimonialsSection = () => {
         {isLogged && (
           <button
             onClick={() => setShowWriteModal(true)}
-            className="flex items-center gap-2 rounded-2xl bg-[#9B7FED] px-6 py-3 text-sm font-semibold text-white hover:bg-[#8a6fe0] transition-colors"
+            className="flex items-center gap-2 rounded-2xl bg-[#9B7FED] px-6 py-3 text-sm font-semibold text-white hover:bg-[#8a6fe0] transition-colors cursor-pointer"
           >
             <Plus size={18} />
             후기 작성하기
@@ -138,7 +138,9 @@ const TestimonialsSection = () => {
         <ReviewModal
           reviewId={selectedReviewId}
           onClose={() => setSelectedReviewId(null)}
-          onDeleted={(id) => setReviews((prev) => prev.filter((r) => r.id !== id))}
+          onDeleted={(id) =>
+            setReviews((prev) => prev.filter((r) => r.id !== id))
+          }
         />
       )}
 
@@ -153,9 +155,7 @@ const TestimonialsSection = () => {
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
           >
-            <h3 className="text-lg font-bold text-[#e1e2e7] mb-4">
-              후기 작성
-            </h3>
+            <h3 className="text-lg font-bold text-[#e1e2e7] mb-4">후기 작성</h3>
             <textarea
               value={writeContent}
               onChange={(e) => setWriteContent(e.target.value)}

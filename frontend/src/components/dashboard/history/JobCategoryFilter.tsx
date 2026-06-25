@@ -25,9 +25,8 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const selectedName = selectedId == null
-    ? "모든 직무"
-    : findCategoryName(categories, selectedId);
+  const selectedName =
+    selectedId == null ? "모든 직무" : findCategoryName(categories, selectedId);
 
   const handleSelect = (id: number | null) => {
     onChange(id);
@@ -60,8 +59,10 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
             {/* Reset option */}
             <button
               onClick={() => handleSelect(null)}
-              className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-[#24272b] ${
-                selectedId == null ? "text-[#cebdff] font-bold" : "text-[#cbc3d7]"
+              className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-[#24272b] cursor-pointer ${
+                selectedId == null
+                  ? "text-[#cebdff] font-bold"
+                  : "text-[#cbc3d7]"
               }`}
             >
               모든 직무
@@ -73,7 +74,7 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
               <div key={parent.id}>
                 <button
                   onClick={() => handleParentClick(parent.id)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-sm text-[#cbc3d7] hover:bg-[#24272b] transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm text-[#cbc3d7] hover:bg-[#24272b] transition-colors cursor-pointer"
                 >
                   <span>{parent.name}</span>
                   <ChevronRight
@@ -85,30 +86,31 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
                 </button>
 
                 <AnimatePresence>
-                  {expandedParent === parent.id && parent.children.length > 0 && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="bg-[#13161a] py-1">
-                        {parent.children.map((child) => (
-                          <button
-                            key={child.id}
-                            onClick={() => handleSelect(child.id)}
-                            className={`w-full text-left pl-8 pr-4 py-2 text-sm transition-colors hover:bg-[#24272b] ${
-                              selectedId === child.id
-                                ? "text-[#cebdff] font-bold"
-                                : "text-[#a09baa]"
-                            }`}
-                          >
-                            {child.name}
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
+                  {expandedParent === parent.id &&
+                    parent.children.length > 0 && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="bg-[#13161a] py-1">
+                          {parent.children.map((child) => (
+                            <button
+                              key={child.id}
+                              onClick={() => handleSelect(child.id)}
+                              className={`w-full text-left pl-8 pr-4 py-2 text-sm transition-colors hover:bg-[#24272b] cursor-pointer ${
+                                selectedId === child.id
+                                  ? "text-[#cebdff] font-bold"
+                                  : "text-[#a09baa]"
+                              }`}
+                            >
+                              {child.name}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
                 </AnimatePresence>
               </div>
             ))}
