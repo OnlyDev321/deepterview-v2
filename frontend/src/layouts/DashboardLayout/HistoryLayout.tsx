@@ -21,6 +21,7 @@ import { jobCategoryService } from "../../services/jobCategoryService";
 import { runSessionAnalysisPipeline } from "../../lib/sessionAnalysisPipeline";
 import { isAnalyzing } from "../../lib/analysisTracker";
 import JobCategoryFilter from "../../components/dashboard/history/JobCategoryFilter";
+import DateFilter from "../../components/dashboard/history/DateFilter";
 import type {
   SessionListItem,
   SessionDetail,
@@ -55,17 +56,20 @@ const HistoryLayout = () => {
     reportReadyNotice ? "AI 피드백 리포트가 생성되었습니다." : null,
   );
   const [selectedJobCategoryId, setSelectedJobCategoryId] = useState<number | null>(null);
+  const [selectedDays, setSelectedDays] = useState<number | null>(0);
   const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
 
   const loadSessionsList = async (
     shouldAutoSelect: boolean = true,
-    categoryId?: number | null
+    categoryId?: number | null,
+    days?: number | null
   ) => {
     try {
       setIsLoadingList(true);
       setError(null);
       const cid = categoryId !== undefined ? categoryId : selectedJobCategoryId;
-      const res = await sessionService.getSessions(0, 50, undefined, cid ?? undefined);
+      const d = days !== undefined ? days : selectedDays;
+      const res = await sessionService.getSessions(0, 50, undefined, cid ?? undefined, d ?? undefined);
       const completedSessions = res.content || [];
       setSessions(completedSessions);
 
@@ -107,8 +111,8 @@ const HistoryLayout = () => {
   }, []);
 
   useEffect(() => {
-    void loadSessionsList(true, selectedJobCategoryId);
-  }, [selectedJobCategoryId]);
+    void loadSessionsList(true, selectedJobCategoryId, selectedDays);
+  }, [selectedJobCategoryId, selectedDays]);
 
   useEffect(() => {
     if (focusSessionId) {
@@ -298,9 +302,10 @@ const HistoryLayout = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-3 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer">
-            <Calendar size={14} /> 최근 30일
-          </button>
+          <DateFilter
+            value={selectedDays}
+            onChange={(days) => setSelectedDays(days)}
+          />
           <JobCategoryFilter
             categories={jobCategories}
             selectedId={selectedJobCategoryId}

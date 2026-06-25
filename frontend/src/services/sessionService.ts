@@ -13,13 +13,15 @@ export const sessionService = {
     page = 0,
     size = 10,
     status?: string,
-    jobCategoryId?: number
+    jobCategoryId?: number,
+    days?: number
   ): Promise<SessionListResponse> => {
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("size", size.toString());
     if (status) params.append("status", status);
     if (jobCategoryId != null) params.append("jobCategoryId", jobCategoryId.toString());
+    if (days != null) params.append("days", days.toString());
 
     const res = await api.get<ApiResponse<SessionListResponse>>("/api/v1/sessions", {
       params,

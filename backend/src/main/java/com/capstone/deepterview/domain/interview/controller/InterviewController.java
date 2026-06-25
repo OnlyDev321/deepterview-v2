@@ -51,9 +51,10 @@ public class InterviewController {
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size,
 			@RequestParam(required = false) SessionStatus status,
-			@RequestParam(required = false) Long jobCategoryId) {
+			@RequestParam(required = false) Long jobCategoryId,
+			@RequestParam(required = false) Integer days) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-		return ApiResponse.success(interviewService.getSessions(principal.getId(), status, jobCategoryId, pageable));
+		return ApiResponse.success(interviewService.getSessions(principal.getId(), status, jobCategoryId, days, pageable));
 	}
 
 	@GetMapping("/{sessionId}")

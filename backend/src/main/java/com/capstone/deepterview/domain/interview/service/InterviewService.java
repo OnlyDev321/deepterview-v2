@@ -127,8 +127,14 @@ public class InterviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public SessionListResponse getSessions(Long userId, SessionStatus status, Long jobCategoryId, Pageable pageable) {
-		Page<InterviewSession> page = interviewSessionRepository.findByUserIdWithFilters(userId, status, jobCategoryId, pageable);
+	public SessionListResponse getSessions(Long userId, SessionStatus status, Long jobCategoryId, Integer days, Pageable pageable) {
+		LocalDateTime cutoff = null;
+		if (days != null) {
+			cutoff = days == 0
+					? LocalDateTime.now().toLocalDate().atStartOfDay()
+					: LocalDateTime.now().minusDays(days);
+		}
+		Page<InterviewSession> page = interviewSessionRepository.findByUserIdWithFilters(userId, status, jobCategoryId, cutoff, pageable);
 
 		Page<SessionListItemResponse> mappedPage = page.map(SessionListItemResponse::from);
 		return SessionListResponse.from(mappedPage);

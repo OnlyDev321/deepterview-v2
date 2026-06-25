@@ -50,7 +50,7 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute right-0 top-full mt-2 z-50 w-56 max-h-80 overflow-y-auto rounded-2xl border border-[#494454]/30 bg-[#191c1f] shadow-xl shadow-black/40"
+            className="absolute left-0 top-full mt-2 z-50 w-56 max-h-80 overflow-y-auto rounded-2xl border border-[#494454]/30 bg-[#191c1f] shadow-xl shadow-black/40"
             initial={{ opacity: 0, scale: 0.95, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
