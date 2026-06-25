@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import type { Auth } from "../../types";
 import {
   ArrowRight,
@@ -28,6 +28,15 @@ const Rightside = () => {
   );
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const tab = (location.state as { tab?: Auth } | null)?.tab;
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+      setMessage(null);
+      setMessageType(null);
+    }
+  }, [location.state]);
 
   const handleTabChange = (tab: Auth) => {
     setActiveTab(tab);
