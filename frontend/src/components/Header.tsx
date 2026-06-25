@@ -133,6 +133,8 @@ const Header = ({
       );
       setReviewUnread((prev) => Math.max(0, prev - 1));
     }
+    setNotifOpen(false);
+    navigate("/", { state: { openReviewId: n.referenceId } });
   };
 
   const handleMarkAllRead = async () => {

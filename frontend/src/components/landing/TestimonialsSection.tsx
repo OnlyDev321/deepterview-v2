@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../services/AuthContext";
 import { reviewService } from "../../services/reviewService";
 import type { ReviewListResponse } from "../../types";
@@ -9,9 +10,14 @@ import { getImageUrl } from "../../lib/api";
 
 const TestimonialsSection = () => {
   const { isLogged } = useContext(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [reviews, setReviews] = useState<ReviewListResponse[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(
-    null,
+    () => {
+      const state = location.state as { openReviewId?: number } | null;
+      return state?.openReviewId ?? null;
+    },
   );
   const [showWriteModal, setShowWriteModal] = useState(false);
   const [writeContent, setWriteContent] = useState("");
@@ -20,6 +26,14 @@ const TestimonialsSection = () => {
   useEffect(() => {
     reviewService.getReviews().then(setReviews).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    const state = location.state as { openReviewId?: number } | null;
+    if (state?.openReviewId) {
+      setSelectedReviewId(state.openReviewId);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const handleWriteReview = async () => {
     if (!writeContent.trim() || submitting) return;
