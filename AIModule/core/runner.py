@@ -145,6 +145,11 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
         "gaze_frames": frame_results
     }
 
+    # Clean up intermediate audio files
+    for f in os.listdir(output_dir):
+        if f.endswith(".wav"):
+            os.remove(os.path.join(output_dir, f))
+
     return result
 
 def send_to_spring(callback_url: str, result: dict):
