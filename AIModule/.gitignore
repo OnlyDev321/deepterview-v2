@@ -191,6 +191,3 @@ cython_debug/
 # Intermediate audio files
 output/audio.wav
 output/enhanced_audio.wav
-
-# Docker
-# Dockerfile

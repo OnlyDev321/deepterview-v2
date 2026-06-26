@@ -26,6 +26,3 @@ dist-ssr
 # env 
 .env
 .env.*
-
-# dockerfile 
-# Dockerfile*
