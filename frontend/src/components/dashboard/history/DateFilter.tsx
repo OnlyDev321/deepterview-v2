@@ -37,15 +37,16 @@ const DateFilter = ({ value, onChange }: Props) => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer whitespace-nowrap"
+        className="flex items-center gap-2 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer whitespace-nowrap max-w-[180px]"
       >
-        <Calendar size={14} /> {currentLabel}
+        <Calendar size={14} />
+        <span className="truncate">{currentLabel}</span>
       </button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute left-0 top-full mt-2 z-50 w-44 rounded-2xl border border-[#494454]/30 bg-[#191c1f] shadow-xl shadow-black/40 overflow-hidden"
+            className="absolute left-0 top-full mt-2 z-50 w-48 rounded-2xl border border-[#494454]/30 bg-[#191c1f] shadow-xl shadow-black/40 overflow-hidden"
             initial={{ opacity: 0, scale: 0.95, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
@@ -58,7 +59,7 @@ const DateFilter = ({ value, onChange }: Props) => {
                   onChange(opt.days);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-[#24272b] cursor-pointer ${
+                className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-[#24272b] cursor-pointer truncate ${
                   value === opt.days
                     ? "text-[#cebdff] font-bold"
                     : "text-[#cbc3d7]"

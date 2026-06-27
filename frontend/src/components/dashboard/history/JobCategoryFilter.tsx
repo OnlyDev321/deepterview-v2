@@ -44,9 +44,10 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer whitespace-nowrap"
+        className="flex items-center gap-2 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-2xl text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer whitespace-nowrap max-w-[200px]"
       >
-        <Filter size={14} /> {selectedName}
+        <Filter size={14} />
+        <span className="truncate">{selectedName}</span>
       </button>
 
       <AnimatePresence>
@@ -78,7 +79,7 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
                   onClick={() => handleParentClick(parent.id)}
                   className="w-full flex items-center justify-between px-4 py-3 text-sm text-[#cbc3d7] hover:bg-[#24272b] transition-colors cursor-pointer"
                 >
-                  <span>{parent.name}</span>
+                   <span className="truncate">{parent.name}</span>
                   <ChevronRight
                     size={14}
                     className={`transition-transform ${
@@ -101,8 +102,8 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
                             <button
                               key={child.id}
                               onClick={() => handleSelect(child.id)}
-                              className={`w-full text-left pl-8 pr-4 py-2 text-sm transition-colors hover:bg-[#24272b] cursor-pointer ${
-                                selectedId === child.id
+                 className={`w-full text-left pl-8 pr-4 py-2 text-sm transition-colors hover:bg-[#24272b] cursor-pointer truncate ${
+                    selectedId === child.id
                                   ? "text-[#cebdff] font-bold"
                                   : "text-[#a09baa]"
                               }`}

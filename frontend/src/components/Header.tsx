@@ -491,7 +491,7 @@ const Header = ({
               </button>
 
               {isOpen && (
-                <div className="absolute right-0 mt-2 w-40 rounded-xl bg-[rgba(15,23,42,0.95)] border border-white/10 shadow-lg backdrop-blur-md overflow-hidden">
+                <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[rgba(15,23,42,0.95)] border border-white/10 shadow-lg backdrop-blur-md overflow-hidden">
                   <button
                     onClick={() => {
                       navigate("/dashboard/myinfo");
@@ -499,8 +499,8 @@ const Header = ({
                     }}
                     className="flex items-center gap-2 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition cursor-pointer"
                   >
-                    <User className="w-4 h-4" />
-                    {t("header.my_info")}
+                    <User className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{t("header.my_info")}</span>
                   </button>
 
                   <button
@@ -511,8 +511,8 @@ const Header = ({
                     }}
                     className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-400 hover:bg-white/10 transition cursor-pointer"
                   >
-                    <LogOut className="w-4 h-4" />
-                    {t("header.logout")}
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{t("header.logout")}</span>
                   </button>
                 </div>
               )}
