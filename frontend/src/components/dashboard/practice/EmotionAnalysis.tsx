@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 
+import { useTranslation } from "react-i18next";
+
 type EmotionAnalysisProps = {
   eyeContact: number;
   confidence: number;
@@ -11,6 +13,8 @@ const EmotionAnalysis = ({
   confidence,
   anxiety,
 }: EmotionAnalysisProps) => {
+  const { t } = useTranslation();
+
   const getColorData = (val: number, label: string) => {
     // Shared color logic for both text badges and bars
     let colorClasses = {
@@ -18,7 +22,7 @@ const EmotionAnalysis = ({
       bg: "bg-emerald-400/10",
     };
 
-    const isAnxiety = label === "긴장도";
+    const isAnxiety = label === "anxiety";
     const isRed = isAnxiety ? val >= 71 : val <= 20;
     const isYellow = val > 20 && val <= 70;
 
@@ -33,32 +37,35 @@ const EmotionAnalysis = ({
 
   const metrics = [
     {
-      label: "아이 컨택",
+      key: "eye_contact",
+      label: t("emotion.eye_contact"),
       value: eyeContact,
-      ...getColorData(eyeContact, "아이 컨택"),
+      ...getColorData(eyeContact, "eye_contact"),
     },
     {
-      label: "자신감 지수",
+      key: "confidence",
+      label: t("emotion.confidence"),
       value: confidence,
-      ...getColorData(confidence, "자신감 지수"),
+      ...getColorData(confidence, "confidence"),
     },
     {
-      label: "긴장도",
+      key: "anxiety",
+      label: t("emotion.anxiety"),
       value: anxiety,
-      ...getColorData(anxiety, "긴장도"),
+      ...getColorData(anxiety, "anxiety"),
     },
   ];
 
   // The bars represent the 3 metrics
   const bars = [
-    { value: eyeContact, label: "아이 컨택" },
-    { value: confidence, label: "자신감 지수" },
-    { value: anxiety, label: "긴장도" },
+    { value: eyeContact, label: t("emotion.eye_contact"), key: "eye_contact" },
+    { value: confidence, label: t("emotion.confidence"), key: "confidence" },
+    { value: anxiety, label: t("emotion.anxiety"), key: "anxiety" },
   ];
 
-  const getBarColor = (val: number, label: string) => {
+  const getBarColor = (val: number, key: string) => {
     // For Anxiety, low is good (green) and high is bad (red)
-    if (label === "긴장도") {
+    if (key === "anxiety") {
       if (val <= 20) return "from-green-500/50 to-green-500/10";
       if (val <= 70) return "from-yellow-500/50 to-yellow-500/10";
       return "from-red-500/50 to-red-500/10";
@@ -72,7 +79,7 @@ const EmotionAnalysis = ({
   return (
     <div className="bg-[#191c1f] rounded-[2rem] p-6 border border-[#494454]/10 h-full flex flex-col">
       <h4 className="text-[0.6rem] uppercase tracking-[0.2em] text-[#cbc3d7]/60 font-bold mb-6">
-        실시간 감정 분석 (LIVE)
+        {t("emotion.title")}
       </h4>
 
       <div className="space-y-4 mb-8">
@@ -100,7 +107,7 @@ const EmotionAnalysis = ({
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
               className={`w-full bg-gradient-to-t ${getBarColor(
                 bar.value,
-                bar.label
+                bar.key
               )} rounded-t-lg relative group transition-colors duration-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]`}
             >
               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity rounded-t-lg" />

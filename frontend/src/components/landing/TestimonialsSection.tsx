@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../services/AuthContext";
@@ -9,6 +10,7 @@ import { MessageCircle, Plus } from "lucide-react";
 import { getImageUrl } from "../../lib/api";
 
 const TestimonialsSection = () => {
+  const { t } = useTranslation();
   const { isLogged } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ const TestimonialsSection = () => {
       setWriteContent("");
       setShowWriteModal(false);
     } catch {
-      alert("후기 작성 중 오류가 발생했습니다.");
+      alert(t("review.error_create"));
     } finally {
       setSubmitting(false);
     }
@@ -69,10 +71,10 @@ const TestimonialsSection = () => {
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-xl space-y-4">
           <h2 className="text-3xl font-bold tracking-[-0.025em] text-[#e1e2e7] sm:text-4xl">
-            <span className="block leading-10 text-[#cebdff]">사용자 후기</span>
+            <span className="block leading-10 text-[#cebdff]">{t("review.title")}</span>
           </h2>
           <p className="text-base leading-[26px] text-[#cbc3d7]">
-            Deepterview와 함께한 사용자들의 생생한 경험을 들어보세요.
+            {t("review.desc")}
           </p>
         </div>
         {isLogged && (
@@ -81,7 +83,7 @@ const TestimonialsSection = () => {
             className="flex items-center gap-2 rounded-2xl bg-[#9B7FED] px-6 py-3 text-sm font-semibold text-white hover:bg-[#8a6fe0] transition-colors cursor-pointer"
           >
             <Plus size={18} />
-            후기 작성하기
+            {t("review.write")}
           </button>
         )}
       </div>
@@ -129,8 +131,8 @@ const TestimonialsSection = () => {
 
       {reviews.length === 0 && (
         <p className="text-center text-[#cbc3d7]/40 py-12">
-          아직 작성된 후기가 없습니다.
-          {isLogged && " 첫 후기를 작성해보세요!"}
+          {t("review.empty")}
+          {isLogged && t("review.empty_cta")}
         </p>
       )}
 
@@ -155,11 +157,11 @@ const TestimonialsSection = () => {
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
           >
-            <h3 className="text-lg font-bold text-[#e1e2e7] mb-4">후기 작성</h3>
+            <h3 className="text-lg font-bold text-[#e1e2e7] mb-4">{t("review.write_title")}</h3>
             <textarea
               value={writeContent}
               onChange={(e) => setWriteContent(e.target.value)}
-              placeholder="Deepterview를 사용한 경험을 공유해주세요..."
+              placeholder={t("review.write_placeholder")}
               rows={6}
               className="w-full bg-[#111417] border border-[#494454]/20 rounded-2xl py-3 px-4 text-sm text-[#e1e2e7] outline-none focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all resize-none"
             />
@@ -168,14 +170,14 @@ const TestimonialsSection = () => {
                 onClick={() => setShowWriteModal(false)}
                 className="rounded-xl border border-[#494454]/20 px-5 py-2.5 text-sm text-[#cbc3d7] hover:text-[#e1e2e7] transition-colors"
               >
-                취소
+                {t("review.write_cancel")}
               </button>
               <button
                 onClick={handleWriteReview}
                 disabled={!writeContent.trim() || submitting}
                 className="rounded-xl bg-[#9B7FED] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40 hover:bg-[#8a6fe0] transition-colors"
               >
-                {submitting ? "작성 중..." : "등록"}
+                {submitting ? t("review.write_submitting") : t("review.write_submit")}
               </button>
             </div>
           </motion.div>

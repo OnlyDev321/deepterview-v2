@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 
+import { useTranslation } from "react-i18next";
+
 type PerformanceVitalsProps = {
   smileRatio: number;
   headStability: number;
@@ -11,21 +13,30 @@ const PerformanceVitals = ({
   headStability,
   dominantEmotion,
 }: PerformanceVitalsProps) => {
+  const { t } = useTranslation();
+
   const getEmotionColor = (emotion: string) => {
     switch (emotion) {
       case "행복":
+      case "Happy":
         return "text-emerald-400";
       case "슬픔":
+      case "Sad":
         return "text-blue-500";
       case "놀람":
+      case "Surprised":
         return "text-yellow-400";
       case "분노":
+      case "Angry":
         return "text-red-500";
       case "공포":
+      case "Fear":
         return "text-slate-400";
       case "혐오":
+      case "Disgust":
         return "text-orange-500";
       case "중립":
+      case "Neutral":
       default:
         return "text-[#cebdff]";
     }
@@ -33,7 +44,7 @@ const PerformanceVitals = ({
 
   const vitals = [
     {
-      label: "미소 비율",
+      label: t("vitals.smile_ratio"),
       value: `${smileRatio}%`,
       progress: smileRatio,
       color:
@@ -41,7 +52,7 @@ const PerformanceVitals = ({
       textColor: "text-emerald-400",
     },
     {
-      label: "고개 안정성",
+      label: t("vitals.head_stability"),
       value: `${headStability}%`,
       progress: headStability,
       color:
@@ -49,7 +60,7 @@ const PerformanceVitals = ({
       textColor: "text-[#d4af37]",
     },
     {
-      label: "주요 감정 상태",
+      label: t("vitals.dominant_emotion"),
       value: dominantEmotion,
       textColor: getEmotionColor(dominantEmotion),
     },
@@ -58,7 +69,7 @@ const PerformanceVitals = ({
   return (
     <div className="bg-[#191c1f] rounded-[2rem] p-6 border border-[#494454]/10 h-full">
       <h4 className="text-[0.6rem] uppercase tracking-[0.2em] text-[#cbc3d7]/60 font-bold mb-6">
-        성과 지표 (LIVE)
+        {t("vitals.title")}
       </h4>
 
       <div className="space-y-8">

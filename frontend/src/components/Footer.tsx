@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="w-full bg-[#05070a] px-6 py-16 sm:px-10 lg:px-20">
       <div className="mx-auto max-w-[1280px] border-t border-[rgba(30,41,59,0.3)] pt-8">
@@ -8,16 +11,16 @@ const Footer = () => {
               Deepterview
             </p>
             <p className="text-xs uppercase tracking-[1.2px] text-[#64748b]">
-              © 2026 Deepterview. 한밤의 관찰자 에디션.
+              {t("footer.copyright")}
             </p>
           </div>
           <nav className="flex flex-wrap gap-x-10 gap-y-2" aria-label="Footer">
             {(
               [
-                { label: "개인정보 처리방침", key: "privacy" },
-                { label: "이용약관", key: "terms" },
-                { label: "고객지원", key: "support" },
-                { label: "문의하기", key: "contact" },
+                { label: t("footer.privacy"), key: "privacy" },
+                { label: t("footer.terms"), key: "terms" },
+                { label: t("footer.support"), key: "support" },
+                { label: t("footer.contact"), key: "contact" },
               ] as const
             ).map(({ label, key }) => (
               <a

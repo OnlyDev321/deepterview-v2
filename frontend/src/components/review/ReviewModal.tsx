@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../../services/AuthContext";
 import { reviewService } from "../../services/reviewService";
@@ -30,6 +31,7 @@ const EmojiTrigger = ({
   onToggle?: (emoji: Emoji) => void;
   compact?: boolean;
 }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -78,7 +80,7 @@ const EmojiTrigger = ({
         disabled={!onToggle}
       >
         <SmilePlus size={compact ? 12 : 16} />
-        <span>이모지</span>
+        <span>{t("review.emoji_label")}</span>
       </button>
       <AnimatePresence>
         {open && onToggle && (
@@ -136,6 +138,7 @@ const CommentItem = ({
   onCommentDeleted: (commentId: number) => void;
   onReplyCreated?: (reply: CommentResponse) => void;
 }) => {
+  const { t } = useTranslation();
   const [showReply, setShowReply] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -169,7 +172,7 @@ const CommentItem = ({
       setReplyText("");
       setShowReply(false);
     } catch {
-      alert("답글 작성 중 오류가 발생했습니다.");
+      alert(t("review.error_reply_create"));
     } finally {
       setSubmitting(false);
     }
@@ -187,12 +190,12 @@ const CommentItem = ({
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+    if (!window.confirm(t("review.confirm_delete"))) return;
     try {
       await reviewService.deleteComment(reviewId, localComment.id);
       onCommentDeleted(localComment.id);
     } catch {
-      alert("댓글 삭제 중 오류가 발생했습니다.");
+      alert(t("review.error_delete"));
     }
   };
 
@@ -284,7 +287,7 @@ const CommentItem = ({
                 className="flex items-center gap-1 ml-1 text-xs text-[#cbc3d7]/40 hover:text-[#cebdff] transition-colors cursor-pointer"
               >
                 <Reply size={12} />
-                답글
+                {t("review.reply_btn")}
               </button>
             )}
           </div>
@@ -297,7 +300,7 @@ const CommentItem = ({
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleReply()}
-                placeholder="답글 입력..."
+                placeholder={t("review.reply_placeholder")}
                 className="flex-1 bg-[#111417] border border-[#494454]/20 rounded-lg py-1.5 px-3 text-xs text-[#e1e2e7] outline-none focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all"
               />
               <button
@@ -348,7 +351,7 @@ const CommentItem = ({
             onClick={() => setShowAllReplies(true)}
             className="text-xs text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors mt-2 ml-8 cursor-pointer"
           >
-            답글 {localComment.replies.length - REPLIES_PREVIEW_COUNT}개 더 보기
+            {t("review.reply_more", { count: localComment.replies.length - REPLIES_PREVIEW_COUNT })}
           </button>
         )}
     </div>
@@ -364,6 +367,7 @@ const countAllComments = (comments: CommentResponse[]): number => {
 };
 
 const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
+  const { t } = useTranslation();
   const { isLogged, user } = useContext(AuthContext);
   const [review, setReview] = useState<ReviewDetailResponse | null>(null);
   const [commentText, setCommentText] = useState("");
@@ -393,7 +397,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
       );
       setCommentText("");
     } catch {
-      alert("댓글 작성 중 오류가 발생했습니다.");
+      alert(t("review.error_comment_create"));
     } finally {
       setSubmitting(false);
       inputRef.current?.focus();
@@ -401,13 +405,13 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
   };
 
   const handleDeleteReview = async () => {
-    if (!window.confirm("후기를 삭제하시겠습니까?")) return;
+    if (!window.confirm(t("review.confirm_delete_review"))) return;
     try {
       await reviewService.deleteReview(reviewId);
       onDeleted?.(reviewId);
       onClose();
     } catch {
-      alert("후기 삭제 중 오류가 발생했습니다.");
+      alert(t("review.error_delete_review"));
     }
   };
 
@@ -528,7 +532,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                 <div className="flex items-center gap-1 text-[#cbc3d7]/50 ml-auto">
                   <MessageCircle size={14} />
                   <span className="text-xs">
-                    댓글 {countAllComments(review.comments)}개
+                    {t("review.comment_count", { count: countAllComments(review.comments) })}
                   </span>
                 </div>
               </div>
@@ -564,7 +568,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                   ))}
                   {review.comments.length === 0 && (
                     <p className="text-center text-sm text-[#cbc3d7]/40 py-4">
-                      첫 번째 댓글을 남겨보세요
+                      {t("review.first_comment")}
                     </p>
                   )}
                   {!showAllComments &&
@@ -573,8 +577,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                         onClick={() => setShowAllComments(true)}
                         className="text-sm text-[#cbc3d7]/50 hover:text-[#cebdff] transition-colors"
                       >
-                        댓글 {review.comments.length - COMMENT_PREVIEW_COUNT}개
-                        더 보기
+                        {t("review.comment_more", { count: review.comments.length - COMMENT_PREVIEW_COUNT })}
                       </button>
                     )}
                 </div>
@@ -587,7 +590,7 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleComment()}
-                      placeholder="댓글 입력..."
+                      placeholder={t("review.comment_placeholder")}
                       className="flex-1 bg-[#111417] border border-[#494454]/20 rounded-xl py-2.5 px-4 text-sm text-[#e1e2e7] outline-none focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all"
                     />
                     <button
@@ -600,14 +603,14 @@ const ReviewModal = ({ reviewId, onClose, onDeleted }: ReviewModalProps) => {
                   </div>
                 ) : (
                   <p className="text-center text-sm text-[#cbc3d7]/50 py-2">
-                    댓글을 작성하려면 로그인해주세요
+                    {t("review.login_to_comment")}
                   </p>
                 )}
               </div>
             </>
           ) : (
             <p className="text-center py-12 text-[#cbc3d7]">
-              후기를 불러올 수 없습니다.
+              {t("review.load_error")}
             </p>
           )}
         </motion.div>

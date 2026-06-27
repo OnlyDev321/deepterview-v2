@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 const CtaSection = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -23,17 +25,17 @@ const CtaSection = () => {
           id="cta-heading"
           className="text-3xl font-bold tracking-[-0.025em] text-[#e1e2e7] sm:text-4xl md:text-5xl md:leading-[48px] md:tracking-[-1.2px]"
         >
-          면접을 마스터할 준비가 되셨나요?
+          {t("cta.heading")}
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-base font-light leading-6 tracking-[0.4px] text-[#cbc3d7]">
-          10,000명 이상의 전문가들과 함께 Deepterview를 사용하여 중요한 날을 준비하세요.
+          {t("cta.desc")}
         </p>
         <button
           onClick={() => navigate("/signin")}
           type="button"
           className="mt-8 rounded-full bg-[rgba(206,189,255,0.8)] px-12 py-5 text-lg font-bold text-[#381385] transition hover:opacity-90 cursor-pointer"
         >
-          무료 세션 시작하기
+          {t("cta.button")}
         </button>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { Auth } from "../../types";
 import {
   ArrowRight,
@@ -14,6 +15,7 @@ import { AuthContext } from "../../services/AuthContext";
 import { authService } from "../../services/authService";
 
 const Rightside = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useContext(AuthContext);
@@ -59,7 +61,7 @@ const Rightside = () => {
         const confirmPassword = formData.get("confirmPassword") as string;
 
         if (!id || id.trim() === "") {
-          setMessage("아이디를 입력해주세요.");
+          setMessage(t("auth.error_id_required"));
           setMessageType("error");
           return;
         }
@@ -68,20 +70,20 @@ const Rightside = () => {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
         if (!passwordRegex.test(password)) {
           setMessage(
-            "비밀번호는 8자 이상이며 대문자, 소문자, 숫자 및 특수문자를 포함해야 합니다",
+            t("auth.error_password_rule"),
           );
           setMessageType("error");
           return;
         }
         // check confirm password
         if (password !== confirmPassword) {
-          setMessage("비밀번호가 일치하지 않습니다");
+          setMessage(t("auth.error_password_mismatch"));
           setMessageType("error");
           return;
         }
 
         await authService.register(id, password);
-        setMessage("회원가입이 완료되었습니다!");
+        setMessage(t("auth.success_register"));
         setMessageType("success");
         setTimeout(() => {
           setMessage(null);
@@ -95,7 +97,7 @@ const Rightside = () => {
         const password = formData.get("password") as string;
 
         if (!id || id.trim() === "") {
-          setMessage("아이디를 입력해주세요.");
+          setMessage(t("auth.error_id_required"));
           setMessageType("error");
           return;
         }
@@ -106,7 +108,7 @@ const Rightside = () => {
 
         if (!passwordRegex.test(password)) {
           setMessage(
-            "비밀번호는 8자 이상이며 대문자, 소문자, 숫자 및 특수문자를 포함해야 합니다",
+            t("auth.error_password_rule"),
           );
           setMessageType("error");
           return;
@@ -127,7 +129,7 @@ const Rightside = () => {
     } catch (error: any) {
       console.log(error);
       const backendMessage = error?.response?.data?.message;
-      setMessage(backendMessage || (isRegister ? "회원가입에 실패했습니다." : "로그인에 실패했습니다."));
+      setMessage(backendMessage || (isRegister ? t("auth.error_register_failed") : t("auth.error_login_failed")));
       setMessageType("error");
     }
   };
@@ -137,12 +139,12 @@ const Rightside = () => {
       <div className="w-full max-w-md">
         <div className="mb-10">
           <h2 className="text-3xl font-bold text-on-background mb-2">
-            {isRegister ? "환영합니다" : "안녕하세요!"}
+            {isRegister ? t("auth.welcome_title_register") : t("auth.welcome_title_login")}
           </h2>
           <p className="text-on-surface-variant/60">
             {isRegister
-              ? "딥터뷰와 함께 완벽한 면접을 준비해 보세요."
-              : "면접 마스터를 향한 여정을 계속하세요."}
+              ? t("auth.welcome_desc_register")
+              : t("auth.welcome_desc_login")}
           </p>
         </div>
 
@@ -156,7 +158,7 @@ const Rightside = () => {
                 : "text-on-surface-variant/60 hover:text-on-background"
             }`}
           >
-            로그인
+            {t("auth.tab_login")}
           </button>
           <button
             onClick={() => handleTabChange("register")}
@@ -166,7 +168,7 @@ const Rightside = () => {
                 : "text-on-surface-variant/60 hover:text-on-background"
             }`}
           >
-            회원가입
+            {t("auth.tab_register")}
           </button>
         </div>
 
@@ -181,14 +183,14 @@ const Rightside = () => {
         >
           <div className="flex flex-col gap-2">
             <label className="text-[0.7rem] uppercase tracking-[0.15em] font-bold text-primary/80 ml-4">
-              아이디
+              {t("auth.label_id")}
             </label>
             <div className="relative group">
               <User className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
                 name="id"
-                placeholder="아이디를 입력하세요"
+                placeholder={t("auth.placeholder_id")}
                 required
                 className="w-full bg-surface-container-lowest border-none ring-1 ring-white/10 focus:ring-2 focus:ring-primary/50 rounded-2xl py-4 pl-14 pr-6 placeholder:text-white/20 transition-all outline-none"
               />
@@ -197,14 +199,14 @@ const Rightside = () => {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center px-4">
               <label className="text-[0.7rem] uppercase tracking-[0.15em] font-bold text-primary/80">
-                비밀번호
+                {t("auth.label_password")}
               </label>
               {activeTab === "login" && (
                 <a
                   href="#"
                   className="text-[0.7rem] uppercase tracking-[0.15em] text-on-surface-variant/40 hover:text-primary transition-colors"
                 >
-                  비밀번호 재설정
+                  {t("auth.forgot_password")}
                 </a>
               )}
             </div>
@@ -231,7 +233,7 @@ const Rightside = () => {
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center px-4">
                 <label className="text-[0.7rem] uppercase tracking-[0.15em] font-bold text-primary/80">
-                  비밀번호 확인
+                  {t("auth.label_confirm_password")}
                 </label>
               </div>
               <div className="relative group">
@@ -273,7 +275,7 @@ const Rightside = () => {
                 htmlFor="keep-logged"
                 className="text-sm text-on-surface-variant/80 cursor-pointer select-none"
               >
-                로그인 유지
+                {t("auth.keep_logged_in")}
               </label>
             </div>
           )}
@@ -283,7 +285,7 @@ const Rightside = () => {
               <div className="flex items-center gap-4 my-4">
                 <div className="flex-1 h-px bg-white/10" />
                 <span className="text-xs text-white/40 tracking-widest">
-                  소셜 로그인
+                  {t("auth.social_login")}
                 </span>
                 <div className="flex-1 h-px bg-white/10" />
               </div>
@@ -319,7 +321,7 @@ const Rightside = () => {
                   }}
                 >
                   <MessageCircle className="w-5 h-5 text-[#FEE500]" />
-                  <span className="font-medium">카카오톡</span>
+                  <span className="font-medium">{t("auth.social_kakao")}</span>
                 </button>
               </div>
             </>
@@ -342,7 +344,7 @@ const Rightside = () => {
             type="submit"
             className="w-full bg-primary-container text-on-background font-bold py-4 rounded-2xl glow-button flex items-center justify-center gap-2 group cursor-pointer"
           >
-            {isRegister ? "회원가입" : "로그인"}
+            {isRegister ? t("auth.btn_register") : t("auth.btn_login")}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
@@ -350,12 +352,12 @@ const Rightside = () => {
         <div className="mt-12 text-center">
           <p className="text-sm text-on-surface-variant/50">
             {/* 조건부 렌더링: 현재 탭 상태에 따라 질문과 링크 텍스트가 바뀝니다. */}
-            {isRegister ? "이미 계정이 있으신가요?" : "플랫폼이 처음이신가요?"}
+            {isRegister ? t("auth.prompt_has_account") : t("auth.prompt_no_account")}
             <a
               onClick={() => handleTabChange(isRegister ? "login" : "register")}
               className="text-primary font-semibold ml-1 hover:underline underline-offset-4 decoration-primary/30 cursor-pointer"
             >
-              {isRegister ? "로그인하기" : "회원가입"}
+              {isRegister ? t("auth.link_login") : t("auth.link_register")}
             </a>
           </p>
         </div>

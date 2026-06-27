@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   Sparkles,
@@ -29,6 +30,7 @@ import type {
 import type { InterviewSession, QAPair } from "../../types/types";
 
 const HistoryLayout = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const focusSessionId = (location.state as { focusSessionId?: number } | null)
@@ -51,7 +53,7 @@ const HistoryLayout = () => {
   const [isCreatingReport, setIsCreatingReport] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successBanner, setSuccessBanner] = useState<string | null>(
-    reportReadyNotice ? "AI 피드백 리포트가 생성되었습니다." : null,
+    reportReadyNotice ? t("history.ai_report_ready") : null,
   );
   const [selectedJobCategoryId, setSelectedJobCategoryId] = useState<number | null>(null);
   const [selectedDays, setSelectedDays] = useState<number | null>(0);
@@ -80,7 +82,7 @@ const HistoryLayout = () => {
       }
     } catch (err: any) {
       console.error("Failed to load sessions:", err);
-      setError("세션 목록을 불러오는 중 오류가 발생했습니다.");
+      setError(t("history.load_error"));
     } finally {
       setIsLoadingList(false);
     }
@@ -133,13 +135,11 @@ const HistoryLayout = () => {
         skipPythonTrigger: false,
       });
       if (result.success) {
-        setSuccessBanner("AI 피드백 리포트가 생성되었습니다.");
+        setSuccessBanner(t("history.ai_report_ready"));
         await loadSessionsList(false);
         await loadSessionData(selectedSessionId);
       } else {
-        alert(
-          "리포트 생성에 실패했습니다. 면접 영상 업로드·Python 서버·LLM API 설정을 확인한 뒤 다시 시도해 주세요.",
-        );
+        alert(t("history.error_python_report"));
       }
     } finally {
       setIsCreatingReport(false);
@@ -152,19 +152,19 @@ const HistoryLayout = () => {
       id: String(s.sessionId),
       company: "Deepterview",
       role: s.jobTitle,
-      date: new Date(s.createdAt).toLocaleDateString("ko-KR", {
+      date: new Date(s.createdAt).toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "vi" ? "vi-VN" : "en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       }),
       duration: (() => {
-        if (!s.endedAt || !s.createdAt) return "0분 0초";
+        if (!s.endedAt || !s.createdAt) return t("history.duration_zero");
         const diffMs =
           new Date(s.endedAt).getTime() - new Date(s.createdAt).getTime();
         const totalSeconds = Math.floor(diffMs / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        return `${minutes}분 ${seconds}초`;
+        return t("history.duration_format", { minutes, seconds });
       })(),
       score: s.overallScore ? Math.round(s.overallScore) : 0,
       questionCount: 0,
@@ -178,10 +178,10 @@ const HistoryLayout = () => {
       id: String(q.id),
       question: q.content,
       answer:
-        q.answerText || "답변 데이터가 존재하지 않거나 녹음이 스킵되었습니다.",
-      tags: [q.questionType === "TECHNICAL" ? "기술" : "행동형"],
+        q.answerText || t("history.no_answer_text"),
+      tags: [q.questionType === "TECHNICAL" ? t("history.tag_technical") : t("history.tag_behavioral")],
       answerId: q.answerId,
-      aiInsight: q.answerId ? "AI 다차원 피드백 산출 완료" : "피드백 미생성",
+      aiInsight: q.answerId ? t("history.ai_feedback_done") : t("history.ai_feedback_none"),
       aiInsightType: q.answerId ? "positive" : "negative",
     }));
   };
@@ -195,22 +195,22 @@ const HistoryLayout = () => {
       company: "Deepterview",
       role: sessionDetail.jobTitle,
       date: sessionDetail.startedAt
-        ? new Date(sessionDetail.startedAt).toLocaleDateString("ko-KR", {
+        ? new Date(sessionDetail.startedAt).toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "vi" ? "vi-VN" : "en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
           })
-        : "진행 시간 없음",
+        : t("history.no_duration"),
       duration: (() => {
         if (!sessionDetail.startedAt || !sessionDetail.endedAt)
-          return "0분 0초";
+          return t("history.duration_zero");
         const diffMs =
           new Date(sessionDetail.endedAt).getTime() -
           new Date(sessionDetail.startedAt).getTime();
         const totalSeconds = Math.floor(diffMs / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        return `${minutes}분 ${seconds}초`;
+        return t("history.duration_format", { minutes, seconds });
       })(),
       score: sessionReport?.overallScore
         ? Math.round(sessionReport.overallScore)
@@ -255,7 +255,7 @@ const HistoryLayout = () => {
     if (!selectedSessionId) return;
 
     const confirmDelete = window.confirm(
-      "이 면접 연습 기록을 정말로 삭제하시겠습니까? 삭제된 기록은 복구할 수 없습니다.",
+      t("history.confirm_delete"),
     );
     if (!confirmDelete) return;
 
@@ -264,11 +264,11 @@ const HistoryLayout = () => {
       await sessionService.deleteSession(selectedSessionId);
 
       // Successfully deleted, refresh list and auto-select next
-      alert("면접 연습 기록이 성공적으로 삭제되었습니다.");
+      alert(t("history.delete_success"));
       await loadSessionsList(true);
     } catch (err) {
       console.error("Failed to delete session:", err);
-      alert("세션 삭제에 실패했습니다. 다시 시도해 주세요.");
+      alert(t("history.delete_failed"));
     } finally {
       setIsLoadingDetail(false);
     }
@@ -292,10 +292,10 @@ const HistoryLayout = () => {
       >
         <div>
           <span className="text-[0.65rem] uppercase tracking-[0.3em] text-[#cebdff] font-black mb-2 block animate-pulse">
-            아카이브 REPORT
+            {t("history.report_title")}
           </span>
           <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-[#e1e2e7]">
-            세션 히스토리
+            {t("history.title")}
           </h2>
         </div>
 
@@ -324,7 +324,7 @@ const HistoryLayout = () => {
             onClick={() => setSuccessBanner(null)}
             className="text-xs uppercase tracking-wider opacity-70 hover:opacity-100 cursor-pointer"
           >
-            닫기
+            {t("history.close")}
           </button>
         </motion.div>
       )}
@@ -334,7 +334,7 @@ const HistoryLayout = () => {
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <RefreshCw size={36} className="text-[#cebdff] animate-spin" />
           <p className="text-sm text-[#cbc3d7]/60 font-medium">
-            세션 내역을 불러오고 있습니다...
+            {t("history.loading")}
           </p>
         </div>
       ) : error ? (
@@ -346,17 +346,16 @@ const HistoryLayout = () => {
         <div className="flex-1 flex flex-col items-center justify-center bg-[#191c1f]/20 rounded-[2.5rem] border border-white/5 p-12 text-center">
           <Sparkles size={48} className="text-[#cebdff]/30 mb-4" />
           <h3 className="text-xl font-bold text-[#e1e2e7] mb-2">
-            면접 연습 기록이 존재하지 않습니다
+            {t("history.empty")}
           </h3>
           <p className="text-[#cbc3d7]/50 text-sm max-w-sm mx-auto">
-            새로운 면접 연습을 생성하여 AI의 다차원 피드백 보고서를
-            확인해보세요!
+            {t("history.empty_cta")}
           </p>
           <button
             onClick={() => navigate("/dashboard")}
             className="mt-6 px-8 py-3 bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-[#9b7fed]/20 cursor-pointer"
           >
-            면접 시작하러 가기
+            {t("history.go_practice")}
           </button>
         </div>
       ) : (
@@ -392,7 +391,7 @@ const HistoryLayout = () => {
               <div className="h-full flex flex-col items-center justify-center gap-4">
                 <RefreshCw size={28} className="text-[#cebdff] animate-spin" />
                 <p className="text-xs text-[#cbc3d7]/60 font-mono">
-                  AI 보고서를 로딩 중입니다...
+                  {t("history.report_loading")}
                 </p>
               </div>
             ) : (
@@ -416,11 +415,10 @@ const HistoryLayout = () => {
                           <Loader size={20} className="text-[#cebdff] animate-spin shrink-0" />
                           <div>
                             <h4 className="text-sm font-bold text-[#cebdff] mb-1">
-                              AI 분석 진행 중
+                              {t("history.analysis_in_progress")}
                             </h4>
                             <p className="text-xs text-[#cbc3d7]/60">
-                              답변 영상 및 텍스트를 분석하여 리포트를 생성하고 있습니다.
-                              잠시만 기다려 주세요.
+                              {t("history.analysis_in_progress_desc")}
                             </p>
                           </div>
                         </div>
@@ -433,11 +431,10 @@ const HistoryLayout = () => {
                       >
                         <div className="text-left">
                           <h4 className="text-sm font-bold text-amber-400 mb-1">
-                            종합 리포트가 아직 없습니다
+                            {t("history.no_report")}
                           </h4>
                           <p className="text-xs text-[#cbc3d7]/60">
-                            AI 분석이 완료되면 종합 점수와 요약을 생성할 수
-                            있습니다.
+                            {t("history.no_report_desc")}
                           </p>
                         </div>
                         <button
@@ -451,7 +448,7 @@ const HistoryLayout = () => {
                           ) : (
                             <FileText size={14} />
                           )}
-                          리포트 생성
+                          {t("history.create_report")}
                         </button>
                       </motion.div>
                     )
@@ -469,42 +466,42 @@ const HistoryLayout = () => {
                       <div className="flex items-center gap-3 mb-4">
                         <Sparkles size={20} className="text-[#cebdff]" />
                         <h4 className="text-[1rem] tracking-widest text-[#cebdff] font-black">
-                          AI 종합 분석 요약
+                          {t("history.summary_title")}
                         </h4>
                       </div>
                       <p className="text-[15px] text-[#cbc3d7]/90 leading-relaxed font-light">
                         {sessionReport.aiSummary ||
-                          "요약 데이터를 생성하는 중입니다..."}
+                          t("history.summary_loading")}
                       </p>
                     </div>
 
                     <div className="bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border-l-4 border-emerald-400 border-t border-r border-b border-t-emerald-500/10 border-r-emerald-500/10 border-b-emerald-500/10 hover:border-l-emerald-300 transition-all duration-300">
                       <h4 className="text-[1rem] tracking-widest text-emerald-400 font-black mb-3">
-                        강점 요약
+                        {t("history.strengths_title")}
                       </h4>
                       <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light">
                         {sessionReport.strengthSummary ||
-                          "강점 데이터를 분석 중입니다..."}
+                          t("history.strengths_loading")}
                       </p>
                     </div>
 
                     <div className="bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border-l-4 border-red-400 border-t border-r border-b border-t-red-500/10 border-r-red-500/10 border-b-red-500/10 hover:border-l-red-300 transition-all duration-300">
                       <h4 className="text-[1rem] tracking-widest text-red-400 font-black mb-3">
-                        약점 요약
+                        {t("history.weaknesses_title")}
                       </h4>
                       <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light">
                         {sessionReport.weaknessSummary ||
-                          "요약 데이터를 생성하는 중입니다..."}
+                          t("history.weaknesses_loading")}
                       </p>
                     </div>
 
                     <div className="col-span-1 md:col-span-2 bg-[#191c1f]/80 backdrop-blur-md rounded-[2rem] p-6 border-l-4 border-blue-400 border-t border-r border-b border-t-blue-500/10 border-r-blue-500/10 border-b-blue-500/10 hover:border-l-blue-300 transition-all duration-300">
                       <h4 className="text-[1rem] tracking-widest text-blue-400 font-black mb-3">
-                        개선 우선순위
+                        {t("history.priorities_title")}
                       </h4>
                       <p className="text-[14px] text-[#cbc3d7]/80 leading-relaxed font-light">
                         {sessionReport.improvementPriority ||
-                          "요약 데이터를 생성하는 중입니다..."}
+                          t("history.priorities_loading")}
                       </p>
                     </div>
                   </motion.div>

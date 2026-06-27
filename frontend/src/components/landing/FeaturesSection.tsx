@@ -6,7 +6,10 @@ import iconChart from "../../assets/iconChart.svg";
 import personaAvatar1 from "../../assets/personaAvatar1.jpeg";
 import personaAvatar2 from "../../assets/personaAvatar2.jpeg";
 
+import { useTranslation } from "react-i18next";
+
 const FeaturesSection = () => {
+  const { t } = useTranslation();
   return (
     <section
       id="resources"
@@ -19,13 +22,13 @@ const FeaturesSection = () => {
             id="features-heading"
             className="text-3xl font-bold tracking-[-0.025em] text-[#e1e2e7] sm:text-4xl"
           >
-            <span className="block leading-10">정밀하게 설계된</span>
+            <span className="block leading-10">{t("features.title_1")}</span>
             <span className="block leading-10 text-[#cebdff]">
-              훈련 플랫폼.
+              {t("features.title_2")}
             </span>
           </h2>
           <p className="text-base leading-[26px] text-[#cbc3d7]">
-            단순히 어려운 질문만 던지는 것이 아닙니다. 저희 시스템은 모든 뉘앙스, 압박감, 그리고 답변 사이의 침묵까지 분석합니다.
+            {t("features.desc")}
           </p>
         </div>
         <div className="hidden h-px w-32 shrink-0 bg-[rgba(255,255,255,0.1)] lg:block" />
@@ -38,10 +41,10 @@ const FeaturesSection = () => {
               <img src={iconEye} alt="" className="h-5 w-7 object-contain" />
             </div>
             <h3 className="text-xl font-bold tracking-[-0.025em] text-[#e1e2e7] sm:text-2xl">
-              실시간 비언어적 피드백
+              {t("features.card1_title")}
             </h3>
             <p className="max-w-[515px] text-base font-light leading-[26px] text-[#cbc3d7]">
-              AI가 답변 도중 시선 처리, 미소, 제스처를 분석하여 항상 가장 전문적인 모습을 유지할 수 있도록 도와줍니다.
+              {t("features.card1_desc")}
             </p>
           </div>
           <div className="mt-8 flex gap-2 pt-2">
@@ -61,10 +64,10 @@ const FeaturesSection = () => {
               />
             </div>
             <h3 className="text-xl font-bold tracking-[-0.025em] text-[#e1e2e7] sm:text-2xl">
-              다양한 AI 면접관
+              {t("features.card2_title")}
             </h3>
             <p className="max-w-[507px] text-base font-light leading-[26px] text-[#cbc3d7]">
-              엄격한 파트너부터 협력적인 기술 리드까지, 다양한 AI 면접관과 함께 실제 압박 면접을 경험하세요.
+              {t("features.card2_desc")}
             </p>
           </div>
           <div className="mt-8 overflow-hidden rounded-[32px] border border-[rgba(255,255,255,0.06)] bg-[#0c0e12]">
@@ -89,30 +92,30 @@ const FeaturesSection = () => {
             className="mb-4 h-6 w-4 object-contain"
           />
           <h3 className="text-lg font-bold text-[#e1e2e7]">
-            즉각적인 교정
+            {t("features.card3_title")}
           </h3>
           <p className="mt-2 max-w-[216px] text-xs leading-[19.5px] text-[#cbc3d7]">
-            말이 너무 빠르거나 집중력을 잃었을 때 알림을 받아 즉시 행동을 바로잡으세요.
+            {t("features.card3_desc")}
           </p>
         </article>
 
         <article className="relative min-h-[220px] overflow-hidden rounded-[48px] border border-[rgba(255,255,255,0.05)] bg-[rgba(12,14,18,0.6)] p-8 backdrop-blur-[20px] lg:col-span-1">
           <img src={iconChart} alt="" className="mb-4 h-6 w-6 object-contain" />
           <h3 className="text-lg font-bold text-[#e1e2e7]">
-            심층 보고서
+            {t("features.card4_title")}
           </h3>
           <p className="mt-2 max-w-[204px] text-xs leading-[19.5px] text-[#cbc3d7]">
-            연습 세션이 끝날 때마다 프레임 단위로 검토하고 구체적인 개선 조언을 받아보세요.
+            {t("features.card4_desc")}
           </p>
         </article>
 
         <article className="flex min-h-[220px] items-center gap-6 rounded-[48px] border border-[rgba(255,255,255,0.05)] bg-[rgba(12,14,18,0.6)] p-8 backdrop-blur-[20px] lg:col-span-2">
           <div className="min-w-0 flex-1 space-y-2">
             <h3 className="text-lg font-bold text-[#e1e2e7]">
-              다양한 면접관 페르소나
+              {t("features.card5_title")}
             </h3>
             <p className="text-xs leading-[19.5px] text-[#cbc3d7]">
-              산업 특성과 기업 문화 스타일에 맞는 모의 면접관을 선택하세요.
+              {t("features.card5_desc")}
             </p>
           </div>
           <div className="flex shrink-0 items-center pr-4">

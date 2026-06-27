@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { AlertCircle, MessageCircle, Sparkles, User } from "lucide-react";
 import type { TranscriptItemProps } from "../../../types/types";
 
 const TranscriptItem = ({ pair }: TranscriptItemProps) => {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +39,7 @@ const TranscriptItem = ({ pair }: TranscriptItemProps) => {
               ) : (
                 <Sparkles size={14} />
               )}
-              AI 인사이트: {pair.aiInsight}
+              {t("analytics.ai_insight")}: {pair.aiInsight}
             </div>
           )}
         </div>

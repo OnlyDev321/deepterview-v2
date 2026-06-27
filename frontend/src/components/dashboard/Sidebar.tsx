@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Home, BrainCircuit, History, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -8,19 +9,20 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
+  const { t } = useTranslation();
   const navItems = [
-    { icon: Home, label: "홈", link: "/dashboard" },
+    { icon: Home, label: t("sidebar.home"), link: "/dashboard" },
     {
       icon: BrainCircuit,
-      label: "연습",
+      label: t("sidebar.practice"),
       link: "/dashboard/practice",
     },
     {
       icon: History,
-      label: "기록",
+      label: t("sidebar.history"),
       link: "/dashboard/history",
     },
-    { icon: User, label: "내 정보", link: "/dashboard/myinfo" },
+    { icon: User, label: t("sidebar.my_info"), link: "/dashboard/myinfo" },
   ];
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,7 +47,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
           Deepterview
         </h1>
         <p className="font-sans text-sm text-[#cbc3d7]/40 mt-6">
-          프리미엄 AI 코치
+          {t("sidebar.premium_ai_coach")}
         </p>
       </div>
 

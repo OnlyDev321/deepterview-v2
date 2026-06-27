@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n";
 import { answerService } from "../services/answerService";
 import { reportService } from "../services/reportService";
 import { sessionService } from "../services/sessionService";
@@ -49,8 +50,8 @@ async function pollUntilAnalysesReady(
       onProgress?.({
         phase: "polling",
         message: videoTarget > 0
-          ? `AI가 답변 영상을 분석하고 있습니다...`
-          : "면접 데이터를 처리하고 있습니다...",
+          ? i18n.t("pipeline.analyzing_video")
+          : i18n.t("pipeline.processing_data"),
         completedAnswers: progress.speechAnalyzed,
         totalAnswers: videoTarget || 1,
       });
@@ -95,7 +96,7 @@ async function pollUntilAnalysesReady(
         }
         onProgress?.({
           phase: "polling",
-          message: "AI가 답변 영상을 분석하고 있습니다...",
+          message: i18n.t("pipeline.analyzing_video"),
           completedAnswers: ready,
           totalAnswers: answerIds.length,
         });
@@ -148,7 +149,7 @@ export async function runSessionAnalysisPipeline(
 
     onProgress?.({
       phase: "polling",
-      message: "AI가 답변 영상을 분석하고 있습니다...",
+      message: i18n.t("pipeline.analyzing_video"),
       completedAnswers: 0,
       totalAnswers: 0,
     });
@@ -160,7 +161,7 @@ export async function runSessionAnalysisPipeline(
       addNotification(sessionId);
       onProgress?.({
         phase: "done",
-        message: "피드백 리포트가 준비되었습니다.",
+        message: i18n.t("pipeline.report_ready"),
         completedAnswers: 1,
         totalAnswers: 1,
       });
@@ -181,7 +182,7 @@ export async function runSessionAnalysisPipeline(
     if (answerIds.length > 0) {
       onProgress?.({
         phase: "polling",
-        message: "답변별 상세 피드백을 생성하고 있습니다...",
+        message: i18n.t("pipeline.generating_detail"),
         completedAnswers: 0,
         totalAnswers: answerIds.length,
       });
@@ -200,7 +201,7 @@ export async function runSessionAnalysisPipeline(
         ).length;
         onProgress?.({
           phase: "polling",
-          message: "답변별 상세 피드백을 생성하고 있습니다...",
+          message: i18n.t("pipeline.generating_detail"),
           completedAnswers: llmReady,
           totalAnswers: answerIds.length,
         });
@@ -211,7 +212,7 @@ export async function runSessionAnalysisPipeline(
 
     onProgress?.({
       phase: "creating-report",
-      message: "종합 피드백 리포트를 생성하고 있습니다...",
+      message: i18n.t("pipeline.generating_report"),
       completedAnswers: 0,
       totalAnswers: 0,
     });
@@ -223,8 +224,8 @@ export async function runSessionAnalysisPipeline(
     onProgress?.({
       phase: "done",
       message: pollResult.timedOut
-        ? "일부 분석이 아직 진행 중일 수 있으나 리포트가 생성되었습니다."
-        : "피드백 리포트가 준비되었습니다.",
+        ? i18n.t("pipeline.report_partial")
+        : i18n.t("pipeline.report_ready"),
       completedAnswers: report ? 1 : 0,
       totalAnswers: 1,
     });
@@ -235,7 +236,7 @@ export async function runSessionAnalysisPipeline(
     onProgress?.({
       phase: "error",
       message:
-        "리포트 생성 중 오류가 발생했습니다. 히스토리에서 다시 시도할 수 있습니다.",
+        i18n.t("pipeline.report_error"),
       completedAnswers: 0,
       totalAnswers: 0,
     });

@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AlertTriangle, RefreshCw } from "lucide-react";
@@ -12,6 +13,7 @@ import { sessionService } from "../../services/sessionService";
 import type { QuestionResponse, SessionDetail } from "../../types";
 
 const PracticeLayout = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -64,7 +66,7 @@ const PracticeLayout = () => {
       } catch (err) {
         console.error("Failed to load session:", err);
         if (!cancelled) {
-          alert("세션 정보를 불러오지 못했습니다.");
+          alert(t("practice.loading_error"));
           navigate("/dashboard");
         }
       } finally {
@@ -104,7 +106,7 @@ const PracticeLayout = () => {
     return (
       <div className="flex items-center justify-center min-h-[40vh] gap-3 text-[#cbc3d7]">
         <RefreshCw size={20} className="animate-spin" />
-        <span>세션을 불러오는 중...</span>
+        <span>{t("practice.loading_session")}</span>
       </div>
     );
   }
@@ -127,9 +129,7 @@ const PracticeLayout = () => {
             >
               <AlertTriangle size={18} className="shrink-0" />
               <span>
-                <strong>주의:</strong> 면접 진행 중 페이지를 새로고침하면
-                녹화 데이터가 손실되어 복구할 수 없습니다.
-                새로고침하지 마세요.
+                <strong>{t("practice.warning_title")}:</strong> {t("practice.warning_text")}
               </span>
             </motion.div>
           )}

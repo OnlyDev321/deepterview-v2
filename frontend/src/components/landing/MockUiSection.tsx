@@ -3,7 +3,10 @@ import sessionWaveBg from "../../assets/sessionWaveBg.png";
 import iconLightbulb from "../../assets/iconLightbulb.svg";
 import iconPlaySmall from "../../assets/iconPlaySmall.svg";
 
+import { useTranslation } from "react-i18next";
+
 const MockUiSection = () => {
+  const { t } = useTranslation();
   return (
     <section
       className="relative w-full max-w-[1232px] px-4 sm:px-6"
@@ -26,10 +29,10 @@ const MockUiSection = () => {
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-[-0.35px] text-[#e1e2e7]">
-                실시간 면접 세션
+                {t("mock_ui.session_title")}
               </h2>
               <p className="text-[10px] font-normal uppercase tracking-wider text-[#64748b]">
-                직무: 시니어 프로덕트 디자이너
+                {t("mock_ui.job_label")}: {t("mock_ui.job_value")}
               </p>
             </div>
           </div>
@@ -37,7 +40,7 @@ const MockUiSection = () => {
             <div className="flex items-center gap-2 rounded-full bg-[rgba(239,68,68,0.1)] px-3 py-1">
               <span className="size-1.5 rounded-full bg-[#ef4444]" />
               <span className="text-[10px] font-bold uppercase text-[#f87171]">
-                녹화 중
+                {t("mock_ui.recording")}
               </span>
             </div>
             <div className="rounded-full bg-[rgba(206,189,255,0.1)] px-3 py-1 flex justify-center">
@@ -67,8 +70,7 @@ const MockUiSection = () => {
                   />
                 </div>
                 <p className="max-w-md text-center text-lg font-medium leading-7 text-[#e2e8f0] sm:text-xl">
-                  &ldquo;실제 데이터가 당신의 디자인 직관과 충돌할 때 어떻게
-                  대응하시겠습니까?&rdquo;
+                  {t("mock_ui.question_text")}
                 </p>
               </div>
             </div>
@@ -102,7 +104,7 @@ const MockUiSection = () => {
                 </div>
               </div>
               <span className="font-mono text-xs uppercase tracking-tight text-[#94a3b8]">
-                분석 중...
+                {t("mock_ui.analyzing")}
               </span>
             </div>
           </div>
@@ -110,27 +112,27 @@ const MockUiSection = () => {
           <div className="flex flex-col gap-6 lg:col-span-4">
             <div className="rounded-[32px] border border-[rgba(255,255,255,0.05)] bg-[#191c1f] p-6">
               <p className="mb-4 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
-                실시간 분석
+                {t("mock_ui.realtime_analysis")}
               </p>
               <ul className="flex flex-col gap-4">
                 <li className="flex items-center justify-between text-sm">
-                  <span className="text-[#94a3b8]">자신감</span>
+                  <span className="text-[#94a3b8]">{t("mock_ui.confidence")}</span>
                   <span className="font-bold text-[#cebdff]">88%</span>
                 </li>
                 <li className="flex items-center justify-between text-sm">
-                  <span className="text-[#94a3b8]">말하기 속도</span>
-                  <span className="font-bold text-[#7bd0ff]">적절함</span>
+                  <span className="text-[#94a3b8]">{t("mock_ui.speech_speed")}</span>
+                  <span className="font-bold text-[#7bd0ff]">{t("mock_ui.speech_speed_value")}</span>
                 </li>
                 <li className="flex items-center justify-between text-sm">
-                  <span className="text-[#94a3b8]">불필요한 단어</span>
-                  <span className="text-[#e1e2e7]">2개 (적음)</span>
+                  <span className="text-[#94a3b8]">{t("mock_ui.fillers")}</span>
+                  <span className="text-[#e1e2e7]">{t("mock_ui.fillers_value")}</span>
                 </li>
               </ul>
             </div>
 
             <div className="overflow-hidden rounded-[32px] border border-[rgba(255,255,255,0.05)] bg-[#191c1f] px-6 pb-6 pt-6">
               <p className="mb-4 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
-                감정 분석
+                {t("mock_ui.emotion_analysis")}
               </p>
               <div className="flex h-32 items-end justify-center gap-2">
                 {(
@@ -182,7 +184,7 @@ const MockUiSection = () => {
               </div>
               <div className="mt-4 border-t border-[rgba(255,255,255,0.05)] pt-4 text-center">
                 <p className="text-[10px] uppercase text-[#64748b]">
-                  시스템: 안정적
+                  {t("mock_ui.system_status")}
                 </p>
               </div>
             </div>

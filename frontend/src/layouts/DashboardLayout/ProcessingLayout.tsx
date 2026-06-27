@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -24,17 +25,18 @@ type AnalysisStep = {
   desc: string;
 };
 
-const analysisSteps: AnalysisStep[] = [
-  { key: "speechAnalyzed", label: "음성 분석", icon: Captions, desc: "화자 속도, 발음, 침묵 구간" },
-  { key: "nonverbalAnalyzed", label: "비언어 분석", icon: Eye, desc: "시선, 표정, 자신감" },
-  { key: "starAnalyzed", label: "STAR 분석", icon: BrainCircuit, desc: "상황·과제·행동·결과" },
-  { key: "llmFeedbackDone", label: "LLM 피드백", icon: MessageSquareText, desc: "강점·약점·개선점" },
-  { key: "reportReady", label: "최종 리포트", icon: FileText, desc: "종합 점수 및 등급" },
+const getAnalysisSteps = (t: (key: string) => string): AnalysisStep[] => [
+  { key: "speechAnalyzed", label: t("processing.step_speech"), icon: Captions, desc: t("processing.step_speech_desc") },
+  { key: "nonverbalAnalyzed", label: t("processing.step_nonverbal"), icon: Eye, desc: t("processing.step_nonverbal_desc") },
+  { key: "starAnalyzed", label: t("processing.step_star"), icon: BrainCircuit, desc: t("processing.step_star_desc") },
+  { key: "llmFeedbackDone", label: t("processing.step_llm"), icon: MessageSquareText, desc: t("processing.step_llm_desc") },
+  { key: "reportReady", label: t("processing.step_report"), icon: FileText, desc: t("processing.step_report_desc") },
 ];
 
 const POLL_INTERVAL = 3000;
 
 const ProcessingLayout = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const sessionId = location.state?.sessionId as number | undefined;
@@ -42,7 +44,7 @@ const ProcessingLayout = () => {
 
   const [pipelineProgress, setPipelineProgress] = useState<PipelineProgress>({
     phase: "polling",
-    message: "면접 데이터를 처리하고 있습니다...",
+    message: t("processing.initial_message"),
     completedAnswers: 0,
     totalAnswers: 0,
   });
@@ -158,7 +160,7 @@ const ProcessingLayout = () => {
           AI ANALYSIS
         </span>
         <h2 className="text-2xl font-black text-[#e1e2e7] tracking-tight">
-          {hasFailed ? "리포트 생성 실패" : "면접 분석 중"}
+          {hasFailed ? t("processing.title_failed") : t("processing.title")}
         </h2>
         <p className="text-sm text-[#cbc3d7]/60 mt-2">{pipelineProgress.message}</p>
       </div>
@@ -169,7 +171,7 @@ const ProcessingLayout = () => {
           <div className="mb-10">
             <div className="flex justify-between items-center mb-2">
               <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-[#cbc3d7]/70">
-                전체 진행률
+                {t("processing.progress_label")}
               </span>
               <span className="text-sm font-mono text-[#cebdff] font-bold">
                 {Math.min(100, progressPercent)}%
@@ -187,7 +189,7 @@ const ProcessingLayout = () => {
 
           {/* Analysis Steps */}
           <div className="space-y-3">
-            {analysisSteps.map((step, index) => {
+            {getAnalysisSteps(t).map((step, index) => {
               const isCompleted = progress
                 ? typeof progress[step.key] === "boolean"
                   ? progress[step.key] === true
@@ -232,7 +234,7 @@ const ProcessingLayout = () => {
                       }`}>
                         {step.label}
                       </span>
-                      <StatusBadge state={isCompleted ? "done" : isActive ? "running" : "pending"} />
+                      <StatusBadge state={isCompleted ? "done" : isActive ? "running" : "pending"} t={t} />
                     </div>
                     <p className="text-[0.7rem] text-[#cbc3d7]/50 mt-0.5">{step.desc}</p>
                   </div>
@@ -252,7 +254,7 @@ const ProcessingLayout = () => {
               setHasFailed(false);
               setPipelineProgress({
                 phase: "polling",
-                message: "다시 시도하는 중...",
+                message: t("processing.retrying"),
                 completedAnswers: 0,
                 totalAnswers: 0,
               });
@@ -272,7 +274,7 @@ const ProcessingLayout = () => {
             }}
             className="w-full px-6 py-3 bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all cursor-pointer"
           >
-            다시 시도
+            {t("processing.btn_retry")}
           </button>
           <button
             type="button"
@@ -283,7 +285,7 @@ const ProcessingLayout = () => {
             }
             className="w-full px-6 py-3 bg-[#191c1f] text-[#cbc3d7] rounded-full text-xs font-bold border border-white/10 hover:border-[#cebdff]/30 transition-all cursor-pointer"
           >
-            히스토리로 이동
+            {t("processing.btn_history")}
           </button>
         </div>
       )}
@@ -291,11 +293,11 @@ const ProcessingLayout = () => {
   );
 };
 
-function StatusBadge({ state }: { state: "done" | "running" | "pending" }) {
+function StatusBadge({ state, t }: { state: "done" | "running" | "pending"; t: (key: string) => string }) {
   if (state === "done") {
     return (
       <span className="text-[0.55rem] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-[#cebdff]/15 text-[#cebdff]">
-        완료
+        {t("processing.badge_done")}
       </span>
     );
   }
@@ -307,13 +309,13 @@ function StatusBadge({ state }: { state: "done" | "running" | "pending" }) {
           transition={{ repeat: Infinity, duration: 1.5 }}
           className="w-1 h-1 bg-[#9b7fed] rounded-full inline-block"
         />
-        분석 중
+        {t("processing.badge_running")}
       </span>
     );
   }
   return (
     <span className="text-[0.55rem] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-[#494454]/20 text-[#494454]">
-      대기 중
+      {t("processing.badge_pending")}
     </span>
   );
 }

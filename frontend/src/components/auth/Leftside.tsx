@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 const Leftside = () => {
+  const { t } = useTranslation();
   return (
     <section className="hidden md:flex md:w-1/2 md:min-h-screen bg-surface-container-lowest relative items-center justify-center p-8 md:p-16 lg:p-24 overflow-hidden border-r border-white/5">
       {/* Background Decorative Elements */}
@@ -7,7 +10,7 @@ const Leftside = () => {
 
       <div className="relative z-10 max-w-xl">
         <span className="text-primary text-[0.75rem] uppercase tracking-[0.2em] font-bold mb-6 block">
-          혁신적인 면접 준비
+          {t("auth.badge")}
         </span>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-8 leading-[1.05] text-on-background">
@@ -20,8 +23,7 @@ const Leftside = () => {
         </h1>
 
         <p className="text-lg md:text-xl text-on-surface-variant/80 mb-12 leading-relaxed font-light">
-          시네마틱한 리얼리즘과 생성형 지능의 힘을 활용하여 전달력, 말투,
-          자신감을 다듬어주는 실시간 피드백을 받으세요.
+          {t("auth.hero_desc")}
         </p>
 
         {/* Testimonial Block */}
@@ -30,9 +32,7 @@ const Leftside = () => {
             “
           </div>
           <p className="text-on-background italic text-lg mb-6 leading-relaxed relative z-10">
-            AI 피드백이 놀라울 정도로 정확했습니다. 제가 깨닫지 못한 말투의
-            뉘앙스까지 잡아내더군요. 이 세션들 덕분에 기업에서 꿈꾸던
-            역할을 얻게 되었습니다.
+            {t("auth.testimonial_text")}
           </p>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-container-highest ring-2 ring-primary/20">
@@ -46,7 +46,7 @@ const Leftside = () => {
             <div>
               <p className="font-bold text-on-background">Marcus Chen</p>
               <p className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">
-                시니어 제품 리드
+                {t("auth.testimonial_role")}
               </p>
             </div>
           </div>

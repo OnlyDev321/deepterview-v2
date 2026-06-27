@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Calendar, Clock } from "lucide-react";
 import type { AnalyticsHeaderProps } from "../../../types/types";
 import { motion } from "framer-motion";
@@ -9,11 +10,12 @@ const AnalyticsHeader = ({
   duration,
   score,
 }: AnalyticsHeaderProps) => {
+  const { t } = useTranslation();
   return (
     <div className="flex items-start justify-between mb-12">
       <div className="space-y-4">
         <span className="text-[0.65rem] uppercase tracking-[0.3em] text-[#cebdff] font-black">
-          면접 세션
+          {t("analytics.session_label")}
         </span>
         <h1 className="text-5xl font-black tracking-tighter text-[#e1e2e7]">
           {company} • {role}
@@ -60,7 +62,7 @@ const AnalyticsHeader = ({
             {score}
           </span>
           <span className="text-[0.5rem] uppercase tracking-widest text-[#cbc3d7]/40 font-bold mt-1">
-            점수 / 100
+            {t("analytics.score_label")} / 100
           </span>
         </div>
       </div>

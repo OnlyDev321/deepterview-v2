@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import type { UserProfile } from "../../types/types";
@@ -9,8 +10,9 @@ import { authService } from "../../services/authService";
 import { AuthContext } from "../../services/AuthContext";
 
 const MyinfoLayout = () => {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile>({
-    name: "김동우",
+    name: "",
     email: "kimdongju123@gmail.com",
     loginId: "",
     profileImageUrl: "",
@@ -53,7 +55,7 @@ const MyinfoLayout = () => {
       handleFieldChange("profileImageUrl", avatarUrl);
     } catch (error) {
       console.error("Failed to upload avatar:", error);
-      alert("프로필 이미지 업로드에 실패했습니다.");
+      alert(t("myinfo.avatar_upload_failed"));
     }
   };
 
@@ -67,10 +69,10 @@ const MyinfoLayout = () => {
       });
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      alert("프로필이 성공적으로 업데이트되었습니다!");
+      alert(t("myinfo.save_success"));
     } catch (error) {
       console.error("Failed to update profile:", error);
-      alert("프로필 업데이트 중 오류가 발생했습니다.");
+      alert(t("myinfo.save_error"));
     } finally {
       setIsSaving(false);
     }
@@ -78,16 +80,16 @@ const MyinfoLayout = () => {
 
   const handleDelete = async () => {
     if (
-      window.confirm("계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")
+      window.confirm(t("myinfo.confirm_delete"))
     ) {
       try {
         await authService.deleteAccount();
-        alert("계정이 성공적으로 삭제되었습니다.");
+        alert(t("myinfo.delete_success"));
         logout();
         navigate("/");
       } catch (error) {
         console.error("Failed to delete account:", error);
-        alert("계정 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+        alert(t("myinfo.delete_error"));
       }
     }
   };
@@ -108,10 +110,10 @@ const MyinfoLayout = () => {
         transition={{ delay: 0.6, duration: 0.6 }}
       >
         <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-[#e1e2e7] mb-4">
-          내 프로필
+          {t("myinfo.title")}
         </h2>
         <p className="text-[#cbc3d7]/60 text-lg font-light">
-          개인 정보 및 계정 설정을 관리하세요
+          {t("myinfo.desc")}
         </p>
       </motion.div>
 

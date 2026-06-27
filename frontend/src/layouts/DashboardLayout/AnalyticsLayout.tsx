@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -20,6 +21,7 @@ import { sessionService } from "../../services/sessionService";
 import type { AnswerAnalysis } from "../../types";
 
 const AnalyticsLayout = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { sessionId } = useParams();
@@ -71,9 +73,7 @@ const AnalyticsLayout = () => {
       console.error("Failed to load answer analysis:", err);
       setAnalysis(null);
       setIsPendingAnalysis(true);
-      setError(
-        "답변 분석 데이터를 불러오는데 실패했거나 AI 분석이 아직 진행 중입니다.",
-      );
+      setError(t("analytics.analysis_failed"));
     } finally {
       setIsLoading(false);
     }
@@ -92,10 +92,10 @@ const AnalyticsLayout = () => {
       .then((progress) => {
         const target = Math.max(progress.answersWithVideo, progress.totalAnswers);
         setAnalysisStatusLabel(
-          `AI 분석 ${progress.speechAnalyzed}/${Math.max(target, 1)} 완료`,
+          `${t("analytics.analysis_pending")} ${progress.speechAnalyzed}/${Math.max(target, 1)}`,
         );
       })
-      .catch(() => setAnalysisStatusLabel("AI 분석이 진행 중입니다."));
+      .catch(() => setAnalysisStatusLabel(t("analytics.analysis_pending")));
   }, [sessionId, isPendingAnalysis]);
 
   useEffect(() => {
@@ -130,12 +130,12 @@ const AnalyticsLayout = () => {
             setSearchParams({ answerId: String(firstAnswered.answerId) });
             setActiveAnswerId(firstAnswered.answerId);
           } else {
-            setError("이 세션에는 AI 분석 완료된 답변이 없습니다.");
+            setError(t("analytics.no_analytics"));
           }
         }
       } catch (err) {
         console.error("Failed to load session info from path parameter:", err);
-        setError("세션 정보를 불러오는데 실패했습니다.");
+        setError(t("analytics.session_load_failed"));
       }
     };
 
@@ -182,14 +182,14 @@ const AnalyticsLayout = () => {
             setSearchParams({ answerId: String(firstAnswered.answerId) });
             setActiveAnswerId(firstAnswered.answerId);
           } else {
-            setError("최근 진행한 세션 중 완료된 답변 분석 데이터가 없습니다.");
+            setError(t("analytics.error_no_data"));
           }
         } else {
-          setError("아직 진행한 면접 연습 데이터가 없습니다.");
+          setError(t("analytics.error_no_session"));
         }
       } catch (err) {
         console.error("Auto load latest session failed:", err);
-        setError("기본 연습 데이터를 조회하는 도중 오류가 발생했습니다.");
+        setError(t("analytics.error_generic"));
       } finally {
         setIsLoading(false);
       }
@@ -222,12 +222,12 @@ const AnalyticsLayout = () => {
               size={14}
               className="group-hover:-translate-x-0.5 transition-transform"
             />
-            <span>이전 기록으로 돌아가기</span>
+            <span>{t("analytics.back_to_history")}</span>
           </button>
 
           <div className="mb-6">
             <span className="text-[0.6rem] uppercase tracking-[0.25em] text-[#cebdff] font-bold">
-              진행 중인 세션
+              {t("analytics.progress")}
             </span>
             <h3 className="text-lg font-black text-[#e1e2e7] tracking-tight mt-1 truncate">
               {sessionTitle}
@@ -250,19 +250,19 @@ const AnalyticsLayout = () => {
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="font-bold text-[0.65rem] uppercase tracking-wider text-[#cebdff]">
-                    질문 0{idx + 1}
+                    {t("analytics.question_number", { num: `0${idx + 1}` })}
                   </span>
                   {!q.answerId ? (
                     <span className="text-[0.6rem] text-red-400 font-bold bg-red-400/5 px-2 py-0.5 rounded border border-red-400/10">
-                      미답변
+                      {t("analytics.unanswered")}
                     </span>
                   ) : q.answerId === activeAnswerId && isPendingAnalysis ? (
                     <span className="text-[0.6rem] text-amber-400 font-bold bg-amber-400/5 px-2 py-0.5 rounded border border-amber-400/10">
-                      분석 중
+                      {t("analytics.analyzing")}
                     </span>
                   ) : (
                     <span className="text-[0.6rem] text-emerald-400 font-bold bg-emerald-400/5 px-2 py-0.5 rounded border border-emerald-400/10">
-                      답변 완료
+                      {t("analytics.answered")}
                     </span>
                   )}
                 </div>
@@ -281,14 +281,14 @@ const AnalyticsLayout = () => {
           <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
             <RefreshCw size={40} className="text-[#cebdff] animate-spin" />
             <p className="text-sm text-[#cbc3d7]/60 font-mono tracking-wider animate-pulse">
-              AI 다차원 ML 리포트를 생성하고 있습니다...
+              {t("analytics.generating_ml_report")}
             </p>
           </div>
         ) : error && !analysis ? (
           <div className="h-[60vh] flex flex-col items-center justify-center bg-[#191c1f]/20 rounded-[2.5rem] border border-white/5 p-12 text-center">
             <AlertCircle size={48} className="text-amber-400 mb-4" />
             <h3 className="text-xl font-bold text-[#e1e2e7] mb-2">
-              분석을 불러올 수 없습니다
+              {t("analytics.load_failed")}
             </h3>
             <p className="text-[#cbc3d7]/50 text-sm max-w-sm mx-auto mb-6">
               {error}
@@ -300,7 +300,7 @@ const AnalyticsLayout = () => {
                   onClick={() => void fetchAnalysis(activeAnswerId)}
                   className="px-6 py-2.5 bg-[#9b7fed] text-[#31057e] rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
                 >
-                  <RefreshCw size={12} /> 새로고침
+                  <RefreshCw size={12} /> {t("analytics.refresh")}
                 </button>
               )}
               <button
@@ -308,8 +308,7 @@ const AnalyticsLayout = () => {
                 onClick={() => navigate("/dashboard/history")}
                 className="px-6 py-2.5 bg-[#cebdff]/10 hover:bg-[#cebdff]/20 text-[#cebdff] rounded-full border border-[#cebdff]/30 text-xs font-bold transition-all cursor-pointer"
               >
-                <ArrowLeft size={12} className="inline mr-2" /> 히스토리
-                목록으로 이동
+                <ArrowLeft size={12} className="inline mr-2" /> {t("analytics.go_to_history")}
               </button>
             </div>
           </div>
@@ -324,7 +323,7 @@ const AnalyticsLayout = () => {
               <div className="flex items-center justify-between gap-4 px-6 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
                 <p className="text-xs text-amber-300/90">
                   {analysisStatusLabel ||
-                    "AI 분석이 진행 중입니다. 잠시 후 자동으로 갱신됩니다."}
+                    t("analytics.auto_refresh")}
                 </p>
                 {activeAnswerId && (
                   <button
@@ -332,7 +331,7 @@ const AnalyticsLayout = () => {
                     onClick={() => void fetchAnalysis(activeAnswerId)}
                     className="shrink-0 px-4 py-2 text-[0.65rem] font-bold uppercase tracking-wider text-amber-200 bg-amber-500/10 rounded-full border border-amber-500/30 cursor-pointer hover:bg-amber-500/20"
                   >
-                    새로고침
+                    {t("analytics.refresh")}
                   </button>
                 )}
               </div>
@@ -351,14 +350,14 @@ const AnalyticsLayout = () => {
                   <h2 className="text-xl font-bold text-[#e1e2e7] tracking-tight leading-relaxed">
                     "
                     {analysis.starAnalysis?.situationFeedback
-                      ? "면접 질문 분석 리포트"
-                      : "질문 내용"}
+                      ? t("analytics.question_report")
+                      : t("analytics.question_content")}
                     "
                   </h2>
                 </div>
                 <p className="text-md text-[#cbc3d7] font-light leading-relaxed mt-4 pl-14 italic">
                   {sessionQuestions.find((q) => q.answerId === activeAnswerId)
-                    ?.content || "면접 질문 내용입니다."}
+                    ?.content ||                     t("analytics.question_content")}
                 </p>
               </div>
 
@@ -368,14 +367,14 @@ const AnalyticsLayout = () => {
                   <div className="flex items-center gap-3 mb-3">
                     <User size={16} className="text-[#cbc3d7]/60" />
                     <span className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/50 font-bold">
-                      제출한 답변 내용
+                      {t("analytics.answer_content")}
                     </span>
                   </div>
                   <div className="p-6 bg-black/40 rounded-2xl border border-white/5">
                     <p className="text-sm text-[#e1e2e7] leading-relaxed font-light font-sans">
                       {analysis.submittedText ||
                         analysis.transcript ||
-                        "제출된 답변이 없습니다."}
+                                                t("analytics.no_answer")}
                     </p>
                   </div>
                 </div>
@@ -387,7 +386,7 @@ const AnalyticsLayout = () => {
                       <div className="flex items-center gap-3 mb-3">
                         <TrendingUp size={16} className="text-[#cbc3d7]/40" />
                         <span className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/40 font-bold">
-                          AI 음성인식(STT) 변환 결과
+                          {t("analytics.stt_result")}
                         </span>
                       </div>
                       <div className="p-6 bg-black/10 rounded-2xl border border-white/5 border-dashed">
@@ -413,7 +412,7 @@ const AnalyticsLayout = () => {
                 <div className="flex items-center gap-3">
                   <Volume2 size={20} className="text-[#7bd0ff]" />
                   <h3 className="text-sm font-black tracking-wider uppercase text-[#e1e2e7]">
-                    언어적 자질 분석 (Speech)
+                    {t("analytics.speech_section")}
                   </h3>
                 </div>
 
@@ -424,12 +423,12 @@ const AnalyticsLayout = () => {
                       <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
                         <div>
                           <h4 className="text-[0.65rem] text-[#cbc3d7]/40 font-bold uppercase tracking-wider">
-                            발화 속도 (WPM)
+                              {t("analytics.wpm_label")}
                           </h4>
                           <p className="text-2xl font-black text-white mt-1">
                             {Math.round(analysis.speechAnalysis.wpm)}{" "}
                             <span className="text-xs text-[#cbc3d7]/40 font-medium">
-                              단어/분
+                              {t("analytics.wpm_unit")}
                             </span>
                           </p>
                         </div>
@@ -443,8 +442,8 @@ const AnalyticsLayout = () => {
                         >
                           {analysis.speechAnalysis.wpm >= 110 &&
                           analysis.speechAnalysis.wpm <= 150
-                            ? "안정적 속도"
-                            : "조율 권장"}
+                            ? t("analytics.speed_stable")
+                            : t("analytics.speed_adjust")}
                         </span>
                       </div>
                     )}
@@ -454,10 +453,10 @@ const AnalyticsLayout = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-[0.65rem] text-[#cbc3d7]/60 font-bold uppercase">
-                            사용 빈도 높은 습관어
+                            {t("analytics.filler_label")}
                           </span>
                           <span className="text-xs text-amber-400 font-bold">
-                            {analysis.speechAnalysis.fillerCount}회 발견
+                            {t("analytics.filler_count", { count: analysis.speechAnalysis.fillerCount })}
                           </span>
                         </div>
                         <div className="flex flex-wrap gap-2 p-4 bg-black/20 rounded-2xl border border-white/5 min-h-[50px] items-center">
@@ -471,12 +470,12 @@ const AnalyticsLayout = () => {
                                 key={word}
                                 className="px-3 py-1 bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[0.65rem] font-bold rounded-xl"
                               >
-                                "{word}" : {count}회
+                                {t("analytics.filler_word_entry", { word, count })}
                               </span>
                             ))
                           ) : (
                             <span className="text-xs text-[#cbc3d7]/30">
-                              습관어가 검출되지 않아 맑고 정돈된 표현입니다. ✨
+                              {t("analytics.filler_clean")}
                             </span>
                           )}
                         </div>
@@ -492,11 +491,10 @@ const AnalyticsLayout = () => {
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
                               <span className="text-[#cbc3d7]/60 uppercase">
-                                발화 템포 점수 (Pace Score)
+                                {t("analytics.pace_score")}
                               </span>
                               <span className="text-[#7bd0ff]">
-                                {Math.round(analysis.speechAnalysis.paceScore)}
-                                점
+                                {Math.round(analysis.speechAnalysis.paceScore)}{t("analytics.points")}
                               </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
@@ -516,13 +514,12 @@ const AnalyticsLayout = () => {
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
                               <span className="text-[#cbc3d7]/60 uppercase">
-                                문장 전달 선명도 (Clarity Score)
+                                {t("analytics.clarity_score")}
                               </span>
                               <span className="text-[#7bd0ff]">
                                 {Math.round(
                                   analysis.speechAnalysis.clarityScore,
-                                )}
-                                점
+                                )}{t("analytics.points")}
                               </span>
                             </div>
                             <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
@@ -542,7 +539,7 @@ const AnalyticsLayout = () => {
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
                               <span className="text-[#cbc3d7]/60 uppercase">
-                                발화 공백 안정비 (Silence)
+                                {t("analytics.silence_label")}
                               </span>
                               <span className="text-[#7bd0ff]">
                                 {Math.round(
@@ -575,7 +572,7 @@ const AnalyticsLayout = () => {
                   </div>
                 ) : (
                   <p className="text-xs text-[#cbc3d7]/40 italic">
-                    언어 감정 분석을 대기 중입니다...
+                    {t("analytics.emotion_pending")}
                   </p>
                 )}
               </div>
@@ -586,7 +583,7 @@ const AnalyticsLayout = () => {
                   <div className="flex items-center gap-3">
                     <Smile size={20} className="text-[#cebdff]" />
                     <h3 className="text-sm font-black tracking-wider uppercase text-[#e1e2e7]">
-                      비언어적 자질 분석 (Facial)
+                      {t("analytics.facial_section")}
                     </h3>
                   </div>
 
@@ -596,7 +593,7 @@ const AnalyticsLayout = () => {
                       {analysis.nonverbalAnalysis.eyeContactScore != null && (
                         <div className="p-4 bg-black/20 rounded-2xl border border-white/5 text-center">
                           <span className="text-[0.55rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider block">
-                            아이컨택 비율
+                            {t("analytics.eye_contact_label")}
                           </span>
                           <span className="text-2xl font-black text-white mt-1 block">
                             {Math.round(
@@ -609,7 +606,7 @@ const AnalyticsLayout = () => {
                       {analysis.nonverbalAnalysis.confidenceScore != null && (
                         <div className="p-4 bg-black/20 rounded-2xl border border-white/5 text-center">
                           <span className="text-[0.55rem] text-[#cbc3d7]/40 uppercase font-black tracking-wider block">
-                            표정 자신감
+                            {t("analytics.facial_confidence")}
                           </span>
                           <span className="text-2xl font-black text-white mt-1 block">
                             {Math.round(
@@ -626,19 +623,19 @@ const AnalyticsLayout = () => {
                       <div className="flex items-center justify-between p-4 bg-[#cebdff]/5 rounded-2xl border border-[#cebdff]/10">
                         <div>
                           <span className="text-[0.6rem] text-[#cebdff] font-bold uppercase tracking-wider block">
-                            핵심 감정 지표
+                            {t("analytics.dominant_emotion_label")}
                           </span>
                           <span className="text-lg font-black text-white mt-1 block">
                             {analysis.nonverbalAnalysis.dominantEmotion ===
                             "NEUTRAL"
-                              ? "차분하고 담담한 상태 😐"
+                              ? t("analytics.emotion_neutral")
                               : analysis.nonverbalAnalysis.dominantEmotion ===
                                   "HAPPY"
-                                ? "긍정적이며 미소 지음 🙂"
+                                ? t("analytics.emotion_happy")
                                 : analysis.nonverbalAnalysis.dominantEmotion ===
                                     "SURPRISE"
-                                  ? "집중하여 몰입함 😲"
-                                  : "감정 반응 안정적"}
+                                  ? t("analytics.emotion_surprise")
+                                  : t("analytics.emotion_stable")}
                           </span>
                         </div>
                         <span className="text-[0.65rem] font-bold uppercase tracking-widest text-[#cebdff] bg-[#cebdff]/10 px-3 py-1 rounded-lg">
@@ -656,7 +653,7 @@ const AnalyticsLayout = () => {
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
                               <span className="text-[#cbc3d7]/60 uppercase">
-                                자세 및 머리 안정도 (Head Stability)
+                                {t("analytics.head_stability")}
                               </span>
                               <span className="text-[#cebdff]">
                                 {Math.round(
@@ -682,7 +679,7 @@ const AnalyticsLayout = () => {
                           <div>
                             <div className="flex justify-between text-[0.65rem] font-bold mb-1">
                               <span className="text-[#cbc3d7]/60 uppercase">
-                                미소 지수 (Smile Ratio)
+                                {t("analytics.smile_ratio")}
                               </span>
                               <span className="text-[#cebdff]">
                                 {Math.round(
@@ -728,7 +725,7 @@ const AnalyticsLayout = () => {
                   <div className="flex items-center gap-3">
                     <Award size={20} className="text-[#cebdff]" />
                     <h3 className="text-sm font-black tracking-wider uppercase text-[#e1e2e7]">
-                      STAR 프레임워크 역량 평가 (Situation-Task-Action-Result)
+                      {t("analytics.star_section")}
                     </h3>
                   </div>
                   <div className="flex items-center gap-4 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#cebdff]/10 via-[#9b7fed]/10 to-[#cebdff]/10 border border-[#cebdff]/20 shadow-lg shadow-[#cebdff]/5">
@@ -737,7 +734,7 @@ const AnalyticsLayout = () => {
                         STAR SCORE
                       </span>
                       <span className="text-[0.7rem] text-[#cbc3d7]/60 font-medium">
-                        콘텐츠 구조화 평가
+                        {t("analytics.star_subtitle")}
                       </span>
                     </div>
 
@@ -765,10 +762,10 @@ const AnalyticsLayout = () => {
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
-                          S (상황)
+                          S ({t("analytics.star_s")})
                         </span>
                         <span className="text-[0.65rem] font-black text-white">
-                          {Math.round(analysis.starAnalysis.situationScore)}점
+                          {Math.round(analysis.starAnalysis.situationScore)}{t("analytics.points")}
                         </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
@@ -782,10 +779,10 @@ const AnalyticsLayout = () => {
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
-                          T (목표/과제)
+                          T ({t("analytics.star_t")})
                         </span>
                         <span className="text-[0.65rem] font-black text-white">
-                          {Math.round(analysis.starAnalysis.taskScore)}점
+                          {Math.round(analysis.starAnalysis.taskScore)}{t("analytics.points")}
                         </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
@@ -799,10 +796,10 @@ const AnalyticsLayout = () => {
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
-                          A (해결 행동)
+                          A ({t("analytics.star_a")})
                         </span>
                         <span className="text-[0.65rem] font-black text-white">
-                          {Math.round(analysis.starAnalysis.actionScore)}점
+                          {Math.round(analysis.starAnalysis.actionScore)}{t("analytics.points")}
                         </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
@@ -816,10 +813,10 @@ const AnalyticsLayout = () => {
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-[0.65rem] font-bold text-[#cebdff] uppercase tracking-wider">
-                          R (성과)
+                          R ({t("analytics.star_r")})
                         </span>
                         <span className="text-[0.65rem] font-black text-white">
-                          {Math.round(analysis.starAnalysis.resultScore)}점
+                          {Math.round(analysis.starAnalysis.resultScore)}{t("analytics.points")}
                         </span>
                       </div>
                       <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
@@ -842,14 +839,14 @@ const AnalyticsLayout = () => {
                 <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                   <Sparkles size={20} className="text-[#cebdff]" />
                   <h3 className="text-sm font-black tracking-wider uppercase text-[#e1e2e7]">
-                    LLM 인공지능 정성 평가 및 다음 대비 전략
+                    {t("analytics.llm_section")}
                   </h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
                     <span className="text-[0.6rem] text-emerald-400 font-bold uppercase tracking-widest block mb-2">
-                      강점 (Strengths)
+                      {t("analytics.llm_strength")}
                     </span>
                     <p className="text-[0.7rem] text-[#cbc3d7]/80 leading-relaxed font-light">
                       {analysis.llmFeedback.strength}
@@ -858,7 +855,7 @@ const AnalyticsLayout = () => {
 
                   <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
                     <span className="text-[0.6rem] text-red-400 font-bold uppercase tracking-widest block mb-2">
-                      보완할 점 (Weaknesses)
+                      {t("analytics.llm_weakness")}
                     </span>
                     <p className="text-[0.7rem] text-[#cbc3d7]/80 leading-relaxed font-light">
                       {analysis.llmFeedback.weakness}
@@ -867,7 +864,7 @@ const AnalyticsLayout = () => {
 
                   <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
                     <span className="text-[0.6rem] text-[#cebdff] font-bold uppercase tracking-widest block mb-2">
-                      개선 로드맵 (Improvement Roadmap)
+                      {t("analytics.llm_roadmap")}
                     </span>
                     <p className="text-[0.7rem] text-[#cbc3d7]/80 leading-relaxed font-light">
                       {analysis.llmFeedback.improvement}
@@ -882,7 +879,7 @@ const AnalyticsLayout = () => {
                       <div className="flex items-center gap-2 text-xs font-bold text-[#e1e2e7]">
                         <HelpCircle size={14} className="text-[#cebdff]" />
                         <span>
-                          추천되는 다음 꼬리 질문 (AI Follow-up Questions)
+                          {t("analytics.followup_title")}
                         </span>
                       </div>
                       <div className="space-y-2">

@@ -48,7 +48,7 @@ export const useFaceAnalysis = (
   const [result, setResult] = useState<FaceAnalysisResult>({
     smileRatio: 0,
     headStability: 100,
-    dominantEmotion: "중립",
+    dominantEmotion: "Neutral",
     eyeContact: 100,
     confidence: 50,
     anxiety: 0,
@@ -129,10 +129,10 @@ export const useFaceAnalysis = (
               const eyeBlinkLeft = shapes.find((s) => s.categoryName === "eyeBlinkLeft")?.score || 0;
               const eyeBlinkRight = shapes.find((s) => s.categoryName === "eyeBlinkRight")?.score || 0;
               
-              let emotion = "중립";
-              if (currentSmile > 30) emotion = "행복";
-              else if (jawOpen > 0.2 && browUp > 0.2) emotion = "놀람";
-              else if (shapes.find((s) => s.categoryName === "browDownLeft")?.score! > 0.3) emotion = "슬픔";
+              let emotion = "Neutral";
+              if (currentSmile > 30) emotion = "Happy";
+              else if (jawOpen > 0.2 && browUp > 0.2) emotion = "Surprised";
+              else if (shapes.find((s) => s.categoryName === "browDownLeft")?.score! > 0.3) emotion = "Sad";
 
               // 4. Derived metrics (Confidence & Anxiety)
               // Confidence: High if smiling, stable, and good eye contact
