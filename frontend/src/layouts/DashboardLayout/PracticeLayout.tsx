@@ -158,6 +158,7 @@ const PracticeLayout = () => {
               isInterviewStarted={isInterviewStarted}
               currentQuestion={currentQuestion}
               hasMoreQuestions={hasMoreQuestions}
+              answerLanguage={session?.answerLanguage}
               onQuestionAnswered={handleQuestionAnswered}
             />
           </motion.div>

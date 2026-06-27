@@ -172,6 +172,7 @@ export interface SessionDetail {
   jobTitle: string;
   careerYears: number;
   sessionType: SessionType;
+  answerLanguage?: AnswerLanguage;
   status: SessionStatus;
   totalQuestions: number;
   startedAt?: string | Date;

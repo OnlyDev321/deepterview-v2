@@ -3,7 +3,13 @@ import { motion } from "framer-motion";
 import { Mic, MicOff, Send, Sparkles } from "lucide-react";
 import { answerService } from "../../../services/answerService";
 import { useInterviewRecording } from "../../../contexts/InterviewRecordingContext";
-import type { QuestionResponse } from "../../../types";
+import type { QuestionResponse, AnswerLanguage } from "../../../types";
+
+const STT_LANG_MAP: Record<AnswerLanguage, string> = {
+  KOREAN: "ko-KR",
+  ENGLISH: "en-US",
+  VIETNAMESE: "vi-VN",
+};
 
 interface Message {
   id: string;
@@ -15,6 +21,7 @@ interface TranscriptProps {
   isInterviewStarted?: boolean;
   currentQuestion?: QuestionResponse | null;
   hasMoreQuestions?: boolean;
+  answerLanguage?: AnswerLanguage;
   onQuestionAnswered?: () => void;
 }
 
@@ -22,6 +29,7 @@ const Transcript = ({
   isInterviewStarted = false,
   currentQuestion = null,
   hasMoreQuestions = true,
+  answerLanguage = "KOREAN",
   onQuestionAnswered,
 }: TranscriptProps) => {
   const [inputText, setInputText] = useState("");
@@ -190,7 +198,7 @@ const Transcript = ({
     const rec = new SpeechRecognitionCtor();
     rec.continuous = true;
     rec.interimResults = true;
-    rec.lang = "ko-KR";
+    rec.lang = STT_LANG_MAP[answerLanguage] || "ko-KR";
 
     rec.onresult = (event: any) => {
       let finalResult = "";
@@ -221,7 +229,7 @@ const Transcript = ({
         /* ignore */
       }
     };
-  }, []);
+  }, [answerLanguage]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) {

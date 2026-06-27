@@ -43,10 +43,13 @@ def analyze_audio_librosa(audio_path: str) -> dict:
     except Exception as e:
         return {"error": str(e)}
     
-def transcribe_audio_whisper(audio_path: str, model_size: str = "base") -> dict:
+def transcribe_audio_whisper(audio_path: str, model_size: str = "base", language: str = None) -> dict:
     try:
         model = whisper.load_model(model_size)
-        result = model.transcribe(audio_path, fp16=False)
+        transcribe_kwargs = {"fp16": False}
+        if language:
+            transcribe_kwargs["language"] = language
+        result = model.transcribe(audio_path, **transcribe_kwargs)
  
         segments = [
             {

@@ -24,7 +24,7 @@ def clean_hallucinated_text(text: str, max_chars: int = 3000) -> str:
     return text
 
 
-def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: int = 5 ) -> dict:
+def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: int = 5, language: str = None ) -> dict:
     os.makedirs(output_dir, exist_ok=True)
     audio_path = extract_audio(video_path, output_dir)
 
@@ -110,7 +110,7 @@ def run_pipeline(video_path: str, output_dir: str = "output", frame_interval: in
         try:
             audio_path = enhance_audio(audio_path, os.path.join(output_dir, "enhanced_audio.wav"))
             audio_features = analyze_audio_librosa(audio_path)
-            stt_result = transcribe_audio_whisper(audio_path)
+            stt_result = transcribe_audio_whisper(audio_path, language=language)
         except Exception as e:
             print(f"[음성 분석 오류] {e}")
             audio_features = {}

@@ -245,11 +245,17 @@ public class InterviewService {
 			throw new CustomException(ErrorCode.VALIDATION_ERROR, "업로드된 영상이 없어 정밀 분석을 시작할 수 없습니다.");
 		}
 
+		String whisperLang = switch (session.getAnswerLanguage()) {
+			case ENGLISH -> "en";
+			case VIETNAMESE -> "vi";
+			default -> "ko";
+		};
+
 		answersWithVideo.forEach(answer -> {
 			String absolutePath = Paths.get(System.getProperty("user.dir"))
 					.resolve(answer.getAudioFilePath())
 					.toAbsolutePath().normalize().toString().replace('\\', '/');
-			answerAsyncAnalysisRunner.runVideoAnalysis(answer.getId(), absolutePath);
+			answerAsyncAnalysisRunner.runVideoAnalysis(answer.getId(), absolutePath, whisperLang);
 		});
 	}
 

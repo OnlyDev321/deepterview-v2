@@ -23,11 +23,12 @@ public class AnswerAsyncAnalysisRunner {
     private String callbackBaseUrl;
 
     @Async
-    public void runVideoAnalysis(Long answerId, String filePath) {
+    public void runVideoAnalysis(Long answerId, String filePath, String language) {
         try {
             Map<String, String> body = Map.of(
                     "interview_id", String.valueOf(answerId),
                     "video_path", filePath,
+                    "language", language,
                     "callback_url", callbackBaseUrl + "/api/v1/internal/analysis/callback"
             );
             restTemplate.postForObject(pythonBaseUrl + "/api/v1/analyze", body, Map.class);

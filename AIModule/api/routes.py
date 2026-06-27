@@ -20,7 +20,8 @@ async def analyze(payload: dict, background_tasks: BackgroundTasks):
 def run_and_callback(payload: dict):
     try:
         # 백그라운드에서 분석 후 콜백
-        result = run_pipeline(payload["video_path"])
+        language = payload.get("language")
+        result = run_pipeline(payload["video_path"], language=language)
         callback_payload = {
             "interview_id": str(payload.get("interview_id")),
             "status": "success",

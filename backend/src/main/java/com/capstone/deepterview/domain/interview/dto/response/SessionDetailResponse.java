@@ -3,6 +3,7 @@ package com.capstone.deepterview.domain.interview.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.capstone.deepterview.domain.interview.domain.AnswerLanguage;
 import com.capstone.deepterview.domain.interview.domain.InterviewSession;
 import com.capstone.deepterview.domain.interview.domain.SessionStatus;
 import com.capstone.deepterview.domain.interview.domain.SessionType;
@@ -13,6 +14,7 @@ public record SessionDetailResponse(
 		String jobTitle,
 		int careerYears,
 		SessionType sessionType,
+		AnswerLanguage answerLanguage,
 		SessionStatus status,
 		int totalQuestions,
 		LocalDateTime startedAt,
@@ -25,6 +27,7 @@ public record SessionDetailResponse(
 				session.getJobTitle(),
 				session.getCareerYears(),
 				session.getSessionType(),
+				session.getAnswerLanguage(),
 				session.getStatus(),
 				session.getTotalQuestions(),
 				session.getStartedAt(),
