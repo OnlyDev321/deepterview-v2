@@ -17,6 +17,7 @@ import com.capstone.deepterview.domain.interview.dto.response.SessionStatusRespo
 import com.capstone.deepterview.domain.interview.repository.InterviewSessionRepository;
 import com.capstone.deepterview.domain.report.repository.FeedbackReportRepository;
 import com.capstone.deepterview.domain.interview.repository.JobCategoryRepository;
+import com.capstone.deepterview.domain.interview.repository.JobCategoryTranslationRepository;
 import com.capstone.deepterview.domain.interview.repository.QuestionRepository;
 import com.capstone.deepterview.domain.member.domain.User;
 import com.capstone.deepterview.domain.member.repository.UserRepository;
@@ -38,8 +39,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +56,7 @@ public class InterviewService {
 	private final AnswerAsyncAnalysisRunner answerAsyncAnalysisRunner;
 	private final FeedbackReportRepository feedbackReportRepository;
 	private final LlmFeedbackService llmFeedbackService;
+	private final JobCategoryTranslationRepository jobCategoryTranslationRepository;
 
 	@Value("${app.file.session-storage-dir}")
 	private String sessionStorageDir;
@@ -186,16 +190,44 @@ public class InterviewService {
 
 	@Transactional(readOnly = true)
 	public List<JobCategoryResponse> getJobCategories() {
+		return getJobCategories(null);
+	}
+
+	@Transactional(readOnly = true)
+	public List<JobCategoryResponse> getJobCategories(String lang) {
 		List<JobCategory> departments = jobCategoryRepository.findByActiveTrueAndParentIsNullOrderByIdAsc();
+
+		Map<Long, JobCategoryTranslation> translationMap = loadTranslationMap(departments, lang);
+
 		return departments.stream()
 				.map(department -> {
 					List<JobCategory> children = jobCategoryRepository.findByActiveTrueAndParentIdOrderByIdAsc(department.getId());
 					List<JobCategoryResponse> childResponses = children.stream()
-							.map(JobCategoryResponse::from)
+							.map(child -> JobCategoryResponse.from(child, translationMap))
 							.toList();
-					return JobCategoryResponse.withChildren(department, childResponses);
+					return JobCategoryResponse.withChildren(department, childResponses, translationMap);
 				})
 				.toList();
+	}
+
+	private Map<Long, JobCategoryTranslation> loadTranslationMap(List<JobCategory> departments, String lang) {
+		if (lang == null || lang.isBlank() || "ko".equals(lang)) {
+			return Map.of();
+		}
+
+		List<Long> allIds = departments.stream()
+				.flatMap(dept -> {
+					List<JobCategory> children = jobCategoryRepository.findByActiveTrueAndParentIdOrderByIdAsc(dept.getId());
+					return java.util.stream.Stream.concat(
+							java.util.stream.Stream.of(dept.getId()),
+							children.stream().map(JobCategory::getId)
+					);
+				})
+				.toList();
+
+		return jobCategoryTranslationRepository.findByJobCategory_IdInAndLanguage(allIds, lang)
+				.stream()
+				.collect(Collectors.toMap(t -> t.getJobCategory().getId(), t -> t));
 	}
 
 	@Transactional(readOnly = true)

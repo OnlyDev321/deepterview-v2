@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,10 +24,11 @@ public class JobCategoryController {
 	@GetMapping
 	@Operation(
 			summary = "직무 카테고리 조회 API",
-			description = "직무 카테고리를 리스트 형태로 반환합니다."
+			description = "직무 카테고리를 리스트 형태로 반환합니다. lang 파라미터로 번역 언어를 지정할 수 있습니다 (en, vi)."
 	)
-	public ApiResponse<List<JobCategoryResponse>> getJobCategories() {
-		return ApiResponse.success(interviewService.getJobCategories());
+	public ApiResponse<List<JobCategoryResponse>> getJobCategories(
+			@RequestParam(required = false) String lang) {
+		return ApiResponse.success(interviewService.getJobCategories(lang));
 	}
 }
 

@@ -38,17 +38,17 @@ const InterviewSetupCard = ({
   setSessionType,
   setAnswerLanguage,
 }: InterviewSetupCardProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
 
   useEffect(() => {
     const fetchJobCategories = async () => {
-      const data = await jobCategoryService.getJobCategories();
+      const data = await jobCategoryService.getJobCategories(i18n.language);
       setJobCategories(data);
     };
 
     fetchJobCategories();
-  }, []);
+  }, [i18n.language]);
 
   return (
     <motion.div
