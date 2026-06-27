@@ -69,6 +69,33 @@ const Header = ({
 
   const dateLocale = localeMap[i18n.language] || "ko-KR";
 
+  const getNotifContent = (n: NotificationResponse) => {
+    const keyMap: Record<string, string> = {
+      REVIEW_COMMENT: "notification.commented",
+      REVIEW_REPLY: "notification.replied",
+      MENTION: "notification.mentioned",
+    };
+    const key = keyMap[n.type];
+    if (key) return t(key, { actor: n.actorName ?? "" });
+    if (n.type === "REVIEW_REACTION") {
+      return n.actorCount <= 1
+        ? t("notification.reacted", { actor: n.actorName ?? "" })
+        : t("notification.reacted_others", {
+            actor: n.actorName ?? "",
+            count: n.actorCount - 1,
+          });
+    }
+    if (n.type === "COMMENT_REACTION") {
+      return n.actorCount <= 1
+        ? t("notification.reacted_comment", { actor: n.actorName ?? "" })
+        : t("notification.reacted_comment_others", {
+            actor: n.actorName ?? "",
+            count: n.actorCount - 1,
+          });
+    }
+    return n.content;
+  };
+
   const refreshNotifications = useCallback(async () => {
     setSessionNotifs(getSessionNotifications());
     try {
@@ -437,7 +464,7 @@ const Header = ({
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-[#e1e2e7] leading-snug line-clamp-2">
-                                {n.content}
+                                {getNotifContent(n)}
                               </p>
                               <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
                                 {new Date(n.createdAt).toLocaleDateString(

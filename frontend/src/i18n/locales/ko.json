@@ -371,6 +371,14 @@
   "cta.desc": "10,000명 이상의 전문가들과 함께 Deepterview를 사용하여 중요한 날을 준비하세요.",
   "cta.button": "무료 세션 시작하기",
 
+  "notification.commented": "{{actor}}님이 회원님의 게시글에 댓글을 남겼습니다",
+  "notification.replied": "{{actor}}님이 회원님의 댓글에 답글을 남겼습니다",
+  "notification.reacted": "{{actor}}님이 회원님의 게시글을 좋아합니다",
+  "notification.reacted_others": "{{actor}}님 외 {{count}}명이 회원님의 게시글을 좋아합니다",
+  "notification.reacted_comment": "{{actor}}님이 회원님의 댓글을 좋아합니다",
+  "notification.reacted_comment_others": "{{actor}}님 외 {{count}}명이 회원님의 댓글을 좋아합니다",
+  "notification.mentioned": "{{actor}}님이 댓글에서 회원님을 언급했습니다",
+
   "page_title.home": "Deepterview | AI 기반 모의 면접 플랫폼",
   "page_title.signin": "로그인 | Deepterview",
   "page_title.dashboard": "대시보드 | Deepterview",

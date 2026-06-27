@@ -369,6 +369,14 @@
   "cta.desc": "Join over 10,000 professionals using Deepterview to prepare for their big day.",
   "cta.button": "Start Free Session",
 
+  "notification.commented": "{{actor}} commented on your review",
+  "notification.replied": "{{actor}} replied to your comment",
+  "notification.reacted": "{{actor}} liked your review",
+  "notification.reacted_others": "{{actor}} and {{count}} others liked your review",
+  "notification.reacted_comment": "{{actor}} liked your comment",
+  "notification.reacted_comment_others": "{{actor}} and {{count}} others liked your comment",
+  "notification.mentioned": "{{actor}} mentioned you in a comment",
+
   "page_title.home": "Deepterview | AI Mock Interview Platform",
   "page_title.signin": "Sign In | Deepterview",
   "page_title.dashboard": "Dashboard | Deepterview",

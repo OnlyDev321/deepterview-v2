@@ -369,6 +369,14 @@
   "cta.desc": "Tham gia cùng hơn 10.000 chuyên gia sử dụng Deepterview để chuẩn bị cho ngày trọng đại.",
   "cta.button": "Bắt đầu Phiên Miễn phí",
 
+  "notification.commented": "{{actor}} đã bình luận về bài viết của bạn",
+  "notification.replied": "{{actor}} đã phản hồi bình luận của bạn",
+  "notification.reacted": "{{actor}} đã thích bài viết của bạn",
+  "notification.reacted_others": "{{actor}} và {{count}} người khác đã thích bài viết của bạn",
+  "notification.reacted_comment": "{{actor}} đã thích bình luận của bạn",
+  "notification.reacted_comment_others": "{{actor}} và {{count}} người khác đã thích bình luận của bạn",
+  "notification.mentioned": "{{actor}} đã nhắc đến bạn trong một bình luận",
+
   "page_title.home": "Deepterview | Nền tảng Phỏng vấn Thử AI",
   "page_title.signin": "Đăng nhập | Deepterview",
   "page_title.dashboard": "Bảng điều khiển | Deepterview",
