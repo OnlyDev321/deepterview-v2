@@ -4,16 +4,19 @@ import DocumentsCard from "../../components/dashboard/home/DocumentsCard";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { sessionService } from "../../services/sessionService";
-import type { SessionType } from "../../types";
+import type { SessionType, AnswerLanguage } from "../../types";
 
 const DashboardLayout = () => {
+  const { t } = useTranslation();
   const [openPosition, setOpenPosition] = useState("");
   const [jobCategoryId, setJobCategoryId] = useState<number | null>(null);
   const [sessionType, setSessionType] = useState<SessionType>("TECHNICAL");
   const [careerYears, setCareerYears] = useState<number>(0);
   const [totalQuestions, setTotalQuestions] = useState<number>(1);
   const [objective, setObjective] = useState<File[] | null>(null);
+  const [answerLanguage, setAnswerLanguage] = useState<AnswerLanguage>("KOREAN");
   const navigate = useNavigate();
 
   const handleCreateSession = async () => {
@@ -29,6 +32,7 @@ const DashboardLayout = () => {
         careerYears,
         sessionType,
         totalQuestions,
+        answerLanguage,
       };
 
       console.log("Creating session with payload:", requestPayload);
@@ -59,10 +63,10 @@ const DashboardLayout = () => {
         className="mb-16"
       >
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-[#e1e2e7] mb-4">
-          세션 설정
+          {t("session_setup.title")}
         </h2>
         <p className="text-[#cbc3d7] text-xl max-w-2xl leading-relaxed font-light">
-          AI 기반 면접을 위한 지능형 설정을 정의하세요.
+          {t("session_setup.description")}
         </p>
       </motion.section>
 
@@ -78,11 +82,13 @@ const DashboardLayout = () => {
           careerYears={careerYears}
           openPosition={openPosition}
           sessionType={sessionType}
+          answerLanguage={answerLanguage}
           setTotalQuestions={setTotalQuestions}
           setCareerYears={setCareerYears}
           setOpenPosition={setOpenPosition}
           setJobCategoryId={setJobCategoryId}
           setSessionType={setSessionType}
+          setAnswerLanguage={setAnswerLanguage}
         />
         <DocumentsCard objective={objective} setObjective={setObjective} />
       </motion.div>
@@ -104,7 +110,7 @@ const DashboardLayout = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-[#cebdff] to-[#7bd0ff] opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
             <div className="flex items-center gap-5 text-[#31057e] font-black text-lg tracking-[0.25em]">
-              <span>세션 시작하기</span>
+              <span>{t("session_setup.start_session")}</span>
               <ChevronRight
                 size={24}
                 className="group-hover:translate-x-1 transition-transform duration-300"

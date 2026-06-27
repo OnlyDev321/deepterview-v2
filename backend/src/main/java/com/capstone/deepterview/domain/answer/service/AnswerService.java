@@ -74,7 +74,8 @@ public class AnswerService {
 			String followUpContent = llmFeedbackService.generateFollowUpQuestion(
 					question.getContent(),
 					request.transcript(),
-					session.getResumeContent()
+					session.getResumeContent(),
+					session.getAnswerLanguage()
 			);
 
 			Question nextQuestion = Question.create(
@@ -137,7 +138,8 @@ public class AnswerService {
 			String analyzeText = answer.getSubmittedText() != null ? answer.getSubmittedText() : answer.getTranscript();
 			LlmAnalysisResult result = llmFeedbackService.generateAnalysis(
 					analyzeText,
-					answer.getQuestion().getContent()
+					answer.getQuestion().getContent(),
+					answer.getQuestion().getSession().getAnswerLanguage()
 			);
 
 			LlmAnalysisResult.FeedbackPart fp = result.feedback();

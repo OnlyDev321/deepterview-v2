@@ -95,6 +95,8 @@ export interface AnswerAnalysis {
 // -------------------------------------------------------------
 export type SessionType = "TECHNICAL" | "GLOBAL_TRADE" | "KOREAN_STUDIES" | "BUSINESS" | "MARKETING" | "ECONOMICS" | "ACCOUNTING_TAX" | "MEDIA_COMM" | "DESIGN";
 
+export type AnswerLanguage = "KOREAN" | "ENGLISH" | "VIETNAMESE";
+
 export interface JobCategory {
   id: number;
   name: string;
@@ -151,6 +153,7 @@ export interface CreateSessionRequest {
   careerYears?: number;
   sessionType: SessionType;
   totalQuestions?: number;
+  answerLanguage?: AnswerLanguage;
 }
 
 export interface QuestionResponse {

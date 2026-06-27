@@ -1,5 +1,6 @@
 package com.capstone.deepterview.domain.interview.dto.request;
 
+import com.capstone.deepterview.domain.interview.domain.AnswerLanguage;
 import com.capstone.deepterview.domain.interview.domain.SessionType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,7 +21,9 @@ public record CreateSessionRequest(
 
 		@Min(value = 1, message = "totalQuestions는 1 이상이어야 합니다.")
 		@Max(value = 10, message = "totalQuestions는 10 이하여야 합니다.")
-		int totalQuestions
+		int totalQuestions,
+
+		AnswerLanguage answerLanguage
 ) {
 }
 

@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.capstone.deepterview.domain.interview.domain.AnswerLanguage.KOREAN;
+
 @Getter
 @Entity
 @Table(name = "interview_session")
@@ -38,6 +40,10 @@ public class InterviewSession extends BaseTimeEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "session_type", nullable = false, length = 30)
 	private SessionType sessionType;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "answer_language", nullable = false, length = 20)
+	private AnswerLanguage answerLanguage;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 20)
@@ -77,7 +83,8 @@ public class InterviewSession extends BaseTimeEntity {
 			String jobTitle,
 			int careerYears,
 			SessionType sessionType,
-			int totalQuestions) {
+			int totalQuestions,
+			AnswerLanguage answerLanguage) {
 		InterviewSession session = new InterviewSession();
 		session.user = user;
 		session.jobCategory = jobCategory;
@@ -85,6 +92,7 @@ public class InterviewSession extends BaseTimeEntity {
 		session.careerYears = careerYears;
 		session.sessionType = sessionType;
 		session.totalQuestions = totalQuestions;
+		session.answerLanguage = answerLanguage != null ? answerLanguage : KOREAN;
 		session.status = SessionStatus.READY;
 		return session;
 	}

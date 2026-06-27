@@ -15,6 +15,7 @@ import {
   Reply,
 } from "lucide-react";
 import { useState, useContext, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "../services/AuthContext";
 import { sessionService } from "../services/sessionService";
 import { notificationService } from "../services/notificationService";
@@ -28,6 +29,7 @@ import {
 import type { AnalysisNotification } from "../lib/notificationTracker";
 import type { NotificationResponse } from "../types";
 import { getImageUrl } from "../lib/api";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type HeaderProps = {
   activeNav?: NavKey;
@@ -35,11 +37,18 @@ type HeaderProps = {
   onToggleSidebar?: () => void;
 };
 
+const localeMap: Record<string, string> = {
+  ko: "ko-KR",
+  en: "en-US",
+  vi: "vi-VN",
+};
+
 const Header = ({
   activeNav,
   onNavigateSection,
   onToggleSidebar,
 }: HeaderProps) => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { isLogged, logout, user } = useContext(AuthContext);
@@ -57,6 +66,8 @@ const Header = ({
   const [loadingTitles, setLoadingTitles] = useState(false);
   const [reviewUnread, setReviewUnread] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  const dateLocale = localeMap[i18n.language] || "ko-KR";
 
   const refreshNotifications = useCallback(async () => {
     setSessionNotifs(getSessionNotifications());
@@ -108,7 +119,7 @@ const Header = ({
               const detail = await sessionService.getSessionDetail(id);
               titles[id] = detail.jobTitle;
             } catch {
-              titles[id] = `Session #${id}`;
+              titles[id] = t("header.session_title_fallback", { id });
             }
           }),
         );
@@ -120,9 +131,7 @@ const Header = ({
 
   const confirmLeaveInterview = () => {
     if (sessionStorage.getItem("interviewActive") !== "true") return true;
-    const ok = window.confirm(
-      "현재 진행 중인 인터뷰가 있습니다. 페이지를 떠나면 인터뷰가 취소됩니다.",
-    );
+    const ok = window.confirm(t("header.confirm_leave_interview"));
     if (ok) sessionStorage.removeItem("interviewActive");
     return ok;
   };
@@ -227,6 +236,7 @@ const Header = ({
           >
             Deepterview
           </button>
+          <LanguageSwitcher />
         </div>
 
         {isLandingPage && (
@@ -242,7 +252,7 @@ const Header = ({
                 onNavigateSection?.("overview");
               }}
             >
-              개요
+              {t("header.overview")}
             </a>
             <a
               href="#resources"
@@ -253,7 +263,7 @@ const Header = ({
                 onNavigateSection?.("resources");
               }}
             >
-              리소스
+              {t("header.resources")}
             </a>
           </nav>
         )}
@@ -270,7 +280,7 @@ const Header = ({
                   className="relative z-10 flex items-center rounded-full bg-[rgba(155,127,237,0.8)] px-3 py-2.5 text-sm font-semibold text-[#31057e] transition-all hover:scale-105 hover:bg-[rgba(155,127,237,1)] active:scale-95 shadow-lg shadow-purple-500/20 cursor-pointer"
                   onClick={() => navigate("/dashboard")}
                 >
-                  Dashboard
+                  {t("header.dashboard")}
                   <ChevronRight
                     size={16}
                     className="transition-transform group-hover:translate-x-1"
@@ -286,7 +296,7 @@ const Header = ({
                     navigate("/signin", { state: { tab: "login" } })
                   }
                 >
-                  로그인
+                  {t("header.login")}
                 </button>
                 <div className="relative">
                   <div
@@ -300,7 +310,7 @@ const Header = ({
                       navigate("/signin", { state: { tab: "register" } })
                     }
                   >
-                    회원가입
+                    {t("header.signup")}
                   </button>
                 </div>
               </>
@@ -325,14 +335,14 @@ const Header = ({
               {notifOpen && (
                 <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-[rgba(15,23,42,0.98)] border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden z-50">
                   <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-                    <h3 className="text-sm font-bold text-white">알림</h3>
+                    <h3 className="text-sm font-bold text-white">{t("header.notifications")}</h3>
                     <div className="flex items-center gap-2">
                       {allNotifs.length > 0 && (
                         <button
                           onClick={handleMarkAllRead}
                           className="text-[0.6rem] uppercase tracking-wider text-[#cebdff] hover:text-white transition cursor-pointer"
                         >
-                          모두 읽음
+                          {t("header.mark_all_read")}
                         </button>
                       )}
                     </div>
@@ -353,7 +363,7 @@ const Header = ({
                           className="mx-auto text-[#494454] mb-2"
                         />
                         <p className="text-xs text-[#494454]">
-                          알림이 없습니다
+                          {t("header.no_notifications")}
                         </p>
                       </div>
                     ) : (
@@ -378,12 +388,12 @@ const Header = ({
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-white truncate">
                                   {notifTitles[n.sessionId] ||
-                                    `Session #${n.sessionId}`}
+                                    t("header.session_title_fallback", { id: n.sessionId })}
                                 </p>
                                 <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
-                                  AI 분석 완료 ·{" "}
+                                  {t("header.ai_analysis_complete")} ·{" "}
                                   {new Date(n.completedAt).toLocaleDateString(
-                                    "ko-KR",
+                                    dateLocale,
                                     {
                                       month: "long",
                                       day: "numeric",
@@ -427,7 +437,7 @@ const Header = ({
                               </p>
                               <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
                                 {new Date(n.createdAt).toLocaleDateString(
-                                  "ko-KR",
+                                  dateLocale,
                                   {
                                     month: "long",
                                     day: "numeric",
@@ -449,7 +459,7 @@ const Header = ({
                         onClick={handleDismissAll}
                         className="w-full text-[0.6rem] uppercase tracking-wider text-[#494454] hover:text-white transition cursor-pointer text-center"
                       >
-                        모든 알림 지우기
+                        {t("header.dismiss_all")}
                       </button>
                     </div>
                   )}
@@ -485,7 +495,7 @@ const Header = ({
                     }}
                     className="flex items-center gap-2 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition cursor-pointer"
                   >
-                    <User className="w-4 h-4" />내 정보
+                    <User className="w-4 h-4" />{t("header.my_info")}
                   </button>
 
                   <button
@@ -497,7 +507,7 @@ const Header = ({
                     className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-400 hover:bg-white/10 transition cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
-                    로그아웃
+                    {t("header.logout")}
                   </button>
                 </div>
               )}

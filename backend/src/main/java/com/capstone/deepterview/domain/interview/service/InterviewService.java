@@ -77,6 +77,10 @@ public class InterviewService {
 				? request.sessionType()
 				: SessionType.TECHNICAL;
 
+		AnswerLanguage normalizedLanguage = request.answerLanguage() != null
+				? request.answerLanguage()
+				: AnswerLanguage.KOREAN;
+
 		String resumeText = null;
 		if (resume != null && !resume.isEmpty()) {
 			try {
@@ -92,7 +96,8 @@ public class InterviewService {
 				request.jobTitle(),
 				normalizedCareerYears,
 				normalizedSessionType,
-				request.totalQuestions());
+				request.totalQuestions(),
+				normalizedLanguage);
 
 		if (resumeText != null) {
 			session.updateResumeContent(resumeText);
@@ -109,7 +114,8 @@ public class InterviewService {
 				request.jobTitle(),
 				normalizedCareerYears,
 				resumeText,
-				pastQuestions
+				pastQuestions,
+				normalizedLanguage
 		);
 
 		Question initialQuestion = Question.create(

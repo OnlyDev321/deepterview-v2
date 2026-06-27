@@ -5,6 +5,7 @@ import com.capstone.deepterview.domain.answer.domain.NonverbalAnalysis;
 import com.capstone.deepterview.domain.answer.domain.SpeechAnalysis;
 import com.capstone.deepterview.domain.answer.domain.StarAnalysis;
 import com.capstone.deepterview.domain.answer.repository.AnswerRepository;
+import com.capstone.deepterview.domain.interview.domain.AnswerLanguage;
 import com.capstone.deepterview.domain.interview.domain.InterviewSession;
 import com.capstone.deepterview.domain.interview.domain.SessionStatus;
 import com.capstone.deepterview.domain.interview.dto.response.SessionReportResponse;
@@ -168,14 +169,27 @@ public class ReportService {
 
     private LlmReportSummary generateReportSummarySafely(InterviewSession session, List<Answer> answers) {
         try {
-            return llmFeedbackService.generateReportSummary(session, answers);
+            return llmFeedbackService.generateReportSummary(session, answers, session.getAnswerLanguage());
         } catch (Exception e) {
             log.error("LLM 종합 리포트 요약 생성 실패 sessionId={}", session.getId(), e);
+            var lang = session.getAnswerLanguage();
+            String fallbackStrength = lang == AnswerLanguage.KOREAN ? "답변 데이터가 저장되었습니다. AI 요약은 일시적으로 생성할 수 없습니다." :
+                    lang == AnswerLanguage.ENGLISH ? "Answer data has been saved. AI summary is temporarily unavailable." :
+                    "Dữ liệu câu trả lời đã được lưu. Tóm tắt AI tạm thời không khả dụng.";
+            String fallbackWeakness = lang == AnswerLanguage.KOREAN ? "LLM API 연결 또는 API 키 설정을 확인해 주세요." :
+                    lang == AnswerLanguage.ENGLISH ? "Please check the LLM API connection or API key configuration." :
+                    "Vui lòng kiểm tra kết nối API LLM hoặc cấu hình khóa API.";
+            String fallbackImprovement = lang == AnswerLanguage.KOREAN ? "Anthropic API 설정 후 리포트를 다시 생성해 주세요." :
+                    lang == AnswerLanguage.ENGLISH ? "Please configure the API and regenerate the report." :
+                    "Vui lòng cấu hình API và tạo lại báo cáo.";
+            String fallbackAiSummary = lang == AnswerLanguage.KOREAN ? "면접 세션 기록 완료 (AI 요약 보류)" :
+                    lang == AnswerLanguage.ENGLISH ? "Interview session recorded (AI summary pending)" :
+                    "Phiên phỏng vấn đã ghi lại (tóm tắt AI đang chờ xử lý)";
             return new LlmReportSummary(
-                    "답변 데이터가 저장되었습니다. AI 요약은 일시적으로 생성할 수 없습니다.",
-                    "LLM API 연결 또는 API 키 설정을 확인해 주세요.",
-                    "Anthropic API 설정 후 리포트를 다시 생성해 주세요.",
-                    "면접 세션 기록 완료 (AI 요약 보류)");
+                    fallbackStrength,
+                    fallbackWeakness,
+                    fallbackImprovement,
+                    fallbackAiSummary);
         }
     }
 
