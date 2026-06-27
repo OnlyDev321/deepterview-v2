@@ -335,7 +335,9 @@ const Header = ({
               {notifOpen && (
                 <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-[rgba(15,23,42,0.98)] border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden z-50">
                   <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-                    <h3 className="text-sm font-bold text-white">{t("header.notifications")}</h3>
+                    <h3 className="text-sm font-bold text-white">
+                      {t("header.notifications")}
+                    </h3>
                     <div className="flex items-center gap-2">
                       {allNotifs.length > 0 && (
                         <button
@@ -388,7 +390,9 @@ const Header = ({
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-white truncate">
                                   {notifTitles[n.sessionId] ||
-                                    t("header.session_title_fallback", { id: n.sessionId })}
+                                    t("header.session_title_fallback", {
+                                      id: n.sessionId,
+                                    })}
                                 </p>
                                 <p className="text-[0.65rem] text-[#94A3B8] mt-0.5">
                                   {t("header.ai_analysis_complete")} ·{" "}
@@ -495,7 +499,8 @@ const Header = ({
                     }}
                     className="flex items-center gap-2 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition cursor-pointer"
                   >
-                    <User className="w-4 h-4" />{t("header.my_info")}
+                    <User className="w-4 h-4" />
+                    {t("header.my_info")}
                   </button>
 
                   <button

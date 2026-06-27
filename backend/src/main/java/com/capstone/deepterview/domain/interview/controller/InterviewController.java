@@ -61,8 +61,9 @@ public class InterviewController {
 	@Operation(summary = "세션 단건 조회", description = "세션에서 답변한 질문들도 모두 함께 조회됩니다.")
 	public ApiResponse<SessionDetailResponse> getSessionDetail(
 			@AuthenticationPrincipal UserPrincipal principal,
-			@PathVariable Long sessionId) {
-		return ApiResponse.success(interviewService.getSessionDetail(principal.getId(), sessionId));
+			@PathVariable Long sessionId,
+			@RequestParam(required = false) String lang) {
+		return ApiResponse.success(interviewService.getSessionDetail(principal.getId(), sessionId, lang));
 	}
 
 	@PatchMapping("/{sessionId}/start")

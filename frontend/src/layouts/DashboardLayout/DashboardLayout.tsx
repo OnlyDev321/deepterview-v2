@@ -81,6 +81,7 @@ const DashboardLayout = () => {
           totalQuestions={totalQuestions}
           careerYears={careerYears}
           openPosition={openPosition}
+          jobCategoryId={jobCategoryId}
           sessionType={sessionType}
           answerLanguage={answerLanguage}
           setTotalQuestions={setTotalQuestions}

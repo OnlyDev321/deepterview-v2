@@ -151,13 +151,23 @@ public class InterviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public SessionDetailResponse getSessionDetail(Long userId, Long sessionId) {
+	public SessionDetailResponse getSessionDetail(Long userId, Long sessionId, String lang) {
 		InterviewSession session = getOwnedSession(userId, sessionId);
 		List<QuestionResponse> questions = questionRepository.findBySessionIdWithAnswerOrderByOrderNumAsc(sessionId)
 				.stream()
 				.map(QuestionResponse::from)
 				.toList();
-		return SessionDetailResponse.of(session, questions);
+
+		Map<Long, JobCategoryTranslation> translationMap = Map.of();
+		if (lang != null && !lang.isBlank() && !"ko".equals(lang)) {
+			JobCategory category = session.getJobCategory();
+			List<JobCategoryTranslation> translations = jobCategoryTranslationRepository
+					.findByJobCategory_IdInAndLanguage(List.of(category.getId()), lang);
+			translationMap = translations.stream()
+					.collect(Collectors.toMap(t -> t.getJobCategory().getId(), t -> t));
+		}
+
+		return SessionDetailResponse.of(session, questions, translationMap);
 	}
 
 	@Transactional

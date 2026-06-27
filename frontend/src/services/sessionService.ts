@@ -57,9 +57,10 @@ export const sessionService = {
     }
   },
 
-  getSessionDetail: async (sessionId: number): Promise<SessionDetail> => {
+  getSessionDetail: async (sessionId: number, lang?: string): Promise<SessionDetail> => {
+    const params = lang ? { lang } : {};
     const res = await api.get<ApiResponse<SessionDetail>>(
-      `/api/v1/sessions/${sessionId}`
+      `/api/v1/sessions/${sessionId}`, { params }
     );
     return res.data.data;
   },

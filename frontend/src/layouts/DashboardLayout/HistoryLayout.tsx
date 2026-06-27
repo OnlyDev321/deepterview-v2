@@ -92,7 +92,7 @@ const HistoryLayout = () => {
     try {
       setIsLoadingDetail(true);
       const [detail, report] = await Promise.all([
-        sessionService.getSessionDetail(sessionId),
+        sessionService.getSessionDetail(sessionId, i18n.language),
         reportService.getSessionReport(sessionId).catch(() => null),
       ]);
 
@@ -107,8 +107,8 @@ const HistoryLayout = () => {
 
   useEffect(() => {
     void loadSessionsList(!focusSessionId);
-    void jobCategoryService.getJobCategories().then(setJobCategories).catch(console.error);
-  }, []);
+    void jobCategoryService.getJobCategories(i18n.language).then(setJobCategories).catch(console.error);
+  }, [i18n.language]);
 
   useEffect(() => {
     void loadSessionsList(true, selectedJobCategoryId, selectedDays);
@@ -150,7 +150,7 @@ const HistoryLayout = () => {
   const formatSessionsForList = (): InterviewSession[] => {
     return sessions.map((s) => ({
       id: String(s.sessionId),
-      company: "Deepterview",
+      company: t("common.company_name"),
       role: s.jobTitle,
       date: new Date(s.createdAt).toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "vi" ? "vi-VN" : "en-US", {
         year: "numeric",
@@ -192,7 +192,7 @@ const HistoryLayout = () => {
 
     return {
       id: String(sessionDetail.sessionId),
-      company: "Deepterview",
+      company: t("common.company_name"),
       role: sessionDetail.jobTitle,
       date: sessionDetail.startedAt
         ? new Date(sessionDetail.startedAt).toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "vi" ? "vi-VN" : "en-US", {

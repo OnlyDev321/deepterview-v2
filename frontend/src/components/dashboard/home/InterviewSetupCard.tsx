@@ -1,6 +1,6 @@
 import { ChevronDown, Sliders } from "lucide-react";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { jobCategoryService } from "../../../services/jobCategoryService";
 import PositionDropdown from "./PositionDropdown";
@@ -10,6 +10,7 @@ type InterviewSetupCardProps = {
   totalQuestions: number;
   careerYears: number;
   openPosition: string;
+  jobCategoryId: number | null;
   sessionType: SessionType;
   answerLanguage: AnswerLanguage;
   setTotalQuestions: (m: number) => void;
@@ -30,6 +31,7 @@ const InterviewSetupCard = ({
   totalQuestions,
   careerYears,
   openPosition,
+  jobCategoryId,
   answerLanguage,
   setTotalQuestions,
   setCareerYears,
@@ -49,6 +51,21 @@ const InterviewSetupCard = ({
 
     fetchJobCategories();
   }, [i18n.language]);
+
+  const findPositionName = (categories: JobCategory[], id: number | null): string => {
+    if (id === null) return "";
+    for (const dept of categories) {
+      for (const child of dept.children) {
+        if (child.id === id) return child.name;
+      }
+    }
+    return "";
+  };
+
+  const displayPosition = useMemo(
+    () => findPositionName(jobCategories, jobCategoryId) || openPosition,
+    [jobCategories, jobCategoryId, openPosition]
+  );
 
   return (
     <motion.div
@@ -71,7 +88,7 @@ const InterviewSetupCard = ({
 
           <PositionDropdown
             categories={jobCategories}
-            value={openPosition}
+            value={displayPosition}
             onSelect={(name, id, type) => {
               setOpenPosition(name);
               setJobCategoryId(id);
