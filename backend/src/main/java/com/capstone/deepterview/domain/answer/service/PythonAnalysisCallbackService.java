@@ -13,6 +13,7 @@ import com.capstone.deepterview.domain.answer.dto.request.PythonTranscriptionRes
 import com.capstone.deepterview.domain.answer.repository.AnswerRepository;
 import com.capstone.deepterview.domain.answer.repository.NonverbalAnalysisRepository;
 import com.capstone.deepterview.domain.answer.repository.SpeechAnalysisRepository;
+import com.capstone.deepterview.domain.interview.domain.AnswerLanguage;
 import com.capstone.deepterview.global.exception.CustomException;
 import com.capstone.deepterview.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +46,7 @@ public class PythonAnalysisCallbackService {
         Long answerId = Long.parseLong(request.interviewId());
         var answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "답변을 찾을 수 없습니다."));
+        AnswerLanguage lang = answer.getQuestion().getSession().getAnswerLanguage();
 
         PythonAnalysisResult result = request.result();
         log.info("Python 콜백 수신 answerId={} audio={} transcription={}",
@@ -107,7 +109,7 @@ public class PythonAnalysisCallbackService {
             }
 
             // Tự động tạo speech feedback
-            String speechFeedback = generateSpeechFeedback(wpm, silenceRatio, fillerCount);
+            String speechFeedback = generateSpeechFeedback(wpm, silenceRatio, fillerCount, lang);
 
             speechAnalysisRepository.save(SpeechAnalysis.create(
                     answer, wpm, fillerCount, fillerWordsJson, silenceRatio, paceScore, clarityScore, speechFeedback));
@@ -129,7 +131,8 @@ public class PythonAnalysisCallbackService {
                 String nonverbalFeedback = generateNonverbalFeedback(
                         summary.eyeContactScore(),
                         summary.anxietyScore(),
-                        summary.headStabilityScore()
+                        summary.headStabilityScore(),
+                        lang
                 );
 
                 nonverbalAnalysisRepository.save(NonverbalAnalysis.create(
@@ -229,7 +232,7 @@ public class PythonAnalysisCallbackService {
                     headStabilityScore = Math.max(50f, Math.min(100f, headStabilityScore));
 
                     // 6. Feedback phi ngôn ngữ
-                    String nonverbalFeedback = generateNonverbalFeedback(eyeContactScore, anxietyScore, headStabilityScore);
+                    String nonverbalFeedback = generateNonverbalFeedback(eyeContactScore, anxietyScore, headStabilityScore, lang);
 
                     nonverbalAnalysisRepository.save(NonverbalAnalysis.create(
                             answer,
@@ -245,6 +248,11 @@ public class PythonAnalysisCallbackService {
                 } else {
                     // Nếu không có dữ liệu hình ảnh (chỉ có audio hoặc không nhận diện được mặt)
                     // Lưu các giá trị mặc định để tránh null
+                    String noVideoMsg = switch (lang) {
+                        case ENGLISH -> "No video analysis data available. Please check that your camera was working properly.";
+                        case VIETNAMESE -> "Không có dữ liệu phân tích video. Vui lòng kiểm tra camera đã hoạt động bình thường chưa.";
+                        default -> "영상 분석 데이터가 존재하지 않습니다. 카메라가 정상적으로 작동하고 있는지 확인해 주세요.";
+                    };
                     nonverbalAnalysisRepository.save(NonverbalAnalysis.create(
                             answer,
                             0.0f,
@@ -254,7 +262,7 @@ public class PythonAnalysisCallbackService {
                             0.0f,
                             Emotion.NEUTRAL,
                             "{\"NEUTRAL\": 100.0}",
-                            "영상 분석 데이터가 존재하지 않습니다. 카메라가 정상적으로 작동하고 있는지 확인해 주세요."
+                            noVideoMsg
                     ));
                 }
             }
@@ -289,65 +297,122 @@ public class PythonAnalysisCallbackService {
         return (float) Math.max(0, Math.min(100, (hz - 80) / 220.0 * 100));
     }
 
-    private String generateSpeechFeedback(Float wpm, Float silenceRatio, int fillerCount) {
+    private String generateSpeechFeedback(Float wpm, Float silenceRatio, int fillerCount, AnswerLanguage lang) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (wpm != null) {
             if (wpm < 80) {
-                sb.append("말하기 속도가 다소 느린 편입니다. 답변의 설득력을 높이기 위해 조금 더 자신감 있고 탄력 있는 템포로 말씀해 보세요. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your speaking pace is somewhat slow. Try speaking with a more confident and dynamic tempo to make your answers more persuasive. ");
+                    case VIETNAMESE -> sb.append("Tốc độ nói của bạn hơi chậm. Hãy thử nói với nhịp độ tự tin và linh hoạt hơn để câu trả lời thuyết phục hơn. ");
+                    default -> sb.append("말하기 속도가 다소 느린 편입니다. 답변의 설득력을 높이기 위해 조금 더 자신감 있고 탄력 있는 템포로 말씀해 보세요. ");
+                }
             } else if (wpm > 160) {
-                sb.append("말하기 속도가 다소 빠른 편입니다. 중요한 논점이 면접관에게 잘 전달될 수 있도록 조금 더 여유를 가지고 천천히 발음해 보세요. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your speaking pace is somewhat fast. Slow down and enunciate clearly so that key points are well conveyed to the interviewer. ");
+                    case VIETNAMESE -> sb.append("Tốc độ nói của bạn hơi nhanh. Hãy nói chậm lại và phát âm rõ ràng để truyền đạt tốt các luận điểm quan trọng. ");
+                    default -> sb.append("말하기 속도가 다소 빠른 편입니다. 중요한 논점이 면접관에게 잘 전달될 수 있도록 조금 더 여유를 가지고 천천히 발음해 보세요. ");
+                }
             } else {
-                sb.append("말하기 속도가 아주 적절하여 답변의 안정감을 줍니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your speaking pace is very appropriate, giving your answers a sense of stability. ");
+                    case VIETNAMESE -> sb.append("Tốc độ nói của bạn rất phù hợp, mang lại sự ổn định cho câu trả lời. ");
+                    default -> sb.append("말하기 속도가 아주 적절하여 답변의 안정감을 줍니다. ");
+                }
             }
         }
-        
+
         if (silenceRatio != null) {
             if (silenceRatio > 0.35) {
-                sb.append("말씀하시는 중간에 침묵하거나 주저하는 시간이 다소 깁니다. 자연스러운 흐름을 이어가기 위해 생각을 신속히 정리하는 연습을 해보세요. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("There are noticeably long pauses or hesitations. Practice organizing your thoughts quickly to maintain a natural flow. ");
+                    case VIETNAMESE -> sb.append("Có những khoảng im lặng hoặc ngập ngừng khá dài. Hãy luyện tập sắp xếp suy nghĩ nhanh chóng để duy trì mạch trôi chảy. ");
+                    default -> sb.append("말씀하시는 중간에 침묵하거나 주저하는 시간이 다소 깁니다. 자연스러운 흐름을 이어가기 위해 생각을 신속히 정리하는 연습을 해보세요. ");
+                }
             } else {
-                sb.append("적절한 타이밍에 단락을 나누고 자연스럽게 말을 이어나갔습니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("You effectively paced your speech with well-timed pauses and natural flow. ");
+                    case VIETNAMESE -> sb.append("Bạn đã phân chia đoạn hợp lý và nói một cách tự nhiên. ");
+                    default -> sb.append("적절한 타이밍에 단락을 나누고 자연스럽게 말을 이어나갔습니다. ");
+                }
             }
         }
-        
+
         if (fillerCount > 5) {
-            sb.append(String.format("답변 중 불필요한 습관적 표현(예: '어', '음' 등)이 %d회 감지되었습니다. 말끝을 흐리거나 추임새를 넣는 습관을 의식적으로 줄여나간다면 더욱 전문적이고 정돈된 느낌을 줄 수 있습니다. ", fillerCount));
+            String msg = switch (lang) {
+                case ENGLISH -> String.format("Unnecessary filler words (e.g., 'um', 'uh') were detected %d times. Consciously reducing fillers will make your speech sound more professional and polished. ", fillerCount);
+                case VIETNAMESE -> String.format("Phát hiện %d từ đệm không cần thiết (ví dụ: 'ừm', 'à'). Giảm thói quen dùng từ đệm sẽ giúp bạn nói chuyên nghiệp và gọn gàng hơn. ", fillerCount);
+                default -> String.format("답변 중 불필요한 습관적 표현(예: '어', '음' 등)이 %d회 감지되었습니다. 말끝을 흐리거나 추임새를 넣는 습관을 의식적으로 줄여나간다면 더욱 전문적이고 정돈된 느낌을 줄 수 있습니다. ", fillerCount);
+            };
+            sb.append(msg);
         } else if (fillerCount > 0) {
-            sb.append("불필요한 추임새의 사용이 적어 전반적으로 메시지 전달력이 우수합니다. ");
+            switch (lang) {
+                case ENGLISH -> sb.append("You used very few filler words, resulting in excellent message clarity. ");
+                case VIETNAMESE -> sb.append("Bạn sử dụng rất ít từ đệm, nhờ đó truyền đạt thông điệp hiệu quả. ");
+                default -> sb.append("불필요한 추임새의 사용이 적어 전반적으로 메시지 전달력이 우수합니다. ");
+            }
         }
-        
+
         return sb.toString().trim();
     }
 
-    private String generateNonverbalFeedback(Float eyeContactScore, Float anxietyScore, Float headStabilityScore) {
+    private String generateNonverbalFeedback(Float eyeContactScore, Float anxietyScore, Float headStabilityScore, AnswerLanguage lang) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (eyeContactScore != null) {
             if (eyeContactScore < 50) {
-                sb.append("카메라(면접관)를 바라보는 비율이 낮아 시선이 다소 불안정해 보일 수 있습니다. 답변 시 정면을 응시하는 연습을 해보세요. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your eye contact ratio is low, which may make you appear less confident. Practice looking directly at the camera when answering. ");
+                    case VIETNAMESE -> sb.append("Tỷ lệ giao tiếp bằng mắt thấp, có thể khiến bạn trông thiếu tự tin. Hãy tập nhìn thẳng vào camera khi trả lời. ");
+                    default -> sb.append("카메라(면접관)를 바라보는 비율이 낮아 시선이 다소 불안정해 보일 수 있습니다. 답변 시 정면을 응시하는 연습을 해보세요. ");
+                }
             } else if (eyeContactScore < 80) {
-                sb.append("시선 처리가 대체로 양호하지만, 가끔 시선이 분산되는 경향이 있습니다. 조금 더 집중력 있게 정면을 응시하는 것이 좋습니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your eye contact is generally good, but occasionally wanders. Try to maintain more focused eye contact with the camera. ");
+                    case VIETNAMESE -> sb.append("Giao tiếp bằng mắt nhìn chung tốt, nhưng đôi khi ánh mắt bị phân tán. Hãy tập trung nhìn thẳng vào camera nhiều hơn. ");
+                    default -> sb.append("시선 처리가 대체로 양호하지만, 가끔 시선이 분산되는 경향이 있습니다. 조금 더 집중력 있게 정면을 응시하는 것이 좋습니다. ");
+                }
             } else {
-                sb.append("아이컨택 유지율이 매우 우수하여 면접관에게 신뢰감과 진정성을 줍니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your eye contact is excellent, conveying trust and sincerity to the interviewer. ");
+                    case VIETNAMESE -> sb.append("Duy trì giao tiếp mắt rất tốt, tạo niềm tin và sự chân thành với người phỏng vấn. ");
+                    default -> sb.append("아이컨택 유지율이 매우 우수하여 면접관에게 신뢰감과 진정성을 줍니다. ");
+                }
             }
         }
-        
+
         if (anxietyScore != null) {
             if (anxietyScore > 45) {
-                sb.append("얼굴 표정이나 움직임에서 다소 긴장한 모습이 관찰됩니다. 답변 시작 전에 깊게 호흡을 하시고 자연스러운 미소를 지어보세요. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Signs of nervousness are observed in your facial expressions and movements. Take a deep breath before answering and try to maintain a natural smile. ");
+                    case VIETNAMESE -> sb.append("Có dấu hiệu căng thẳng qua biểu cảm khuôn mặt và cử chỉ. Hãy hít thở sâu trước khi trả lời và cố gắng mỉm cười tự nhiên. ");
+                    default -> sb.append("얼굴 표정이나 움직임에서 다소 긴장한 모습이 관찰됩니다. 답변 시작 전에 깊게 호흡을 하시고 자연스러운 미소를 지어보세요. ");
+                }
             } else {
-                sb.append("차분하고 안정감 있는 태도로 대답하셨습니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("You answered with a calm and composed demeanor. ");
+                    case VIETNAMESE -> sb.append("Bạn đã trả lời với thái độ điềm tĩnh và ổn định. ");
+                    default -> sb.append("차분하고 안정감 있는 태도로 대답하셨습니다. ");
+                }
             }
         }
-        
+
         if (headStabilityScore != null) {
             if (headStabilityScore < 75) {
-                sb.append("대답할 때 머리나 시선의 잦은 흔들림이 감지됩니다. 몸의 긴장을 풀고 머리를 고정한 채 차분히 말하는 연습이 필요합니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Frequent head or gaze movements are detected. Try to relax your body and keep your head steady while speaking. ");
+                    case VIETNAMESE -> sb.append("Phát hiện cử động đầu hoặc ánh mắt thường xuyên. Hãy thư giãn cơ thể và giữ đầu ổn định khi nói. ");
+                    default -> sb.append("대답할 때 머리나 시선의 잦은 흔들림이 감지됩니다. 몸의 긴장을 풀고 머리를 고정한 채 차분히 말하는 연습이 필요합니다. ");
+                }
             } else {
-                sb.append("움직임이 흔들림 없이 안정적이어서 신뢰도를 더욱 높여줍니다. ");
+                switch (lang) {
+                    case ENGLISH -> sb.append("Your movements are stable and steady, enhancing your credibility. ");
+                    case VIETNAMESE -> sb.append("Cử động của bạn ổn định, giúp tăng độ tin cậy. ");
+                    default -> sb.append("움직임이 흔들림 없이 안정적이어서 신뢰도를 더욱 높여줍니다. ");
+                }
             }
         }
-        
+
         return sb.toString().trim();
     }
 }
