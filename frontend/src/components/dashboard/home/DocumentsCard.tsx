@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { FileText, Upload, X, FileCode } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 type DocumentsCardProps = {
   objective: File[] | null;
@@ -8,6 +9,7 @@ type DocumentsCardProps = {
 };
 
 const DocumentsCard = ({ objective, setObjective }: DocumentsCardProps) => {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -76,7 +78,7 @@ const DocumentsCard = ({ objective, setObjective }: DocumentsCardProps) => {
         <div className="p-2 bg-[#cebdff]/10 rounded-lg">
           <FileText size={20} className="text-[#cebdff]" />
         </div>
-        <h3 className="text-xl font-bold tracking-tight text-white">문서</h3>
+        <h3 className="text-xl font-bold tracking-tight text-white">{t("documents.title")}</h3>
       </div>
 
       <div className="flex-1 flex flex-col">
@@ -105,17 +107,17 @@ const DocumentsCard = ({ objective, setObjective }: DocumentsCardProps) => {
             <Upload size={28} className="text-[#cebdff]" />
           </div>
           <p className="text-[#e1e2e7] font-bold mb-1 pointer-events-none text-sm">
-            여기에 파일을 드롭하거나 클릭하여 업로드하세요
+            {t("documents.drop_here")}
           </p>
           <p className="text-[#cbc3d7]/60 text-xs font-medium max-w-[200px] pointer-events-none">
-            이력서를 업로드하세요 (PDF, DOCX)
+            {t("documents.upload_hint")}
           </p>
         </motion.div>
 
         {objective !== null && objective?.length > 0 && (
           <div className="space-y-4">
             <p className="text-xs tracking-widest text-[#cbc3d7]/70 font-bold mt-4">
-              업로드된 파일
+            {t("documents.uploaded_files")}
             </p>
 
             {objective?.map((file, index) => (

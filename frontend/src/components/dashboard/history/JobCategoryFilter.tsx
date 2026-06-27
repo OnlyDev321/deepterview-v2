@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Filter, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { JobCategory } from "../../../types";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [expandedParent, setExpandedParent] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -26,7 +28,7 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
   }, []);
 
   const selectedName =
-    selectedId == null ? "모든 직무" : findCategoryName(categories, selectedId);
+    selectedId == null ? t("history.job_filter_all") : findCategoryName(categories, selectedId, t);
 
   const handleSelect = (id: number | null) => {
     onChange(id);
@@ -65,7 +67,7 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
                   : "text-[#cbc3d7]"
               }`}
             >
-              모든 직무
+              {t("history.job_filter_all")}
             </button>
 
             <div className="h-px bg-[#494454]/20" />
@@ -121,14 +123,14 @@ const JobCategoryFilter = ({ categories, selectedId, onChange }: Props) => {
   );
 };
 
-function findCategoryName(categories: JobCategory[], id: number): string {
+function findCategoryName(categories: JobCategory[], id: number, t: (key: string) => string): string {
   for (const cat of categories) {
     if (cat.id === id) return cat.name;
     for (const child of cat.children) {
       if (child.id === id) return child.name;
     }
   }
-  return "모든 직무";
+  return t("history.job_filter_all");
 }
 
 export default JobCategoryFilter;

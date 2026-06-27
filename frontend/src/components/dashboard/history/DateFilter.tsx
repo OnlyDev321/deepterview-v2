@@ -1,21 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   value: number | null;
   onChange: (days: number | null) => void;
 }
 
-const options: { label: string; days: number | null }[] = [
-  { label: "전체", days: null },
-  { label: "오늘", days: 0 },
-  { label: "최근 7일", days: 7 },
-  { label: "최근 30일", days: 30 },
-  { label: "최근 90일", days: 90 },
-];
-
 const DateFilter = ({ value, onChange }: Props) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -29,7 +23,15 @@ const DateFilter = ({ value, onChange }: Props) => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const currentLabel = options.find((o) => o.days === value)?.label ?? "전체";
+  const options: { label: string; days: number | null }[] = [
+    { label: t("history.date_filter_all"), days: null },
+    { label: t("history.date_filter_today"), days: 0 },
+    { label: t("history.date_filter_7d"), days: 7 },
+    { label: t("history.date_filter_30d"), days: 30 },
+    { label: t("history.date_filter_90d"), days: 90 },
+  ];
+
+  const currentLabel = options.find((o) => o.days === value)?.label ?? t("history.date_filter_all");
 
   return (
     <div className="relative" ref={ref}>

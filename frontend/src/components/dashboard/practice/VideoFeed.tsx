@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, VibrateOff, VideoOff, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { sessionService } from "../../../services/sessionService";
 import { useInterviewRecording } from "../../../contexts/InterviewRecordingContext";
 
@@ -30,6 +31,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
     const [isEnding, setIsEnding] = useState(false);
     const [showEndConfirm, setShowEndConfirm] = useState(false);
 
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const {
       isRecording,
@@ -117,7 +119,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
 
     const startRecording = async () => {
       if (!stream) {
-        alert("카메라 스트림을 준비 중입니다. 잠시 후 다시 시도해 주세요.");
+        alert(t("video.alert_camera_stream"));
         return;
       }
 
@@ -127,7 +129,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
         } catch (err) {
           console.error("Failed to start session via API:", err);
           alert(
-            "서버 연결에 실패하여 면접 세션을 시작할 수 없습니다. 다시 시도해 주세요.",
+            t("video.alert_connection_failed"),
           );
           return;
         }
@@ -140,7 +142,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
         }
       } catch (err) {
         console.error("Failed to start MediaRecorder:", err);
-        alert("녹화를 시작할 수 없습니다. 카메라/마이크 권한을 확인하세요.");
+        alert(t("video.alert_recording_failed"));
       }
     };
 
@@ -168,7 +170,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
             await sessionService.endSession(sessionId);
           } catch (err) {
             console.error("Failed to end session via API:", err);
-            alert("세션 종료에 실패했습니다. 다시 시도해 주세요.");
+            alert(t("video.alert_end_failed"));
             setIsEnding(false);
             return;
           }
@@ -233,7 +235,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
               className={`w-2 h-2 rounded-full bg-red-500 ${isRecording ? "animate-pulse" : ""}`}
             />
             <span className="text-[0.65rem] font-bold text-red-500 uppercase tracking-widest">
-              {isRecording ? "라이브 녹화 중" : "라이브 세션"}
+              {isRecording ? t("video.live_recording") : t("video.live_session")}
             </span>
           </div>
           <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
@@ -262,10 +264,10 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
             />
             <span className="text-xs uppercase tracking-wider">
               {isRecording
-                ? "Recording..."
+                ? t("video.btn_recording")
                 : !hasMoreQuestions
-                  ? "답변 완료 (Completed)"
-                  : "면접 시작 (Start)"}
+                  ? t("video.btn_completed")
+                  : t("video.btn_start")}
             </span>
           </motion.button>
 
@@ -297,9 +299,9 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                 className="bg-[#1a1d23] border border-[#494454]/30 rounded-3xl p-8 mx-4 max-w-sm w-full shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-[#e1e2e7]">
-                    면접 종료
-                  </h3>
+                    <h3 className="text-lg font-bold text-[#e1e2e7]">
+                      {t("video.end_title")}
+                    </h3>
                   <button
                     type="button"
                     onClick={() => setShowEndConfirm(false)}
@@ -308,28 +310,28 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                     <X size={16} className="text-[#cbc3d7]" />
                   </button>
                 </div>
-                <p className="text-sm text-[#cbc3d7]/70 leading-relaxed mb-2">
-                  아직 <strong className="text-[#e1e2e7]">{remainingQuestions}개</strong>의
-                  질문이 남았습니다. 지금 종료하면 남은 질문은 AI 분석에서
-                  제외되며, 지금까지 답변한 내용만 분석됩니다.
-                </p>
-                <p className="text-sm text-[#cbc3d7]/50 leading-relaxed mb-6">
-                  종료하시겠습니까?
-                </p>
+                    <p className="text-sm text-[#cbc3d7]/70 leading-relaxed mb-2"
+                      dangerouslySetInnerHTML={{
+                        __html: t("video.end_remaining", { count: remainingQuestions }),
+                      }}
+                    />
+                    <p className="text-sm text-[#cbc3d7]/50 leading-relaxed mb-6">
+                      {t("video.end_confirm")}
+                    </p>
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setShowEndConfirm(false)}
                     className="flex-1 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-full text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer"
                   >
-                    계속 녹화
+                      {t("video.end_continue")}
                   </button>
                   <button
                     type="button"
                     onClick={() => void stopRecordingAndNavigate()}
                     className="flex-1 px-5 py-3 bg-red-500 text-white rounded-full text-xs font-bold hover:brightness-110 transition-all cursor-pointer"
                   >
-                    종료하기
+                      {t("video.end_stop")}
                   </button>
                 </div>
               </motion.div>

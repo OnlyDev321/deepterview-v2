@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Mic, MicOff, Send, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { answerService } from "../../../services/answerService";
 import { useInterviewRecording } from "../../../contexts/InterviewRecordingContext";
 import type { QuestionResponse, AnswerLanguage } from "../../../types";
@@ -46,6 +47,7 @@ const Transcript = ({
 
   const { isRecording, extractAnswerBlob, markQuestionStart } =
     useInterviewRecording();
+  const { t } = useTranslation();
 
   const submitAnswerFlow = useCallback(
     async (
@@ -55,12 +57,12 @@ const Transcript = ({
       displayText: string,
     ) => {
       if (!currentQuestion) {
-        alert("질문 정보를 불러오지 못했습니다. 페이지를 새로고침해 주세요.");
+        alert(t("transcript.alert_no_question"));
         return;
       }
 
       if (!isRecording) {
-        alert("먼저 '면접 시작' 버튼을 눌러 녹화를 시작해 주세요.");
+        alert(t("transcript.alert_start_recording"));
         return;
       }
 
@@ -114,7 +116,7 @@ const Transcript = ({
       } catch (err) {
         console.error("Failed to submit answer:", err);
         alert(
-          "답변을 전송하는 데 실패했습니다. 네트워크 상태를 확인해 주세요.",
+          t("transcript.alert_submit_failed"),
         );
       } finally {
         setIsSubmitting(false);
@@ -173,10 +175,10 @@ const Transcript = ({
       }
       timeoutHandledForQuestionRef.current = currentQuestion.id;
       void submitAnswerFlow(
-        "(시간 초과 - 답변 없음)",
+        t("transcript.timeout_text"),
         timeLimitRef.current,
         "TIMEOUT",
-        "(시간 초과 - 답변 없음)",
+        t("transcript.timeout_text"),
       );
       return;
     }
@@ -233,9 +235,7 @@ const Transcript = ({
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
-      alert(
-        "이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 브라우저를 사용해 주세요.",
-      );
+      alert(t("transcript.alert_stt_not_supported"));
       return;
     }
 
@@ -298,10 +298,10 @@ const Transcript = ({
             rows={1}
             placeholder={
               !hasMoreQuestions
-                ? "모든 질문에 답변했습니다. 면접 종료 버튼을 눌러 주세요."
+                ? t("transcript.placeholder_all_done")
                 : isListening
-                  ? "말씀해 주세요... 실시간으로 받아적고 있습니다..."
-                  : "메모를 입력하거나 음성 인식으로 답변하세요..."
+                  ? t("transcript.placeholder_listening")
+                  : t("transcript.placeholder_default")
             }
             className="w-full bg-[#191c1f] border border-[#494454]/20 rounded-xl py-5 pl-14 pr-5 text-sm text-[#e1e2e7] focus:ring-2 focus:ring-[#cebdff]/20 focus:border-[#cebdff]/30 transition-all outline-none disabled:opacity-50 resize-none overflow-y-auto"
           />
@@ -319,7 +319,7 @@ const Transcript = ({
                 ? "bg-red-500 text-white border-red-400/30 animate-pulse"
                 : "bg-white/5 text-[#cebdff] hover:bg-white/10 border-white/10"
             } disabled:opacity-40 disabled:cursor-not-allowed`}
-            title={isListening ? "음성 인식 중지" : "음성 인식 시작"}
+            title={isListening ? t("transcript.title_listening_stop") : t("transcript.title_listening_start")}
           >
             {isListening ? <MicOff size={16} /> : <Mic size={16} />}
           </motion.button>
@@ -329,7 +329,7 @@ const Transcript = ({
             disabled={submitDisabled || !inputText.trim()}
             className="px-6 py-4 bg-[#9b7fed] text-[#31057e] font-bold rounded-full text-xs uppercase tracking-widest flex items-center gap-2 hover:brightness-110 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            제출 <Send size={14} />
+            {t("transcript.submit")} <Send size={14} />
           </button>
         </div>
       </form>
@@ -337,7 +337,7 @@ const Transcript = ({
       <div className="bg-[#191c1f] rounded-[2rem] p-8 border border-[#494454]/10 shadow-[0_0_40px_0_rgba(206,189,255,0.05)]">
         <div className="flex items-center justify-between mb-8">
           <h4 className="text-[0.65rem] uppercase tracking-[0.2em] text-[#cbc3d7]/60 font-bold">
-            실시간 대화록
+            {t("transcript.live_chat")}
           </h4>
           <div className="flex gap-2">
             <span className="px-3 py-1 bg-[#cebdff]/10 text-[#cebdff] text-[0.6rem] font-bold uppercase rounded-full border border-[#cebdff]/20">
@@ -356,7 +356,7 @@ const Transcript = ({
                     : "text-emerald-400"
                 }`}
               >
-                {msg.sender === "interviewer" ? "면접관:" : "나 (답변):"}
+                {msg.sender === "interviewer" ? t("transcript.label_interviewer") : t("transcript.label_me")}
               </p>
               <p
                 className={`leading-relaxed ${

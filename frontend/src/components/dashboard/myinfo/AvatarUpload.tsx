@@ -1,10 +1,12 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import type { AvatarUploadProps } from "../../../types/types";
 import { Camera } from "lucide-react";
 import { getImageUrl } from "../../../lib/api";
 
 const AvatarUpload = ({ avatar, onAvatarChange }: AvatarUploadProps) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +48,7 @@ const AvatarUpload = ({ avatar, onAvatarChange }: AvatarUploadProps) => {
 
       <div className="text-center ">
         <h3 className="text-xl font-black text-[#e1e2e7] tracking-tight">
-          프로필 정보
+          {t("myinfo.profile_info")}
         </h3>
         <div className="w-12 h-1 bg-[#cebdff] mx-auto mt-2 rounded-full opacity-50" />
       </div>

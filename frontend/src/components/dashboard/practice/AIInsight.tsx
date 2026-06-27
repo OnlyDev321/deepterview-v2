@@ -1,6 +1,8 @@
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const AIInsight = () => {
+  const { t } = useTranslation();
   return (
     <div className="bg-[#191c1f] rounded-[2rem] p-8 border border-[#494454]/10">
       <div className="flex items-center gap-3 mb-6">

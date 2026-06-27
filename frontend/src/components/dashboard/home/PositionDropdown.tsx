@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { JobCategory, SessionType } from "../../../types";
 
 type PositionDropdownProps = {
@@ -15,6 +16,7 @@ const isTouchDevice =
   window.matchMedia("(pointer: coarse)").matches;
 
 const PositionDropdown = ({ categories, value, onSelect }: PositionDropdownProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [activeDept, setActiveDept] = useState<JobCategory | null>(null);
   const deptTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -91,7 +93,7 @@ const PositionDropdown = ({ categories, value, onSelect }: PositionDropdownProps
         onClick={handleTriggerClick}
       >
         <span className={value ? "text-[#e1e2e7]" : "text-[#cbc3d7]/50"}>
-          {value || "포지션을 선택하세요"}
+          {value || t("position.select_placeholder")}
         </span>
         <ChevronDown
           size={18}

@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import type { InterviewTimelineProps } from "../../../types/types";
 import { AlertCircle, MessageCircle, Sparkles, User } from "lucide-react";
 
 const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineProps) => {
+  const { t } = useTranslation();
   return (
     <div className="relative pl-8 sm:pl-12 space-y-12 py-8">
       {/* Timeline Line */}
@@ -30,7 +32,7 @@ const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineP
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex gap-2">
                 <span className="px-3 py-1 bg-white/5 text-[#cbc3d7]/60 text-[0.6rem] font-bold uppercase rounded-full border border-white/10">
-                  실시간 대화록
+                  {t("history.realtime_transcript")}
                 </span>
                 {pair.tags?.map((tag) => (
                   <span
@@ -55,7 +57,7 @@ const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineP
                   ) : (
                     <Sparkles size={12} />
                   )}
-                  AI 인사이트: {pair.aiInsight}
+                  {t("history.ai_insight_prefix", { text: pair.aiInsight })}
                 </div>
               )}
             </div>
@@ -86,7 +88,7 @@ const InterviewTimeline = ({ qaPairs, onNavigateToAnalysis }: InterviewTimelineP
                   onClick={() => onNavigateToAnalysis(pair.answerId!)}
                   className="flex items-center gap-2 px-5 py-2.5 bg-[#cebdff]/10 hover:bg-[#cebdff]/20 text-[#cebdff] rounded-full border border-[#cebdff]/20 text-[0.7rem] font-bold transition-all hover:scale-102 cursor-pointer shadow-lg shadow-[#cebdff]/5 hover:border-[#cebdff]/40"
                 >
-                  <Sparkles size={12} className="animate-pulse" /> AI 상세 분석 보고서 보기
+                  <Sparkles size={12} className="animate-pulse" /> {t("history.view_ai_report")}
                 </button>
               </div>
             )}

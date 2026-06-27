@@ -1,10 +1,12 @@
 import { useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { AuthContext } from "../services/AuthContext";
 import { motion } from "framer-motion";
 
 const OAuth2Success = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { loginSocial } = useContext(AuthContext);
   const hasRun = useRef(false);
 
@@ -22,7 +24,7 @@ const OAuth2Success = () => {
         // Không có token → redirect về signin với thông báo lỗi
         navigate("/signin", {
           replace: true,
-          state: { error: "소셜 로그인에 실패했습니다. 다시 시도해주세요." },
+          state: { error: t("auth.social_login_failed") },
         });
         return;
       }
@@ -34,7 +36,7 @@ const OAuth2Success = () => {
         console.error("Social login failed:", err);
         navigate("/signin", {
           replace: true,
-          state: { error: "소셜 로그인 처리 중 오류가 발생했습니다." },
+          state: { error: t("auth.social_login_error") },
         });
       }
     };
@@ -61,8 +63,8 @@ const OAuth2Success = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <p className="text-white/80 font-medium text-lg">로그인 처리 중...</p>
-        <p className="text-white/30 text-sm mt-1">잠시만 기다려 주세요</p>
+        <p className="text-white/80 font-medium text-lg">{t("auth.login_processing")}</p>
+        <p className="text-white/30 text-sm mt-1">{t("auth.login_please_wait")}</p>
       </motion.div>
     </motion.div>
   );
