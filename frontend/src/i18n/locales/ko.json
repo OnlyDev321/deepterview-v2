@@ -68,6 +68,8 @@
   "video.end_confirm": "종료하시겠습니까?",
   "video.end_continue": "계속 녹화",
   "video.end_stop": "종료하기",
+  "video.all_done_title": "모든 질문에 답변했습니다!",
+  "video.all_done_hint": "빨간 버튼을 눌러 세션을 종료하고 AI 분석을 확인하세요.",
 
   "emotion.title": "실시간 감정 분석 (LIVE)",
   "emotion.eye_contact": "아이 컨택",

@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, VibrateOff, VideoOff, X } from "lucide-react";
+import { Play, VibrateOff, VideoOff, X, Trophy, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { sessionService } from "../../../services/sessionService";
@@ -30,6 +30,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
     const [recordingTime, setRecordingTime] = useState(0);
     const [isEnding, setIsEnding] = useState(false);
     const [showEndConfirm, setShowEndConfirm] = useState(false);
+    const [hasShownComplete, setHasShownComplete] = useState(false);
 
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -114,6 +115,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
     useEffect(() => {
       if (isRecording && !hasMoreQuestions) {
         void stopRecorder();
+        setHasShownComplete(true);
       }
     }, [isRecording, hasMoreQuestions, stopRecorder]);
 
@@ -275,12 +277,64 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={isEnding}
+            animate={hasShownComplete ? {
+              boxShadow: ["0 0 0px rgba(239,68,68,0.4)", "0 0 24px rgba(239,68,68,0.9)", "0 0 0px rgba(239,68,68,0.4)"],
+              scale: [1, 1.08, 1],
+            } : {}}
+            transition={hasShownComplete ? { repeat: Infinity, duration: 1.4, ease: "easeInOut" } : {}}
             className="w-14 h-14 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/30 hover:shadow-red-500/50 cursor-pointer disabled:opacity-60"
             onClick={handleEndClick}
           >
             <VibrateOff size={24} />
           </motion.button>
         </div>
+
+        {/* Session Complete Overlay */}
+        <AnimatePresence>
+          {hasShownComplete && (
+            <motion.div
+              key="session-complete-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 rounded-[2.5rem] pointer-events-none z-10"
+            >
+              {/* Subtle green shimmer border */}
+              <div
+                className="absolute inset-0 rounded-[2.5rem]"
+                style={{
+                  boxShadow: "inset 0 0 0 3px rgba(52,211,153,0.5), 0 0 40px rgba(52,211,153,0.15)",
+                }}
+              />
+
+              {/* Top completion banner */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
+                className="absolute top-6 left-1/2 -translate-x-1/2 pointer-events-auto"
+              >
+                <div className="flex items-center gap-3 px-5 py-3 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/40 rounded-2xl shadow-lg shadow-emerald-500/10 whitespace-nowrap">
+                  <motion.div
+                    animate={{ rotate: [0, -10, 10, -6, 6, 0] }}
+                    transition={{ delay: 0.5, duration: 0.6 }}
+                  >
+                    <Trophy size={18} className="text-emerald-400" />
+                  </motion.div>
+                  <div>
+                    <p className="text-[0.7rem] font-black text-emerald-400 uppercase tracking-widest">
+                      {t("video.all_done_title")}
+                    </p>
+                    <p className="text-[0.6rem] text-emerald-300/70">
+                      {t("video.all_done_hint")}
+                    </p>
+                  </div>
+                  <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* End-early confirmation modal */}
         <AnimatePresence>

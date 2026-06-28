@@ -68,6 +68,8 @@
   "video.end_confirm": "Are you sure you want to end?",
   "video.end_continue": "Continue Recording",
   "video.end_stop": "End",
+  "video.all_done_title": "All questions answered!",
+  "video.all_done_hint": "Press the red button to end session and view AI analysis.",
 
   "emotion.title": "Real-time Emotion Analysis (LIVE)",
   "emotion.eye_contact": "Eye Contact",

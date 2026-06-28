@@ -68,6 +68,8 @@
   "video.end_confirm": "Bạn có chắc muốn kết thúc?",
   "video.end_continue": "Tiếp tục ghi hình",
   "video.end_stop": "Kết thúc",
+  "video.all_done_title": "Hoàn thành tất cả câu hỏi!",
+  "video.all_done_hint": "Nhấn nút đỏ để kết thúc phiên và xem phân tích AI.",
 
   "emotion.title": "Phân tích cảm xúc trực tiếp (LIVE)",
   "emotion.eye_contact": "Giao tiếp mắt",
