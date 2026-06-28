@@ -247,7 +247,6 @@
   "analytics.question_report": "면접 질문 분석 리포트",
   "analytics.question_content": "면접 질문 내용입니다.",
   "analytics.answer_content": "제출한 답변 내용",
-  "analytics.stt_result": "AI 음성인식(STT) 변환 결과",
   "analytics.speech_section": "언어적 자질 분석 (Speech)",
   "analytics.wpm_label": "발화 속도 (WPM)",
   "analytics.wpm_unit": "단어/분",

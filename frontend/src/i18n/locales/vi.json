@@ -247,7 +247,6 @@
   "analytics.question_report": "Báo cáo Phân tích Câu hỏi Phỏng vấn",
   "analytics.question_content": "Nội dung câu hỏi phỏng vấn.",
   "analytics.answer_content": "Câu trả lời đã gửi",
-  "analytics.stt_result": "Kết quả Nhận dạng Giọng nói AI (STT)",
   "analytics.speech_section": "Phân tích Ngôn ngữ (Speech)",
   "analytics.wpm_label": "Tốc độ Nói (WPM)",
   "analytics.wpm_unit": "từ/phút",

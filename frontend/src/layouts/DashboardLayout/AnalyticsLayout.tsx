@@ -378,27 +378,9 @@ const AnalyticsLayout = () => {
                     </p>
                   </div>
                 </div>
+                </div>
 
-                {analysis.submittedText &&
-                  analysis.transcript &&
-                  analysis.submittedText !== analysis.transcript && (
-                    <div>
-                      <div className="flex items-center gap-3 mb-3">
-                        <TrendingUp size={16} className="text-[#cbc3d7]/40" />
-                        <span className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/40 font-bold">
-                          {t("analytics.stt_result")}
-                        </span>
-                      </div>
-                      <div className="p-6 bg-black/10 rounded-2xl border border-white/5 border-dashed">
-                        <p className="text-sm text-[#cbc3d7]/90 leading-relaxed font-light font-sans">
-                          {analysis.transcript}
-                        </p>
-                      </div>
-                    </div>
-                  )}
               </div>
-            </div>
-
             {/* Visual Analytics Columns */}
             <div
               className={

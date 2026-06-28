@@ -247,7 +247,6 @@
   "analytics.question_report": "Interview Question Analysis Report",
   "analytics.question_content": "Interview question content.",
   "analytics.answer_content": "Submitted Answer",
-  "analytics.stt_result": "AI Speech Recognition (STT) Result",
   "analytics.speech_section": "Linguistic Analysis (Speech)",
   "analytics.wpm_label": "Speaking Rate (WPM)",
   "analytics.wpm_unit": "words/min",
