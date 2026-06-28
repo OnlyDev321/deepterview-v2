@@ -312,7 +312,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
-                className="absolute top-6 left-1/2 -translate-x-1/2 pointer-events-auto"
+                className="absolute top-6 right-6 pointer-events-auto"
               >
                 <div className="flex items-center gap-3 px-5 py-3 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/40 rounded-2xl shadow-lg shadow-emerald-500/10 whitespace-nowrap">
                   <motion.div
