@@ -327,9 +327,9 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                 }}
               />
 
-              {/* Top completion banner */}
+              {/* Completion banner — bottom on mobile, top-right on desktop */}
               <motion.div
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   delay: 0.2,
@@ -337,9 +337,9 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                   stiffness: 260,
                   damping: 20,
                 }}
-                className="absolute top-6 right-6 pointer-events-auto"
+                className="absolute bottom-24 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:bottom-auto sm:top-6 sm:left-auto sm:right-6 pointer-events-auto w-max"
               >
-                <div className="flex items-center gap-3 px-5 py-3 bg-[#111417]/85 backdrop-blur-md border border-emerald-400/40 rounded-2xl shadow-lg shadow-black/40 whitespace-nowrap">
+                <div className="flex items-center gap-3 px-4 py-3 sm:px-5 bg-[#111417]/90 backdrop-blur-md border border-emerald-400/40 rounded-2xl shadow-lg shadow-black/40 whitespace-nowrap">
                   <motion.div
                     animate={{ rotate: [0, -10, 10, -6, 6, 0] }}
                     transition={{ delay: 0.5, duration: 0.6 }}
