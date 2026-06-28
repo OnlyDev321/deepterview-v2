@@ -1,6 +1,13 @@
 import { forwardRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, VibrateOff, VideoOff, X, Trophy, CheckCircle2 } from "lucide-react";
+import {
+  Play,
+  VibrateOff,
+  VideoOff,
+  X,
+  Trophy,
+  CheckCircle2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { sessionService } from "../../../services/sessionService";
@@ -130,9 +137,7 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
           await sessionService.startSession(sessionId);
         } catch (err) {
           console.error("Failed to start session via API:", err);
-          alert(
-            t("video.alert_connection_failed"),
-          );
+          alert(t("video.alert_connection_failed"));
           return;
         }
       }
@@ -237,10 +242,12 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
               className={`w-2 h-2 rounded-full bg-red-500 ${isRecording ? "animate-pulse" : ""}`}
             />
             <span className="text-[0.65rem] font-bold text-red-500 uppercase tracking-widest">
-              {isRecording ? t("video.live_recording") : t("video.live_session")}
+              {isRecording
+                ? t("video.live_recording")
+                : t("video.live_session")}
             </span>
           </div>
-          <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
+          <div className="flex items-center justify-center px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10">
             <span className="text-[0.65rem] font-mono text-white/80">
               {formatTime(recordingTime)}
             </span>
@@ -277,11 +284,23 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={isEnding}
-            animate={hasShownComplete ? {
-              boxShadow: ["0 0 0px rgba(239,68,68,0.4)", "0 0 24px rgba(239,68,68,0.9)", "0 0 0px rgba(239,68,68,0.4)"],
-              scale: [1, 1.08, 1],
-            } : {}}
-            transition={hasShownComplete ? { repeat: Infinity, duration: 1.4, ease: "easeInOut" } : {}}
+            animate={
+              hasShownComplete
+                ? {
+                    boxShadow: [
+                      "0 0 0px rgba(239,68,68,0.4)",
+                      "0 0 24px rgba(239,68,68,0.9)",
+                      "0 0 0px rgba(239,68,68,0.4)",
+                    ],
+                    scale: [1, 1.08, 1],
+                  }
+                : {}
+            }
+            transition={
+              hasShownComplete
+                ? { repeat: Infinity, duration: 1.4, ease: "easeInOut" }
+                : {}
+            }
             className="w-14 h-14 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/30 hover:shadow-red-500/50 cursor-pointer disabled:opacity-60"
             onClick={handleEndClick}
           >
@@ -303,7 +322,8 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
               <div
                 className="absolute inset-0 rounded-[2.5rem]"
                 style={{
-                  boxShadow: "inset 0 0 0 3px rgba(52,211,153,0.5), 0 0 40px rgba(52,211,153,0.15)",
+                  boxShadow:
+                    "inset 0 0 0 3px rgba(52,211,153,0.5), 0 0 40px rgba(52,211,153,0.15)",
                 }}
               />
 
@@ -311,7 +331,12 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
+                transition={{
+                  delay: 0.2,
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                }}
                 className="absolute top-6 right-6 pointer-events-auto"
               >
                 <div className="flex items-center gap-3 px-5 py-3 bg-[#111417]/85 backdrop-blur-md border border-emerald-400/40 rounded-2xl shadow-lg shadow-black/40 whitespace-nowrap">
@@ -329,7 +354,10 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                       {t("video.all_done_hint")}
                     </p>
                   </div>
-                  <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                  <CheckCircle2
+                    size={16}
+                    className="text-emerald-400 shrink-0"
+                  />
                 </div>
               </motion.div>
             </motion.div>
@@ -353,9 +381,9 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                 className="bg-[#1a1d23] border border-[#494454]/30 rounded-3xl p-8 mx-4 max-w-sm w-full shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-[#e1e2e7]">
-                      {t("video.end_title")}
-                    </h3>
+                  <h3 className="text-lg font-bold text-[#e1e2e7]">
+                    {t("video.end_title")}
+                  </h3>
                   <button
                     type="button"
                     onClick={() => setShowEndConfirm(false)}
@@ -364,28 +392,31 @@ const VideoFeed = forwardRef<HTMLVideoElement, VideoFeedProps>(
                     <X size={16} className="text-[#cbc3d7]" />
                   </button>
                 </div>
-                    <p className="text-sm text-[#cbc3d7]/70 leading-relaxed mb-2"
-                      dangerouslySetInnerHTML={{
-                        __html: t("video.end_remaining", { count: remainingQuestions }),
-                      }}
-                    />
-                    <p className="text-sm text-[#cbc3d7]/50 leading-relaxed mb-6">
-                      {t("video.end_confirm")}
-                    </p>
+                <p
+                  className="text-sm text-[#cbc3d7]/70 leading-relaxed mb-2"
+                  dangerouslySetInnerHTML={{
+                    __html: t("video.end_remaining", {
+                      count: remainingQuestions,
+                    }),
+                  }}
+                />
+                <p className="text-sm text-[#cbc3d7]/50 leading-relaxed mb-6">
+                  {t("video.end_confirm")}
+                </p>
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setShowEndConfirm(false)}
                     className="flex-1 px-5 py-3 bg-[#191c1f] border border-[#494454]/20 text-[#cbc3d7] rounded-full text-xs font-bold hover:border-[#cebdff]/30 transition-all cursor-pointer"
                   >
-                      {t("video.end_continue")}
+                    {t("video.end_continue")}
                   </button>
                   <button
                     type="button"
                     onClick={() => void stopRecordingAndNavigate()}
                     className="flex-1 px-5 py-3 bg-red-500 text-white rounded-full text-xs font-bold hover:brightness-110 transition-all cursor-pointer"
                   >
-                      {t("video.end_stop")}
+                    {t("video.end_stop")}
                   </button>
                 </div>
               </motion.div>
