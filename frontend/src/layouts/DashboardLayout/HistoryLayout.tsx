@@ -158,9 +158,10 @@ const HistoryLayout = () => {
         day: "numeric",
       }),
       duration: (() => {
-        if (!s.endedAt || !s.createdAt) return t("history.duration_zero");
+        const startTime = s.startedAt || s.createdAt;
+        if (!s.endedAt || !startTime) return t("history.duration_zero");
         const diffMs =
-          new Date(s.endedAt).getTime() - new Date(s.createdAt).getTime();
+          new Date(s.endedAt).getTime() - new Date(startTime).getTime();
         const totalSeconds = Math.floor(diffMs / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
@@ -199,6 +200,8 @@ const HistoryLayout = () => {
             year: "numeric",
             month: "long",
             day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
           })
         : t("history.no_duration"),
       duration: (() => {

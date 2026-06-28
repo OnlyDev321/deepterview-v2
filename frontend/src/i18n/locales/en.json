@@ -322,7 +322,7 @@
   "history.previous_session": "Previous Sessions",
   "history.selected": "Selected",
   "history.archive": "Archive",
-  "history.session_date": "Interview Date: {{date}}",
+  "history.session_date": "Started: {{date}}",
   "history.questions_count": "{{count}} Questions",
   "history.share_report": "Share Report",
   "history.view_full_analysis": "View Full Analysis",

@@ -322,7 +322,7 @@
   "history.previous_session": "Phiên trước",
   "history.selected": "Đã chọn",
   "history.archive": "Lưu trữ",
-  "history.session_date": "Ngày phỏng vấn: {{date}}",
+  "history.session_date": "Bắt đầu: {{date}}",
   "history.questions_count": "{{count}} Câu hỏi",
   "history.share_report": "Chia sẻ Báo cáo",
   "history.view_full_analysis": "Xem Phân tích Đầy đủ",

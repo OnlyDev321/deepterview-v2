@@ -137,6 +137,7 @@ export interface SessionListItem {
   overallScore?: number;
   grade?: "S" | "A" | "B" | "C" | "D";
   createdAt: string;
+  startedAt?: string;
   endedAt: string;
 }
 

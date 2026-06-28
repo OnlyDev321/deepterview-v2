@@ -15,6 +15,7 @@ public record SessionListItemResponse(
 		Float overallScore,
 		Grade grade,
 		LocalDateTime createdAt,
+		LocalDateTime startedAt,
 		LocalDateTime endedAt) {
 	public static SessionListItemResponse from(InterviewSession session) {
 		Float overallScore = session.getFeedbackReport() == null ? null : session.getFeedbackReport().getOverallScore();
@@ -28,6 +29,7 @@ public record SessionListItemResponse(
 				overallScore,
 				grade,
 				session.getCreatedAt(),
+				session.getStartedAt(),
 				session.getEndedAt());
 	}
 }

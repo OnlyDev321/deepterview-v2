@@ -322,7 +322,7 @@
   "history.previous_session": "이전 세션",
   "history.selected": "선택됨",
   "history.archive": "아카이브",
-  "history.session_date": "면접 날짜: {{date}}",
+  "history.session_date": "시작: {{date}}",
   "history.questions_count": "{{count}} 질문",
   "history.share_report": "보고서 공유",
   "history.view_full_analysis": "전체 분석 보기",
