@@ -750,7 +750,7 @@ const AnalyticsLayout = () => {
                           {Math.round(analysis.starAnalysis.situationScore)}{t("analytics.points")}
                         </span>
                       </div>
-                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
+                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light ">
                         {analysis.starAnalysis.situationFeedback}
                       </p>
                     </div>
@@ -767,7 +767,7 @@ const AnalyticsLayout = () => {
                           {Math.round(analysis.starAnalysis.taskScore)}{t("analytics.points")}
                         </span>
                       </div>
-                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
+                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light ">
                         {analysis.starAnalysis.taskFeedback}
                       </p>
                     </div>
@@ -784,7 +784,7 @@ const AnalyticsLayout = () => {
                           {Math.round(analysis.starAnalysis.actionScore)}{t("analytics.points")}
                         </span>
                       </div>
-                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
+                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light ">
                         {analysis.starAnalysis.actionFeedback}
                       </p>
                     </div>
@@ -801,7 +801,7 @@ const AnalyticsLayout = () => {
                           {Math.round(analysis.starAnalysis.resultScore)}{t("analytics.points")}
                         </span>
                       </div>
-                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light line-clamp-4">
+                      <p className="text-[0.65rem] text-[#cbc3d7]/60 leading-relaxed font-light ">
                         {analysis.starAnalysis.resultFeedback}
                       </p>
                     </div>
