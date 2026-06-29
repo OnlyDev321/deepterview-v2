@@ -392,5 +392,20 @@
   "share.modal_desc_off": "Sharing is currently disabled. Turn it on to generate a shareable link for your interview report.",
   "share.enable": "Enable Sharing",
   "share.disable": "Disable Sharing",
-  "share.copied": "Copied!"
+  "share.copied": "Copied!",
+
+  "public.header_badge": "Public Report · Read-only",
+  "public.session_label": "Interview Session",
+  "public.questions_label": "Questions & Answers",
+  "public.no_questions": "No questions found.",
+  "public.question_prefix": "Q",
+  "public.answer_label": "Answer",
+  "public.no_answer": "No answer provided.",
+  "public.footer": "Powered by Deepterview · AI Interview Coach",
+  "public.invalid_link_title": "Invalid Link",
+  "public.invalid_link_desc": "This report does not exist or sharing has been disabled.",
+  "public.invalid_link_error": "This share link is no longer valid or has been disabled.",
+  "public.go_home": "Go to Home",
+  "public.questions_count": "{{count}} / {{total}} questions",
+  "public.duration_format": "{{minutes}}min {{seconds}}s"
 }

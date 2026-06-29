@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   Trophy,
@@ -14,10 +15,12 @@ import {
   Lock,
 } from "lucide-react";
 import { sessionService } from "../services/sessionService";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 import type { SessionDetail } from "../types";
 
 const PublicReportPage = () => {
   const { shareToken } = useParams<{ shareToken: string }>();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +36,7 @@ const PublicReportPage = () => {
     sessionService
       .getPublicReport(shareToken)
       .then(setSession)
-      .catch(() => setError("Link chia sẻ không còn hợp lệ hoặc đã bị tắt."))
+      .catch(() => setError(t("public.invalid_link_error")))
       .finally(() => setIsLoading(false));
   }, [shareToken]);
 
@@ -52,8 +55,15 @@ const PublicReportPage = () => {
     const totalSeconds = Math.floor(diffMs / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes}ph ${seconds}s`;
+    return t("public.duration_format", { minutes, seconds });
   };
+
+  const localeStr =
+    i18n.language === "ko"
+      ? "ko-KR"
+      : i18n.language === "vi"
+        ? "vi-VN"
+        : "en-US";
 
   if (isLoading) {
     return (
@@ -69,15 +79,17 @@ const PublicReportPage = () => {
         <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
           <Lock size={28} className="text-red-400" />
         </div>
-        <h1 className="text-xl font-bold text-[#e1e2e7]">Link không hợp lệ</h1>
+        <h1 className="text-xl font-bold text-[#e1e2e7]">
+          {t("public.invalid_link_title")}
+        </h1>
         <p className="text-sm text-[#cbc3d7]/60 text-center max-w-sm">
-          {error ?? "Báo cáo này không tồn tại hoặc đã bị tắt chia sẻ."}
+          {error ?? t("public.invalid_link_desc")}
         </p>
         <button
           onClick={() => navigate("/")}
           className="mt-2 px-6 py-3 bg-[#9b7fed] text-white rounded-full text-sm font-bold hover:brightness-110 transition-all"
         >
-          Về trang chủ
+          {t("public.go_home")}
         </button>
       </div>
     );
@@ -97,9 +109,14 @@ const PublicReportPage = () => {
             Deepterview
           </span>
         </div>
-        <span className="text-[0.65rem] text-[#cbc3d7]/40 uppercase tracking-widest">
-          Báo cáo công khai · Read-only
-        </span>
+        <div className="scale-100 flex items-center gap-3">
+          <span className="text-[0.65rem] text-[#cbc3d7]/40 uppercase tracking-widest hidden sm:block">
+            {t("public.header_badge")}
+          </span>
+          <div className="scale-100 origin-right">
+            <LanguageSwitcher />
+          </div>
+        </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-10 space-y-8">
@@ -113,7 +130,7 @@ const PublicReportPage = () => {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/40 font-bold mb-1">
-                Phiên phỏng vấn
+                {t("public.session_label")}
               </p>
               <h1 className="text-2xl font-black text-[#e1e2e7]">
                 {session.jobTitle}
@@ -136,11 +153,14 @@ const PublicReportPage = () => {
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full text-xs text-[#cbc3d7]/70">
               <MessageSquare size={12} />
-              {answeredCount} / {session.totalQuestions} câu hỏi
+              {t("public.questions_count", {
+                count: answeredCount,
+                total: session.totalQuestions,
+              })}
             </div>
             {session.startedAt && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full text-xs text-[#cbc3d7]/70">
-                {new Date(session.startedAt).toLocaleString("vi-VN", {
+                {new Date(session.startedAt).toLocaleString(localeStr, {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -160,13 +180,15 @@ const PublicReportPage = () => {
           className="space-y-3"
         >
           <h2 className="text-[0.65rem] uppercase tracking-widest text-[#cbc3d7]/40 font-bold px-1">
-            Câu hỏi & Câu trả lời
+            {t("public.questions_label")}
           </h2>
 
           {session.questions.length === 0 ? (
             <div className="bg-[#191c1f] border border-[#494454]/20 rounded-2xl p-8 flex flex-col items-center gap-3">
               <AlertCircle size={24} className="text-[#cbc3d7]/30" />
-              <p className="text-sm text-[#cbc3d7]/40">Không có câu hỏi nào.</p>
+              <p className="text-sm text-[#cbc3d7]/40">
+                {t("public.no_questions")}
+              </p>
             </div>
           ) : (
             session.questions.map((q, idx) => {
@@ -185,14 +207,19 @@ const PublicReportPage = () => {
                   >
                     <div className="flex gap-3 items-start">
                       <span className="text-[0.6rem] font-black text-[#9b7fed] bg-[#9b7fed]/10 px-2 py-0.5 rounded-full uppercase tracking-widest shrink-0 mt-0.5">
-                        Q{idx + 1}
+                        {t("public.question_prefix")}
+                        {idx + 1}
                       </span>
                       <p className="text-sm text-[#e1e2e7]/90 font-medium leading-relaxed">
                         {q.content}
                       </p>
                     </div>
                     <div className="shrink-0 mt-0.5 text-[#cbc3d7]/40">
-                      {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      {isOpen ? (
+                        <ChevronUp size={16} />
+                      ) : (
+                        <ChevronDown size={16} />
+                      )}
                     </div>
                   </button>
 
@@ -204,12 +231,12 @@ const PublicReportPage = () => {
                       className="px-6 pb-5 border-t border-white/5"
                     >
                       <p className="text-[0.6rem] uppercase tracking-widest text-emerald-400/60 font-bold mt-4 mb-2">
-                        Câu trả lời
+                        {t("public.answer_label")}
                       </p>
                       <p className="text-sm text-[#cbc3d7]/80 leading-relaxed">
                         {q.answerText || (
                           <span className="text-[#cbc3d7]/30 italic">
-                            Chưa có câu trả lời.
+                            {t("public.no_answer")}
                           </span>
                         )}
                       </p>
@@ -224,7 +251,7 @@ const PublicReportPage = () => {
 
       {/* Footer */}
       <footer className="text-center py-8 text-[0.6rem] text-[#cbc3d7]/20 uppercase tracking-widest">
-        Được tạo bởi Deepterview · AI Interview Coach
+        {t("public.footer")}
       </footer>
     </div>
   );

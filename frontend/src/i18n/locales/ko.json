@@ -394,5 +394,20 @@
   "share.modal_desc_off": "공유가 현재 비활성화되어 있습니다. 켜서 면접 보고서의 공유 가능한 링크를 생성하세요.",
   "share.enable": "공유 활성화",
   "share.disable": "공유 비활성화",
-  "share.copied": "복사됨!"
+  "share.copied": "복사됨!",
+
+  "public.header_badge": "공개 보고서 · 읽기 전용",
+  "public.session_label": "면접 세션",
+  "public.questions_label": "질문 및 답변",
+  "public.no_questions": "질문이 없습니다.",
+  "public.question_prefix": "Q",
+  "public.answer_label": "답변",
+  "public.no_answer": "답변이 없습니다.",
+  "public.footer": "Deepterview 제공 · AI 면접 코치",
+  "public.invalid_link_title": "유효하지 않은 링크",
+  "public.invalid_link_desc": "이 보고서가 존재하지 않거나 공유가 비활성화되었습니다.",
+  "public.invalid_link_error": "이 공유 링크는 더 이상 유효하지 않거나 비활성화되었습니다.",
+  "public.go_home": "홈으로",
+  "public.questions_count": "{{count}} / {{total}}개 질문",
+  "public.duration_format": "{{minutes}}분 {{seconds}}초"
 }

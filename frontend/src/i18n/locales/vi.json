@@ -392,5 +392,20 @@
   "share.modal_desc_off": "Chia sẻ hiện đang tắt. Bật lên để tạo đường dẫn chia sẻ báo cáo phỏng vấn của bạn.",
   "share.enable": "Bật Chia sẻ",
   "share.disable": "Tắt Chia sẻ",
-  "share.copied": "Đã sao chép!"
+  "share.copied": "Đã sao chép!",
+
+  "public.header_badge": "Báo cáo công khai · Read-only",
+  "public.session_label": "Phiên phỏng vấn",
+  "public.questions_label": "Câu hỏi & Câu trả lời",
+  "public.no_questions": "Không có câu hỏi nào.",
+  "public.question_prefix": "Q",
+  "public.answer_label": "Câu trả lời",
+  "public.no_answer": "Chưa có câu trả lời.",
+  "public.footer": "Được tạo bởi Deepterview · AI Interview Coach",
+  "public.invalid_link_title": "Link không hợp lệ",
+  "public.invalid_link_desc": "Báo cáo này không tồn tại hoặc đã bị tắt chia sẻ.",
+  "public.invalid_link_error": "Link chia sẻ không còn hợp lệ hoặc đã bị tắt.",
+  "public.go_home": "Về trang chủ",
+  "public.questions_count": "{{count}} / {{total}} câu hỏi",
+  "public.duration_format": "{{minutes}}ph {{seconds}}s"
 }
