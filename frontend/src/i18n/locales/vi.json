@@ -385,5 +385,12 @@
   "page_title.history": "Lịch sử Phỏng vấn | Deepterview",
   "page_title.processing": "Đang phỏng vấn | Deepterview",
   "page_title.myinfo": "Thông tin của tôi | Deepterview",
-  "page_title.analytics": "Kết quả Phân tích Phỏng vấn | Deepterview"
+  "page_title.analytics": "Kết quả Phân tích Phỏng vấn | Deepterview",
+
+  "share.modal_title": "Chia sẻ Báo cáo",
+  "share.modal_desc_on": "Ai có đường dẫn này đều có thể xem báo cáo phỏng vấn của bạn ở chế độ chỉ đọc. Bạn có thể tắt chia sẻ bất kỳ lúc nào.",
+  "share.modal_desc_off": "Chia sẻ hiện đang tắt. Bật lên để tạo đường dẫn chia sẻ báo cáo phỏng vấn của bạn.",
+  "share.enable": "Bật Chia sẻ",
+  "share.disable": "Tắt Chia sẻ",
+  "share.copied": "Đã sao chép!"
 }

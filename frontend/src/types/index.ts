@@ -179,6 +179,8 @@ export interface SessionDetail {
   startedAt?: string | Date;
   endedAt?: string | Date;
   questions: QuestionResponse[];
+  shareToken?: string;
+  shareEnabled?: boolean;
 }
 
 // -------------------------------------------------------------

@@ -7,6 +7,7 @@ import com.capstone.deepterview.domain.interview.dto.response.AnalysisProgressRe
 import com.capstone.deepterview.domain.interview.dto.response.SessionDetailResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionListResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionStatusResponse;
+import com.capstone.deepterview.domain.interview.dto.response.ShareTokenResponse;
 import com.capstone.deepterview.domain.interview.service.InterviewService;
 import com.capstone.deepterview.domain.member.dto.response.UserPrincipal;
 import com.capstone.deepterview.global.common.ApiResponse;
@@ -113,5 +114,29 @@ public class InterviewController {
 			@PathVariable Long sessionId) {
 		interviewService.generateReport(principal.getId(), sessionId);
 		return ApiResponse.successMessage("정밀 분석이 시작되었습니다.");
+	}
+
+	@PostMapping("/{sessionId}/share")
+	@Operation(summary = "보고서 공유 링크 토글", description = "공유 상태 전환 (ON/OFF). 보고서가 없는 세션에는 토큰만 생성됩니다.")
+	public ApiResponse<ShareTokenResponse> toggleShare(
+			@AuthenticationPrincipal UserPrincipal principal,
+			@PathVariable Long sessionId) {
+		return ApiResponse.success(interviewService.toggleShare(principal.getId(), sessionId));
+	}
+}
+
+@Tag(name = "공개 API")
+@org.springframework.web.bind.annotation.RestController
+@RequiredArgsConstructor
+@org.springframework.web.bind.annotation.RequestMapping("/api/v1/public")
+class PublicReportController {
+
+	private final InterviewService interviewService;
+
+	@org.springframework.web.bind.annotation.GetMapping("/sessions/{shareToken}")
+	@Operation(summary = "공개 보고서 조회", description = "토큰으로 공개된 세션 보고서를 인증 없이 조회합니다.")
+	public ApiResponse<SessionDetailResponse> getPublicReport(
+			@PathVariable String shareToken) {
+		return ApiResponse.success(interviewService.getPublicSessionDetail(shareToken));
 	}
 }

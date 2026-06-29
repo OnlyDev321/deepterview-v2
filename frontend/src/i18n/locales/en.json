@@ -385,5 +385,12 @@
   "page_title.processing": "Interview in Progress | Deepterview",
   "page_title.history": "Interview History | Deepterview",
   "page_title.myinfo": "My Info | Deepterview",
-  "page_title.analytics": "Interview Analytics | Deepterview"
+  "page_title.analytics": "Interview Analytics | Deepterview",
+
+  "share.modal_title": "Share Report Link",
+  "share.modal_desc_on": "Anyone with this link can view your interview report in read-only mode. You can disable sharing at any time.",
+  "share.modal_desc_off": "Sharing is currently disabled. Turn it on to generate a shareable link for your interview report.",
+  "share.enable": "Enable Sharing",
+  "share.disable": "Disable Sharing",
+  "share.copied": "Copied!"
 }

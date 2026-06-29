@@ -387,5 +387,12 @@
   "page_title.processing": "면접 진행 중 | Deepterview",
   "page_title.history": "면접 내역 | Deepterview",
   "page_title.myinfo": "내 정보 | Deepterview",
-  "page_title.analytics": "면접 분석 결과 | Deepterview"
+  "page_title.analytics": "면접 분석 결과 | Deepterview",
+
+  "share.modal_title": "보고서 공유 링크",
+  "share.modal_desc_on": "이 링크를 가진 사람은 누구나 읽기 전용으로 면접 보고서를 볼 수 있습니다. 언제든지 공유를 비활성화할 수 있습니다.",
+  "share.modal_desc_off": "공유가 현재 비활성화되어 있습니다. 켜서 면접 보고서의 공유 가능한 링크를 생성하세요.",
+  "share.enable": "공유 활성화",
+  "share.disable": "공유 비활성화",
+  "share.copied": "복사됨!"
 }

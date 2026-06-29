@@ -49,8 +49,10 @@ export interface SessionListProps {
 
 export interface SessionDetailHeaderProps {
   session: InterviewSession;
+  shareEnabled?: boolean;
   onViewReport?: () => void;
   onDeleteSession?: () => void;
+  onShare?: () => void;
 }
 
 export interface UserProfile {

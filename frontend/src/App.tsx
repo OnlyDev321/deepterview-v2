@@ -11,6 +11,7 @@ import MyinfoLayout from "./layouts/DashboardLayout/MyinfoLayout";
 import AnalyticsLayout from "./layouts/DashboardLayout/AnalyticsLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
+import PublicReportPage from "./pages/PublicReportPage";
 
 import { useDocumentTitle } from "./hooks/useDocumentTitle";
 
@@ -22,6 +23,7 @@ function AppContent() {
       {/* Public Routes - Anyone can access */}
       <Route path="/" element={<Landing />} />
       <Route path="/oauth2/success" element={<OAuth2Success />} />
+      <Route path="/report/:shareToken" element={<PublicReportPage />} />
 
       {/* Auth Routes - Only for non-logged in users */}
       <Route element={<PublicRoute />}>

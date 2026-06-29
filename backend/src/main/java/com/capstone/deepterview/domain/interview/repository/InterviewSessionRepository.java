@@ -33,5 +33,8 @@ public interface InterviewSessionRepository extends JpaRepository<InterviewSessi
 
 	@EntityGraph(attributePaths = {"jobCategory", "questions"})
 	Optional<InterviewSession> findByIdAndUserId(Long id, Long userId);
+
+	@EntityGraph(attributePaths = {"jobCategory", "questions", "feedbackReport"})
+	Optional<InterviewSession> findByShareTokenAndShareEnabledTrue(String shareToken);
 }
 

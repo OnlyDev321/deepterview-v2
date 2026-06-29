@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.capstone.deepterview.domain.interview.domain.AnswerLanguage.KOREAN;
 
@@ -68,6 +69,12 @@ public class InterviewSession extends BaseTimeEntity {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
+	@Column(name = "share_token", unique = true, length = 36)
+	private String shareToken;
+
+	@Column(name = "share_enabled", nullable = false)
+	private boolean shareEnabled = false;
+
 	@OneToMany(mappedBy = "session")
 	private List<Question> questions = new ArrayList<>();
 
@@ -122,5 +129,17 @@ public class InterviewSession extends BaseTimeEntity {
 
 	public void updateResumeContent(String resumeContent) {
 		this.resumeContent = resumeContent;
+	}
+
+	public String enableShare() {
+		if (this.shareToken == null) {
+			this.shareToken = UUID.randomUUID().toString();
+		}
+		this.shareEnabled = true;
+		return this.shareToken;
+	}
+
+	public void disableShare() {
+		this.shareEnabled = false;
 	}
 }

@@ -14,6 +14,7 @@ import com.capstone.deepterview.domain.interview.dto.response.SessionListRespons
 import com.capstone.deepterview.domain.interview.dto.response.SessionListItemResponse;
 import com.capstone.deepterview.domain.interview.dto.response.AnalysisProgressResponse;
 import com.capstone.deepterview.domain.interview.dto.response.SessionStatusResponse;
+import com.capstone.deepterview.domain.interview.dto.response.ShareTokenResponse;
 import com.capstone.deepterview.domain.interview.repository.InterviewSessionRepository;
 import com.capstone.deepterview.domain.report.repository.FeedbackReportRepository;
 import com.capstone.deepterview.domain.interview.repository.JobCategoryRepository;
@@ -357,5 +358,32 @@ public class InterviewService {
 					return Question.create(session, content, questionType, order, 120);
 				})
 				.toList();
+	}
+
+	@Transactional
+	public ShareTokenResponse toggleShare(Long userId, Long sessionId) {
+		InterviewSession session = getOwnedSession(userId, sessionId);
+		if (session.isShareEnabled()) {
+			session.disableShare();
+			return new ShareTokenResponse(session.getShareToken(), false);
+		} else {
+			String token = session.enableShare();
+			return new ShareTokenResponse(token, true);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public SessionDetailResponse getPublicSessionDetail(String shareToken) {
+		InterviewSession session = interviewSessionRepository
+				.findByShareTokenAndShareEnabledTrue(shareToken)
+				.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "공유 링크를 찾을 수 없거나 비활성화되었습니다."));
+
+		List<QuestionResponse> questions = questionRepository
+				.findBySessionIdWithAnswerOrderByOrderNumAsc(session.getId())
+				.stream()
+				.map(QuestionResponse::from)
+				.toList();
+
+		return SessionDetailResponse.of(session, questions, null);
 	}
 }

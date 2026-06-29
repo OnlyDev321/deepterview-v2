@@ -5,8 +5,10 @@ import { Clock, FileText, MessageSquare, Share2, Trash2 } from "lucide-react";
 
 const SessionDetailHeader = ({
   session,
+  shareEnabled,
   onViewReport,
   onDeleteSession,
+  onShare,
 }: SessionDetailHeaderProps) => {
   const { t } = useTranslation();
   return (
@@ -80,8 +82,15 @@ const SessionDetailHeader = ({
 
         {/* Right: Buttons */}
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
-          <button className="flex items-center justify-center gap-2 px-4 h-10 bg-[#111417] border border-[#494454]/20 text-[#e1e2e7] rounded-full text-[0.65rem] font-bold uppercase tracking-widest hover:bg-[#191c1f] transition-all w-full sm:w-auto whitespace-nowrap">
-            <Share2 size={13} /> {t("history.share_report")}
+          <button
+            onClick={onShare}
+            className={`flex items-center justify-center gap-2 px-4 h-10 rounded-full text-[0.65rem] font-bold uppercase tracking-widest transition-all w-full sm:w-auto whitespace-nowrap cursor-pointer ${
+              shareEnabled
+                ? "bg-[#cebdff]/10 border border-[#cebdff]/30 text-[#cebdff] hover:bg-[#cebdff]/20"
+                : "bg-[#111417] border border-[#494454]/20 text-[#e1e2e7] hover:bg-[#191c1f]"
+            }`}
+          >
+            <Share2 size={13} className={shareEnabled ? "text-[#cebdff]" : ""} /> {t("history.share_report")}
           </button>
           <button
             onClick={onViewReport}

@@ -1,4 +1,5 @@
 import api from "../lib/api";
+import axios from "axios";
 import type {
   AnalysisProgress,
   ApiResponse,
@@ -7,6 +8,11 @@ import type {
   SessionDetail,
   SessionStatus,
 } from "../types";
+
+const publicApi = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "",
+  withCredentials: false,
+});
 
 export const sessionService = {
   getSessions: async (
@@ -97,6 +103,20 @@ export const sessionService = {
   getAnalysisProgress: async (sessionId: number): Promise<AnalysisProgress> => {
     const res = await api.get<ApiResponse<AnalysisProgress>>(
       `/api/v1/sessions/${sessionId}/analysis-progress`,
+    );
+    return res.data.data;
+  },
+
+  toggleShare: async (sessionId: number): Promise<{ shareToken: string; shareEnabled: boolean }> => {
+    const res = await api.post<ApiResponse<{ shareToken: string; shareEnabled: boolean }>>(
+      `/api/v1/sessions/${sessionId}/share`
+    );
+    return res.data.data;
+  },
+
+  getPublicReport: async (shareToken: string): Promise<SessionDetail> => {
+    const res = await publicApi.get<ApiResponse<SessionDetail>>(
+      `/api/v1/public/sessions/${shareToken}`
     );
     return res.data.data;
   },

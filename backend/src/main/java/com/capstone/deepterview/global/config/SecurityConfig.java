@@ -50,6 +50,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/api/v1/job-categories").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
 						.requestMatchers("/api/v1/internal/**").permitAll()
+						.requestMatchers("/api/v1/public/**").permitAll()
 						.requestMatchers("/oauth2/**", "/login/**").permitAll()
 						.anyRequest().authenticated()
 				)

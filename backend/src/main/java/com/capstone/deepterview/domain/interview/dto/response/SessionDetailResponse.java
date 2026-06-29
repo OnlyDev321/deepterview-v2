@@ -21,7 +21,9 @@ public record SessionDetailResponse(
 		int totalQuestions,
 		LocalDateTime startedAt,
 		LocalDateTime endedAt,
-		List<QuestionResponse> questions) {
+		List<QuestionResponse> questions,
+		String shareToken,
+		boolean shareEnabled) {
 	public static SessionDetailResponse of(InterviewSession session, List<QuestionResponse> questions, Map<Long, JobCategoryTranslation> translationMap) {
 		String name = session.getJobCategory().getName();
 		if (translationMap != null) {
@@ -41,6 +43,8 @@ public record SessionDetailResponse(
 				session.getTotalQuestions(),
 				session.getStartedAt(),
 				session.getEndedAt(),
-				questions);
+				questions,
+				session.getShareToken(),
+				session.isShareEnabled());
 	}
 }

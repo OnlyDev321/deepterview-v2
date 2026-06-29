@@ -13,6 +13,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SessionList from "../../components/dashboard/history/SessionList";
 import SessionDetailHeader from "../../components/dashboard/history/SessionDetailHeader";
 import InterviewTimeline from "../../components/dashboard/history/InterviewTimeline";
+import ShareModal from "../../components/dashboard/history/ShareModal";
 
 import { sessionService } from "../../services/sessionService";
 import { reportService } from "../../services/reportService";
@@ -58,6 +59,8 @@ const HistoryLayout = () => {
   const [selectedJobCategoryId, setSelectedJobCategoryId] = useState<number | null>(null);
   const [selectedDays, setSelectedDays] = useState<number | null>(0);
   const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareState, setShareState] = useState<{ shareToken: string; shareEnabled: boolean } | null>(null);
 
   const loadSessionsList = async (
     shouldAutoSelect: boolean = true,
@@ -254,6 +257,26 @@ const HistoryLayout = () => {
     }
   };
 
+  const handleShareClick = () => {
+    if (!sessionDetail) return;
+    setShareState({
+      shareToken: sessionDetail.shareToken || "",
+      shareEnabled: sessionDetail.shareEnabled || false,
+    });
+    setShowShareModal(true);
+  };
+
+  const handleShareToggle = async () => {
+    if (!selectedSessionId || !shareState) return;
+    try {
+      const res = await sessionService.toggleShare(selectedSessionId);
+      setShareState(res);
+      await loadSessionData(selectedSessionId);
+    } catch (err) {
+      console.error("Failed to toggle share:", err);
+    }
+  };
+
   const handleDeleteSession = async () => {
     if (!selectedSessionId) return;
 
@@ -401,8 +424,10 @@ const HistoryLayout = () => {
               <>
                 <SessionDetailHeader
                   session={selectedMappedSession}
+                  shareEnabled={sessionDetail?.shareEnabled ?? false}
                   onViewReport={handleViewReport}
                   onDeleteSession={handleDeleteSession}
+                  onShare={handleShareClick}
                 />
 
                 {!sessionReport &&
@@ -522,6 +547,15 @@ const HistoryLayout = () => {
                     onNavigateToAnalysis={handleNavigateToAnalysis}
                   />
                 </motion.div>
+
+                {showShareModal && shareState && (
+                  <ShareModal
+                    shareToken={shareState.shareToken}
+                    shareEnabled={shareState.shareEnabled}
+                    onClose={() => setShowShareModal(false)}
+                    onToggle={handleShareToggle}
+                  />
+                )}
               </>
             )}
           </motion.div>
