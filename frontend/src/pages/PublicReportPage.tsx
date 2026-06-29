@@ -49,7 +49,7 @@ const PublicReportPage = () => {
     });
   };
 
-  const formatDuration = (startedAt?: string, endedAt?: string) => {
+  const formatDuration = (startedAt?: string | Date, endedAt?: string | Date) => {
     if (!startedAt || !endedAt) return "—";
     const diffMs = new Date(endedAt).getTime() - new Date(startedAt).getTime();
     const totalSeconds = Math.floor(diffMs / 1000);
