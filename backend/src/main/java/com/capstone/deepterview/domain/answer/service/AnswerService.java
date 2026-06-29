@@ -83,7 +83,7 @@ public class AnswerService {
 					followUpContent,
 					question.getQuestionType(),
 					question.getOrderNum() + 1,
-					120
+					180
 			);
 			questionRepository.save(nextQuestion);
 		}

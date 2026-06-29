@@ -128,7 +128,7 @@ public class InterviewService {
 				initialContent,
 				QuestionType.TECHNICAL,
 				1,
-				120
+				180
 		);
 		questionRepository.save(initialQuestion);
 
@@ -355,7 +355,7 @@ public class InterviewService {
 					String content = String.format("[%s %s] 모의 질문 %d번입니다. 본인의 경험을 기반으로 답변해주세요.", sessionType,
 							careerLabel, order);
 					// TODO: LLM 연동 후 직무/경력 기반 질문 생성으로 대체
-					return Question.create(session, content, questionType, order, 120);
+					return Question.create(session, content, questionType, order, 180);
 				})
 				.toList();
 	}
