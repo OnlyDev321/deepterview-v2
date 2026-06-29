@@ -8,7 +8,7 @@ import {
   FileText,
   Loader,
 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 import SessionList from "../../components/dashboard/history/SessionList";
 import SessionDetailHeader from "../../components/dashboard/history/SessionDetailHeader";
@@ -34,6 +34,7 @@ const HistoryLayout = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const focusSessionId = (location.state as { focusSessionId?: number } | null)
     ?.focusSessionId;
   const reportReadyNotice = (location.state as { reportReady?: boolean } | null)
@@ -56,11 +57,67 @@ const HistoryLayout = () => {
   const [successBanner, setSuccessBanner] = useState<string | null>(
     reportReadyNotice ? t("history.ai_report_ready") : null,
   );
-  const [selectedJobCategoryId, setSelectedJobCategoryId] = useState<number | null>(null);
-  const [selectedDays, setSelectedDays] = useState<number | null>(0);
-  const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareState, setShareState] = useState<{ shareToken: string; shareEnabled: boolean } | null>(null);
+  const [jobCategories, setJobCategories] = useState<JobCategory[]>([]);
+
+  // Filters: sessionStorage persists across navigation (not across tabs)
+  const STORAGE_KEY = "historyFilters";
+  const loadFilter = (key: string, fallback: string) => {
+    try {
+      return sessionStorage.getItem(`${STORAGE_KEY}.${key}`) || fallback;
+    } catch { return fallback; }
+  };
+  const saveFilter = (key: string, val: string) => {
+    try { sessionStorage.setItem(`${STORAGE_KEY}.${key}`, val); } catch { /* noop */ }
+  };
+
+  const initDays = () => {
+    const url = searchParams.get("days");
+    if (url) return url;
+    const saved = loadFilter("days", "0");
+    return saved === "null" ? "0" : saved;
+  };
+  const initCategory = () => {
+    const url = searchParams.get("category");
+    if (url) return url;
+    const saved = loadFilter("category", "all");
+    return saved === "null" ? "all" : saved;
+  };
+
+  const [daysParam, setDaysParamState] = useState(initDays);
+  const [categoryParam, setCategoryParamState] = useState(initCategory);
+
+  const parseDays = (v: string) => {
+    const n = parseInt(v, 10);
+    return isNaN(n) ? 0 : n;
+  };
+  const parseCategory = (v: string) => {
+    const n = parseInt(v, 10);
+    return isNaN(n) ? null : n;
+  };
+
+  const selectedDays = daysParam === "all" || daysParam === "null" ? null : parseDays(daysParam);
+  const selectedJobCategoryId = categoryParam === "all" || categoryParam === "null" ? null : parseCategory(categoryParam);
+
+  const updateFilter = (key: string, val: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set(key, val);
+    setSearchParams(params, { replace: true });
+    saveFilter(key, val);
+  };
+
+  const setDaysFilter = useCallback((days: number | null) => {
+    const val = days == null ? "all" : String(days);
+    setDaysParamState(val);
+    updateFilter("days", val);
+  }, [searchParams, setSearchParams]);
+
+  const setCategoryFilter = useCallback((categoryId: number | null) => {
+    const val = categoryId == null ? "all" : String(categoryId);
+    setCategoryParamState(val);
+    updateFilter("category", val);
+  }, [searchParams, setSearchParams]);
 
   const loadSessionsList = async (
     shouldAutoSelect: boolean = true,
@@ -328,12 +385,12 @@ const HistoryLayout = () => {
         <div className="flex items-center gap-4">
           <DateFilter
             value={selectedDays}
-            onChange={(days) => setSelectedDays(days)}
+            onChange={setDaysFilter}
           />
           <JobCategoryFilter
             categories={jobCategories}
             selectedId={selectedJobCategoryId}
-            onChange={(id) => setSelectedJobCategoryId(id)}
+            onChange={setCategoryFilter}
           />
         </div>
       </motion.div>
